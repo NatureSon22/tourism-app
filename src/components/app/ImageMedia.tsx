@@ -1,10 +1,10 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-export default function SignIn() {
+export default function ImageMedia() {
   return (
     <View>
-      <Text>SignIn</Text>
+      <Text>ImageMedia</Text>
     </View>
   );
 }

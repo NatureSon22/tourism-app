@@ -1,4 +1,5 @@
 import type { PlaceList } from "@/src/constants/placeList";
+import { Colors, Typography } from "@/src/constants/styles";
 import formatCurrency from "@/src/utils/currency";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
@@ -38,8 +39,9 @@ export default function PlaceCard({
           overflow: "hidden",
         }}
       >
+        {/* for online source use uri */}
         <Image
-          source={{ uri: imageUrl }}
+          source={imageUrl}
           placeholder={{ blurhash }}
           contentFit="cover"
           transition={400}
@@ -49,9 +51,8 @@ export default function PlaceCard({
         <View
           style={{
             position: "absolute",
-            bottom: 8,
-            left: 8,
-            backgroundColor: "rgba(0,0,0,0.6)",
+            bottom: 3,
+            left: 3,
             borderRadius: 6,
             paddingHorizontal: 8,
             paddingVertical: 4,
@@ -64,7 +65,11 @@ export default function PlaceCard({
           <FontAwesome6 name="location-dot" size={10} color="white" />
           <Text
             numberOfLines={1}
-            style={{ color: "white", fontWeight: "700", fontSize: 12 }}
+            style={{
+              color: "white",
+              fontSize: 11,
+              fontFamily: Typography.family.regular,
+            }}
           >
             {name}
           </Text>
@@ -72,18 +77,21 @@ export default function PlaceCard({
       </View>
 
       <View style={{ gap: 5, padding: 8 }}>
-        <Text numberOfLines={1} style={{ fontSize: 12, fontWeight: "600" }}>
+        <Text
+          numberOfLines={1}
+          style={{ fontSize: 11, fontFamily: Typography.family.medium }}
+        >
           {location}
         </Text>
 
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
-          <FontAwesome6 name="star" size={10} color="#FBBF24" solid />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
+          <FontAwesome6 name="star" size={10} color="#E28F0B" solid />
           <Text
             style={{
               marginLeft: 4,
               fontSize: 10,
-              fontWeight: "700",
-              color: "#FBBF24",
+              fontFamily: Typography.family.medium,
+              color: "#E28F0B",
             }}
           >
             {rating}
@@ -92,15 +100,23 @@ export default function PlaceCard({
             style={{
               marginLeft: 4,
               fontSize: 10,
-              fontWeight: "700",
-              color: "#374151",
+              fontFamily: Typography.family.medium,
+              color: Colors.textDimmed,
             }}
           >
             ({reviews})
           </Text>
         </View>
 
-        <Text style={{ fontSize: 12 }}>From {formatCurrency(price)}</Text>
+        <Text
+          style={{
+            fontSize: 12,
+            fontFamily: Typography.family.medium,
+            color: Colors.textMuted,
+          }}
+        >
+          From {formatCurrency(price)}
+        </Text>
       </View>
     </View>
   );

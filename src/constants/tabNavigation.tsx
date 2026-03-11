@@ -1,30 +1,36 @@
-import Entypo from "@expo/vector-icons/Entypo";
+import { ImageSourcePropType } from "react-native";
 
-const TABNAVIGATION = [
+type TabNavigationItem = {
+  name: string;
+  path: string;
+  icon: ImageSourcePropType;
+};
+
+const TABNAVIGATION: TabNavigationItem[] = [
   {
-    name: "Tours",
-    path: "/tours",
-    icon: <Entypo name="globe" size={24} color="black" />,
-  },
-  {
-    name: "Hotels",
+    name: "Hotels & Lodges",
     path: "/hotels",
-    icon: <Entypo name="globe" size={24} color="black" />,
+    icon: require("../assets/images/hotels.png"),
   },
   {
-    name: "Food",
+    name: "Food & Dining",
     path: "/food",
-    icon: <Entypo name="globe" size={24} color="black" />,
+    icon: require("../assets/images/food.png"),
   },
   {
-    name: "Events",
+    name: "General Activities",
+    path: "/activity",
+    icon: require("../assets/images/general.png"),
+  },
+  {
+    name: "Events & Festivals",
     path: "/events",
-    icon: <Entypo name="globe" size={24} color="black" />,
+    icon: require("../assets/images/events.png"),
   },
   {
     name: "More",
     path: "/more",
-    icon: <Entypo name="globe" size={24} color="black" />,
+    icon: require("../assets/images/more.png"),
   },
 ];
 

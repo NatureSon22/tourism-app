@@ -1,4 +1,4 @@
-const imagePlaceholder = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY8N8Ne2eepwalQRav5liU3NU5o4ZCRPArEg&s";
+const imagePlaceholder = require("../assets/images/imagecontainer.png");
 
 export type PlaceList = {
   id: number;

@@ -1,0 +1,135 @@
+<View>
+    <Hstack>
+        <View>
+            <Image source={imageUrl} />    
+        </View>
+
+        <VStack>
+            <Text>name</Text>
+            
+            <Text>location</Text>
+            
+            <Vstack>
+                <Text>>{distanceFromCityCenter} away</Text>
+                <HStack>
+                    with star
+                    <View>rating</View> 
+                    <Text>reviewrs</Text>
+                </HStack>
+            </Vstack>
+
+            <View>pricePerNight</View>
+        </VStack>
+    
+    </Hstack>
+</View>
+
+data 
+    accessToken
+    refreshToken
+    user: id, email
+message
+
+
+states:
+    selectedStar = 4
+    reviewScore = 3
+    propertyType = hotel
+    accomodationType = []
+    ammenities = []
+
+
+<ActionSheet>
+    <View>
+        header
+        <View>
+            <Text>Filter</Text>
+        </View>
+
+        body
+        <View>
+            <VStack>
+                <Text>Star Rating</Text>
+                map: [2, 3, 4, 5] // display in row
+                    <View><=2 <IconStar/> </View>
+                    <View><=2 <IconStar/> </View>
+                    <View><=2 <IconStar/> </View>
+                    <View><=2 <IconStar/> </View>
+            </Vstack>
+
+             <VStack>
+                <Text>Review Score</Text>
+                map: [3, 3.5, 4+, 4.5+] // display in grid (2 columns)
+                    <View> 3+ Comfort </View>
+                    <View> 3.5+ Good </View>
+                    ... so on
+            </Vstack>
+
+            <VStack>
+                <Text>Property Type</Text>
+                map: [Hotel, Resort , Airbnb] // use the customradiogroup
+                    Hotel
+                    Resort
+                    Airbnb
+            </Vstack>
+
+            <VStack>
+                <Text>Accommodation Type</Text>
+                map: [Beach Hotel, Budget Hotel, Botique Hotel, Business Hotel, Luxury Hotel] // display in flex-wrap
+                    <View>Beach Hotel</View>
+                    <View>Budget Hotel</View>
+                    ... so on
+            </Vstack>
+
+            <VStack>
+                <Text>Accommodation Type</Text>
+                map: [24-hour front desk, free wifi, free Parking, so on...] // display using checkbox 
+                    <View>
+                        <CheckBox /> 24-hour front desk
+                    </View>
+                     <View>
+                        <CheckBox /> free wifi
+                    </View>
+                     <View>
+                        <CheckBox /> free Parking
+                    </View>
+                    <Button>See all</Button> show the rest of the list
+            </Vstack>
+        </View>
+
+
+        footer
+        <View>
+            <Pressable>Clear</Pressable>
+            <CustomButton>Show Results</CustomButton>
+        </View>
+    </View>
+</ActionSheet>
+
+
+
+custom popup menu
+
+// popup menu item
+props:
+    isSelected
+    Icon
+    label
+
+
+// the menu
+props:
+    triggerButton
+    options: PopUpOptions[]
+<>
+
+    <TriggerMenu>
+        button
+    </TriggerMenu>
+
+    <Content>
+        {
+            options.map
+        }
+    </Content>
+<>

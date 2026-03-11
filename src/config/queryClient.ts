@@ -1,4 +1,5 @@
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryClient } from "@tanstack/react-query";
+import Toast from "react-native-toast-message";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,6 +16,19 @@ const queryClient = new QueryClient({
       throwOnError: true,
     },
   },
+  mutationCache: new MutationCache({
+    onError: (error: any, _variables, _context, mutation) => {
+      console.error("Mutation error:", error);
+      // const shouldShowToast = mutation.meta?.showErrorToast ?? true; // Default to true if not specified
+
+      // if (shouldShowToast) {
+      //   Toast.show({
+      //     type: "error",
+      //     text1: error.message || "An error occurred",
+      //   });
+      // }
+    },
+  }),
 });
 
 export default queryClient;
