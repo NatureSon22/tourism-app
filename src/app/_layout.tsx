@@ -141,6 +141,8 @@ function Routes() {
         <Sheets />
         <KeyboardProvider>
           <Stack screenOptions={{ headerShown: false }}>
+            {/* <StatusBar backgroundColor="#ffffff" style="dark" /> */}
+
             {/* If no user object exists, go to Auth */}
             <Stack.Protected guard={!user}>
               <Stack.Screen name="(auth)" />
@@ -153,6 +155,7 @@ function Routes() {
 
             {/* User exists and onboarding is done */}
             <Stack.Protected guard={!!user && onBoardingCompleted}>
+              <Stack.Screen name="(dining)" />
               <Stack.Screen name="(bookmark)" />
               <Stack.Screen name="(accommodation)" />
               <Stack.Screen name="(main)" />

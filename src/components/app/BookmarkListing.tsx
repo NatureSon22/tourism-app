@@ -41,10 +41,13 @@ export default function BookmarkListing() {
         !isConnected ? (
           <ReloadPage
             refetch={() => {}}
-            message="Listings failed to load. Retry loading the page."
+            message="Couldn't load bookmarks. Check your connection and try again."
           />
         ) : notFound ? (
-          <NoResourceFound message="Oh no! There’s no accommodation that matches the search or filter criteria." />
+          <NoResourceFound
+            message="Oh no! There are no saved bookmarks."
+            onRetry={() => {}}
+          />
         ) : (
           <></>
         )

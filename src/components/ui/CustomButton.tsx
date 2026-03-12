@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.family.bold,
     fontSize: 16,
     fontWeight: Typography.weight.bold,
+    includeFontPadding: false,
   },
   solidContainer: {
     backgroundColor: Colors.primary,

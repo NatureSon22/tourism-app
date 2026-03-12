@@ -1,4 +1,4 @@
-import FormCard from "@/src/components/app/FormCard";
+import FormCard from "@/src/components/app/ForumCard";
 import forumData from "@/src/constants/forum";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";

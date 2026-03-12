@@ -71,7 +71,7 @@ export default function AccommodationPage() {
             }
           />
         </HStack>
-        
+
         <View style={{ paddingHorizontal: 10 }}>
           <HStack justifyContent="space-around">
             <Pressable onPress={() => handleAreaPress("area-sheet")}>
@@ -150,7 +150,10 @@ export default function AccommodationPage() {
                 message="Listings failed to load. Retry loading the page."
               />
             ) : notFound ? (
-              <NoResourceFound message="Oh no! There’s no accommodation that matches the search or filter criteria." />
+              <NoResourceFound
+                message="Oh no! There’s no accommodation that matches the search or filter criteria."
+                onRetry={() => {}}
+              />
             ) : (
               <></>
             )

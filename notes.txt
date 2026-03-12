@@ -133,3 +133,8 @@ props:
         }
     </Content>
 <>
+
+
+i created the pages for the tourism app which consists of the bookmark and accodation. accomodation which shows different place the users can visit.
+the bookmark where they can see see their saved listings and forums. Along the way i create custom componnets like popupmenu. 
+I also learned about flatlist like the Listemptycomponent for handling no connection for refresh pull and no data found.  

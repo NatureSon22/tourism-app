@@ -1,3 +1,4 @@
+import { BOOKMARK_ICON } from "@/src/constants/assetsPath";
 import { Listing } from "@/src/constants/listings";
 
 import { Colors, Typography } from "@/src/constants/styles";
@@ -21,8 +22,15 @@ export default function BookmarkListingCard({
 }: Props) {
   return (
     <View style={styles.card}>
-      <HStack gap={17} alignItems="flex-start">
-        <Image source={imageUrl} contentFit="cover" style={styles.image} />
+      <HStack gap={17} alignItems="stretch">
+        <View style={styles.imageWrapper}>
+          <Image source={imageUrl} contentFit="cover" style={styles.image} />
+          <Image
+            source={BOOKMARK_ICON}
+            contentFit="contain"
+            style={styles.bookmarkIcon}
+          />
+        </View>
 
         <VStack style={styles.content} gap={5}>
           <Text style={styles.name} numberOfLines={1}>
@@ -51,13 +59,26 @@ export default function BookmarkListingCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
-    alignItems: "flex-start",
+  },
+  imageWrapper: {
+    width: 95,
+    height: 105,
+    borderRadius: 10,
+    overflow: "hidden",
+    position: "relative",
   },
   image: {
     width: 95,
     height: "100%",
     borderRadius: 10,
     backgroundColor: Colors.background,
+  },
+  bookmarkIcon: {
+    position: "absolute",
+    top: 5,
+    right: 6,
+    width: 20,
+    height: 20,
   },
   content: {
     flex: 1,
@@ -92,6 +113,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Typography.family.semiBold,
     color: "#334155",
-    alignSelf: "flex-end",
+    alignSelf: "flex-start",
   },
 });

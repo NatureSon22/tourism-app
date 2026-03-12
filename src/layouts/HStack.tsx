@@ -1,9 +1,9 @@
 import React, { ReactNode } from "react";
-import { View } from "react-native";
+import { View, type StyleProp, type ViewStyle } from "react-native";
 
 type HStackProps = {
   gap?: number;
-  alignItems?: "flex-start" | "center" | "flex-end" | "stretch";
+  alignItems?: "flex-start" | "center" | "flex-end";
   justifyContent?:
     | "flex-start"
     | "center"
@@ -11,6 +11,7 @@ type HStackProps = {
     | "space-between"
     | "space-around";
   children: ReactNode;
+  style?: StyleProp<ViewStyle>;
 };
 
 export default function HStack({
@@ -18,15 +19,19 @@ export default function HStack({
   children,
   alignItems,
   justifyContent,
+  style,
 }: HStackProps) {
   return (
     <View
-      style={{
-        flexDirection: "row",
-        alignItems: alignItems || "center",
-        justifyContent: justifyContent || "center",
-        gap,
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          alignItems: alignItems || "center",
+          justifyContent: justifyContent || "center",
+          gap,
+        },
+        style,
+      ]}
     >
       {children}
     </View>

@@ -1,7 +1,12 @@
+import BookmarkForum from "@/src/components/app/BookmarkForum";
 import BookmarkListing from "@/src/components/app/BookmarkListing";
+
 import CustomPopupMenu from "@/src/components/ui/CustomPopupMenu";
+import FORUMS_OPTIONS, {
+  ForumsOptionValue,
+} from "@/src/constants/forumsFilter";
 import LISTING_OPTIONS, {
-    type ListingOptionValue,
+  type ListingOptionValue,
 } from "@/src/constants/listingsFilter";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
@@ -12,12 +17,16 @@ import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 export default function Bookmark() {
-  const [section, setSection] = useState<"listing" | "forum">("listing");
-  const [selectedFilter, setSelectedFilter] =
-    useState<ListingOptionValue>("accommodation");
+  const [section, setSection] = useState<"listing" | "forum">("forum");
+  const [selectedFilter, setSelectedFilter] = useState<
+    ListingOptionValue | ForumsOptionValue
+  >("accommodation");
 
   const handleSetSection = (section: "listing" | "forum") => {
     setSection(section);
+    setSelectedFilter(
+      section === "listing" ? "accommodation" : "tourist_spots_and_attractions",
+    );
   };
 
   return (
@@ -81,10 +90,14 @@ export default function Bookmark() {
 
           {/* filter */}
           <CustomPopupMenu
-            options={LISTING_OPTIONS}
+            options={section === "listing" ? LISTING_OPTIONS : FORUMS_OPTIONS}
             selectedValue={selectedFilter}
             onSelect={setSelectedFilter}
-            menuStyle={{ width: 220, padding: 10 }}
+            // TODO: make the width dynamic based on the longest option label
+            menuStyle={{
+              width: section === "listing" ? 220 : 255,
+              padding: 10,
+            }}
             triggerButton={
               <View
                 style={{
@@ -118,7 +131,7 @@ export default function Bookmark() {
         </HStack>
 
         {/* body */}
-        {section === "listing" ? <BookmarkListing /> : <></>}
+        {section === "listing" ? <BookmarkListing /> : <BookmarkForum />}
       </Screen>
     </SafeArea>
   );
