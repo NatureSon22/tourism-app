@@ -7,69 +7,35 @@ import Screen from "@/src/layouts/Screen";
 import VStack from "@/src/layouts/VStack";
 import { Image } from "expo-image";
 import React from "react";
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-export default function SignIn() {
+export default function SignUp() {
   return (
     <KeyBoardAvoid>
       <Screen>
         <Center>
-          <View
-            style={{
-              padding: 16,
-              width: "100%",
-              gap: 30,
-            }}
-          >
-            {/* logo */}
-            <View style={{ gap: 5 }}>
-              <View
-                style={{
-                  width: 190,
-                  height: 80,
-                  alignSelf: "center",
-                }}
-              >
+          <View style={styles.formContainer}>
+            {/* Logo Section */}
+            <View style={styles.header}>
+              <View style={styles.logoWrapper}>
                 <Image
                   source={LOGO_IMAGE}
                   contentFit="contain"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                  }}
+                  style={styles.logo}
                 />
               </View>
 
-              <VStack
-                gap={3}
-                style={{
-                  alignItems: "center",
-                  alignSelf: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontFamily: Typography.family.mediumItalic,
-                    textAlign: "center",
-                  }}
-                >
+              <VStack gap={3} style={styles.textGroup}>
+                <Text style={styles.tagline}>
                   Where the real adventure begins
                 </Text>
-                <Text
-                  style={{
-                    fontSize: 11,
-                    fontFamily: Typography.family.regular,
-                    color: Colors.textMuted,
-                    textAlign: "center",
-                  }}
-                >
-                  Please login to continue
+                <Text style={styles.instruction}>
+                  Please sign up to continue
                 </Text>
               </VStack>
             </View>
 
-            {/* form */}
+            {/* Form Section */}
             <SignUpForm />
           </View>
         </Center>
@@ -77,3 +43,38 @@ export default function SignIn() {
     </KeyBoardAvoid>
   );
 }
+
+const styles = StyleSheet.create({
+  formContainer: {
+    padding: 16,
+    width: "100%",
+    gap: 30,
+  },
+  header: {
+    gap: 5,
+  },
+  logoWrapper: {
+    width: 190,
+    height: 80,
+    alignSelf: "center",
+  },
+  logo: {
+    width: "100%",
+    height: "100%",
+  },
+  textGroup: {
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  tagline: {
+    fontSize: 13,
+    fontFamily: Typography.family.mediumItalic,
+    textAlign: "center",
+  },
+  instruction: {
+    fontSize: 11,
+    fontFamily: Typography.family.regular,
+    color: Colors.textMuted,
+    textAlign: "center",
+  },
+});

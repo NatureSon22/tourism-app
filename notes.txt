@@ -135,6 +135,114 @@ props:
 <>
 
 
-i created the pages for the tourism app which consists of the bookmark and accodation. accomodation which shows different place the users can visit.
-the bookmark where they can see see their saved listings and forums. Along the way i create custom componnets like popupmenu. 
-I also learned about flatlist like the Listemptycomponent for handling no connection for refresh pull and no data found.  
+export type Dining = {
+  id: number;
+  name: string;
+  location: string;
+  price: number; 
+  rating: number;
+  reviews: number;
+  books: number;
+  distanceFromCityCenter: number;
+  types: string[];
+  images: string[];
+};
+
+
+<VStack>
+    <HStack>
+        name
+        {location}km away
+    </HStack>
+
+    types.map() // flex wrap
+
+    images.map
+        - for the last image if more than 5
+        -   <View>
+                <Image />
+                <Text>+remainig more</Text>
+            </View>
+
+    <Hstack>
+        location
+        price
+    </Hstack>
+</VStack>
+
+
+<screen>
+
+<scrollview>
+    <images></images>
+
+
+
+</scrollview>
+
+<footer></footer>
+
+</screen>
+
+// general information
+// terms & conditions
+// community forums
+// reviews
+// what to expect
+
+
+// when clicked, the desciption will show (if any)
+<View>
+    <Image></Image>
+
+    <VStack>
+        <HStack>
+            <icon>^</icon>
+            <View>name</View>
+        </HStack>
+
+        <View>descripton</View>
+    </VStack>
+</View>
+
+i created the listing page for the accomodation detials. it is in different section for general information, terms and conditons, reviews and what to expect, and
+community forum
+
+GOAL: REFACTOR ACCOMMODATION MODULE FOR PERFORMANCE AND REUSABILITY
+
+1. COMPONENTS & STRUCTURE
+    - Move all accommodation-specific components to: @/src/components/app/activity/
+    - Extract FlatList into: ActivityList.tsx
+        - it will hold the query hook
+        -it  will only receive the search and filter as props
+        * Logic: Use ListEmptyState from the src/components/ListEmptyState for handling Offline, and No Results.
+    - create a ActivityCardSkeleton using the Skeleton component from src/component/skeleton
+
+2. STYLING (Zero Inline Policy)
+    - All components must use StyleSheet.create().
+    - Standardize spacing using the existing Typography and Colors constants.
+    - Ensure hitSlop is applied to all navigation icons/buttons to improve UX.
+
+3. STATE MANAGEMENT
+    - UI State: [search, setSearch] for the header search bar.
+    - Performance State: useDebounce(search) to delay API calls/filtering.
+
+4. SERVICES & API
+    - Create: @/src/services/activityService.ts
+    - Structure: Export an object 'activity' containing:
+        * getAvailableAccommodations: (params) => Promise<Data>
+
+5. CUSTOM QUERY HOOKS (The "Brain")
+    - Folder: @/src/hooks/activity/
+    - File: useActivity.ts
+    - Logic: 
+        * Consume the debouncedSearch value as a dependency.
+        * Use TanStack Query (useQuery) for caching and status tracking.
+        * Return: { data, isLoading, isFetched, refetch }.
+
+6. EMPTY STATE & SKELETONS
+    - Use the ListEmptyState.tsx as the primary empty-handler.
+    - Use the Skeletons.tsx from the src/components/Skeleton
+    - Props to pass:
+        * isEmpty: (!isLoading && isFetched && data.length === 0) -> Renders NoResourceFound.
+        * isConnected: From useNetInfo -> Renders ReloadPage.

@@ -9,12 +9,12 @@ type TabNavigationItem = {
 const TABNAVIGATION: TabNavigationItem[] = [
   {
     name: "Hotels & Lodges",
-    path: "/hotels",
+    path: "/accommodation",
     icon: require("../assets/images/hotels.png"),
   },
   {
     name: "Food & Dining",
-    path: "/food",
+    path: "/dining",
     icon: require("../assets/images/food.png"),
   },
   {
@@ -24,7 +24,7 @@ const TABNAVIGATION: TabNavigationItem[] = [
   },
   {
     name: "Events & Festivals",
-    path: "/events",
+    path: "/event",
     icon: require("../assets/images/events.png"),
   },
   {

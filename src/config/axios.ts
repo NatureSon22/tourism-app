@@ -1,12 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import * as Keychain from "react-native-keychain";
-import {
-  EXPO_SERVICE_NAME,
-  IS_EXPO_GO,
-  TEMP_TOKEN_KEY,
-} from "../config/constants";
 import useAuthStore from "../stores/authStore";
+import { tokenStorage } from "../utils/tokenStorage";
 
 export type ApiResponse<T> = {
   success: boolean;
@@ -14,31 +9,30 @@ export type ApiResponse<T> = {
   data: T;
 };
 
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) prom.reject(error);
+    else prom.resolve(token);
+  });
+  failedQueue = [];
+};
+
 const api = axios.create({
   baseURL: process.env.EXPO_PUBLIC_BACKEND_URL || "http://localhost:3333",
-  timeout: 5000,
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
-    Accept: "application/json",
   },
 });
-
-// Helper to get tokens based on environment
-const getStoredTokens = async () => {
-  if (IS_EXPO_GO) {
-    const raw = await AsyncStorage.getItem(TEMP_TOKEN_KEY);
-    return raw ? JSON.parse(raw) : null;
-  }
-  const credentials = await Keychain.getGenericPassword({
-    service: EXPO_SERVICE_NAME,
-  });
-  return credentials ? JSON.parse(credentials.password) : null;
-};
 
 // 1. Request Interceptor
 api.interceptors.request.use(async (config) => {
   try {
-    const tokens = await getStoredTokens();
+    const tokens = await tokenStorage.getTokens();
+
     if (tokens?.accessToken) {
       config.headers.set("Authorization", `Bearer ${tokens.accessToken}`);
     }
@@ -61,10 +55,24 @@ api.interceptors.response.use(
 
     // If 401 and we haven't tried refreshing yet
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Queue the request while refreshing
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
-        const tokens = await getStoredTokens();
+        const tokens = await tokenStorage.getTokens();
+
         if (!tokens?.refreshToken)
           throw new Error("No refresh token available");
 
@@ -75,39 +83,29 @@ api.interceptors.response.use(
         });
 
         const { accessToken, refreshToken: newRefreshToken } = res.data.data;
-
         console.log("Token refreshed successfully: ", {
           accessToken,
           refreshToken: newRefreshToken,
         });
 
-        const newTokens = {
+        await tokenStorage.saveTokens({
           accessToken,
-          refreshToken: newRefreshToken || tokens.refreshToken,
-        };
+          refreshToken: newRefreshToken,
+        });
 
-        // Persist new tokens
-        if (IS_EXPO_GO) {
-          await AsyncStorage.setItem(TEMP_TOKEN_KEY, JSON.stringify(newTokens));
-        } else {
-          await Keychain.setGenericPassword(
-            "user-session",
-            JSON.stringify(newTokens),
-            {
-              service: EXPO_SERVICE_NAME,
-            },
-          );
-        }
+        processQueue(null, accessToken);
 
         // Update the original request with the NEW token and retry
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         // If refresh fails, logout user
+        processQueue(refreshError, null);
         console.error("Refresh token expired or invalid");
-        const { logout } = useAuthStore.getState();
-        await logout();
+        await useAuthStore.getState().logout();
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

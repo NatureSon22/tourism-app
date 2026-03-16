@@ -24,9 +24,10 @@ export const Colors = {
   // Backgrounds & Surfaces
   background: "#F9FAFB",
   surface: "#FFFFFF",
+  overlay: "#F4F4F4",
 
   // Neutral / Borders / Dividers
-  border: "#D8D8D9", // Light gray for borders
+  border: "#D8D8D9", // Light gray for bordersf
   text: "#1A2117", // Primary text
   neutral: "#7b8ba1ff", // Neutral text
   textMuted: "#6B7280", // Secondary text
@@ -55,6 +56,8 @@ export const Colors = {
   textCaption: "#9CA3AF",
   textOnPrimary: "#FFFFFF",
   textHighlight: "#2E9CF4",
+
+  rating: "#E28F0B",
 };
 
 export type ColorKeys = keyof typeof Colors;

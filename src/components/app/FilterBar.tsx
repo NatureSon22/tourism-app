@@ -45,7 +45,7 @@ function FilterButton({
   selected?: boolean;
 }) {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} hitSlop={10}>
       <HStack gap={5} alignItems="center">
         <Text style={[styles.labelText]}>{label}</Text>
         <MaterialIcons name="arrow-drop-down" size={17} color="black" />

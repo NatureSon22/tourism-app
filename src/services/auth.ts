@@ -14,7 +14,6 @@ export type AuthResponse = {
 export type SignUpResponse = ApiResponse<AuthResponse>;
 export type LoginResponse = ApiResponse<AuthResponse>;
 
-// TODO: clean up crsftoken
 const authService = {
   requestCrsfToken: async () => {
     const response = await fetch(

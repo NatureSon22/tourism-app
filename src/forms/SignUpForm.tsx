@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 import ControllerTextInput from "../components/ui/ControllerTextInput";
@@ -22,7 +22,7 @@ const SignUpSchema = z
     firstname: z.string().min(1, "First name is required"),
     lastname: z.string().min(1, "Last name is required"),
     username: z.string().min(3, "Username must be at least 3 characters"),
-    email: z.email("Invalid email address"),
+    email: z.string().email("Invalid email address"), // Fixed: z.string().email()
     password: z.string().min(1, { message: "Password is required" }),
     confirmPassword: z.string().min(1, "Confirm password is required"),
   })
@@ -34,6 +34,12 @@ const SignUpSchema = z
 export type SignUpFormData = z.infer<typeof SignUpSchema>;
 
 export default function SignUpForm() {
+  const router = useRouter();
+  const login = useAuthStore((state) => state.login);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { mutate, isPending } = useRegister();
+
   const {
     control,
     handleSubmit,
@@ -41,29 +47,23 @@ export default function SignUpForm() {
     setError,
     clearErrors,
     formState: { errors, isValid },
-  } = useForm({
+  } = useForm<SignUpFormData>({
     resolver: zodResolver(SignUpSchema),
-    values: {
-      email: "user@gmail.com",
-      password: "StrongPassword123",
-      confirmPassword: "StrongPassword123",
-      firstname: "John",
-      lastname: "Doe",
-      username: "johndoe",
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      firstname: "",
+      lastname: "",
+      username: "",
     },
     mode: "onTouched",
   });
-  const router = useRouter();
-  const login = useAuthStore((state) => state.login);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { mutate, isPending } = useRegister();
 
   const passwordValue = watch("password");
 
   useEffect(() => {
     const strength = evaluatePasswordStrength(passwordValue || "");
-
     if (!strength) {
       clearErrors("password");
       return;
@@ -73,35 +73,25 @@ export default function SignUpForm() {
       setError("password", { type: "manual", message: "Password is too weak" });
     } else {
       const current = errors.password as any;
-      if (current && current.type === "manual") {
-        clearErrors("password");
-      }
+      if (current?.type === "manual") clearErrors("password");
     }
-  }, [clearErrors, errors.password, passwordValue, setError]);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
+  }, [passwordValue, setError, clearErrors, errors.password]);
 
   const onSubmit = (data: SignUpFormData) => {
-    mutate({ email: data.email, password: data.password } as SignUpFormData, {
-      onSuccess: async (data) => {
-        const { user, accessToken, refreshToken } = data.data;
-        const token = { accessToken, refreshToken };
-
-        await login({ id: user.id, email: user.email }, token, false);
-
-        router.replace("/(onboarding)/welcome");
+    mutate(data, {
+      onSuccess: async (res) => {
+        const { user, accessToken, refreshToken } = res.data;
+        await login(
+          { id: 1, email: user.email, name: "" },
+          { accessToken, refreshToken },
+          false,
+        );
+        router.replace("/onboarding/index");
       },
       onError: (error: any) => {
-        console.error("Registration failed:", error);
         Toast.show({
           type: "error",
-          text1: "Login failed",
+          text1: "Registration failed",
           text2: error.message,
         });
       },
@@ -109,16 +99,16 @@ export default function SignUpForm() {
   };
 
   return (
-    <View style={{ width: "100%", gap: 10 }}>
+    <View style={styles.container}>
       <ControllerTextInput
         control={control}
         name="email"
         placeholder="Email"
-        isRequired={true}
-        label={"Email"}
+        isRequired
+        label="Email"
         errors={errors}
-        textInputStyle={{ fontSize: 12 }}
-        containerStyle={{ height: 40 }}
+        textInputStyle={styles.smallInputText}
+        containerStyle={styles.inputHeight}
         prefixIcon={
           <MaterialIcons name="mail" size={15} color={Colors.iconSecondary} />
         }
@@ -128,49 +118,39 @@ export default function SignUpForm() {
         control={control}
         name="username"
         placeholder="Username"
-        isRequired={true}
-        label={"Username"}
+        isRequired
+        label="Username"
         errors={errors}
-        textInputStyle={{ fontSize: 12 }}
-        containerStyle={{ height: 40 }}
+        textInputStyle={styles.smallInputText}
+        containerStyle={styles.inputHeight}
         prefixIcon={
-          <MaterialIcons name="mail" size={15} color={Colors.iconSecondary} />
+          <MaterialIcons name="person" size={15} color={Colors.iconSecondary} />
         }
       />
 
       <ControllerTextInput
         control={control}
         name="password"
-        label={"Password"}
-        isRequired={true}
+        label="Password"
+        isRequired
         placeholder="Password"
         errors={errors}
         prefixIcon={
           <Entypo name="lock" size={15} color={Colors.iconSecondary} />
         }
-        textInputStyle={{ fontSize: 12 }}
-        containerStyle={{ height: 40 }}
+        textInputStyle={styles.smallInputText}
+        containerStyle={styles.inputHeight}
         secureTextEntry={!showPassword}
-        showStrength={true}
-        strengthEvaluator={(val: string) => evaluatePasswordStrength(val)}
+        showStrength
+        strengthEvaluator={evaluatePasswordStrength}
         suffixIcon={
-          showPassword ? (
-            <Pressable onPress={togglePasswordVisibility}>
-              <MaterialCommunityIcons
-                name="eye-outline"
-                size={18}
-                color={Colors.iconSecondary}
-              />
-            </Pressable>
-          ) : (
-            <Pressable onPress={togglePasswordVisibility}>
-              <MaterialCommunityIcons
-                name="eye-off-outline"
-                size={18}
-                color={Colors.iconSecondary}
-              />
-            </Pressable>
-          )
+          <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <MaterialCommunityIcons
+              name={showPassword ? "eye-outline" : "eye-off-outline"}
+              size={18}
+              color={Colors.iconSecondary}
+            />
+          </Pressable>
         }
       />
 
@@ -178,92 +158,106 @@ export default function SignUpForm() {
         control={control}
         name="confirmPassword"
         placeholder="Confirm Password"
-        isRequired={true}
-        label={"Confirm Password"}
+        isRequired
+        label="Confirm Password"
         errors={errors}
-        textInputStyle={{ fontSize: 12 }}
-        containerStyle={{ height: 40 }}
+        textInputStyle={styles.smallInputText}
+        containerStyle={styles.inputHeight}
         prefixIcon={
           <Entypo name="lock" size={15} color={Colors.iconSecondary} />
         }
         secureTextEntry={!showConfirmPassword}
         suffixIcon={
-          showConfirmPassword ? (
-            <Pressable onPress={toggleConfirmPasswordVisibility}>
-              <MaterialCommunityIcons
-                name="eye-outline"
-                size={18}
-                color={Colors.iconSecondary}
-              />
-            </Pressable>
-          ) : (
-            <Pressable onPress={toggleConfirmPasswordVisibility}>
-              <MaterialCommunityIcons
-                name="eye-off-outline"
-                size={18}
-                color={Colors.iconSecondary}
-              />
-            </Pressable>
-          )
+          <Pressable
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <MaterialCommunityIcons
+              name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+              size={18}
+              color={Colors.iconSecondary}
+            />
+          </Pressable>
         }
       />
 
-      <HStack justifyContent="space-around">
+      <HStack gap={10}>
         <ControllerTextInput
           control={control}
           name="firstname"
-          isRequired={true}
+          isRequired
           placeholder="First Name"
-          label={"First Name"}
+          label="First Name"
           errors={errors}
-          textInputStyle={{ fontSize: 12 }}
-          containerStyle={{ height: 40 }}
-          style={{ flex: 1 }}
+          textInputStyle={styles.smallInputText}
+          containerStyle={styles.inputHeight}
+          style={styles.flex1}
         />
         <ControllerTextInput
           control={control}
           name="lastname"
-          isRequired={true}
+          isRequired
           placeholder="Last Name"
-          label={"Last Name"}
+          label="Last Name"
           errors={errors}
-          textInputStyle={{ fontSize: 12 }}
-          containerStyle={{ height: 40 }}
-          style={{ flex: 1 }}
+          textInputStyle={styles.smallInputText}
+          containerStyle={styles.inputHeight}
+          style={styles.flex1}
         />
       </HStack>
 
-      <VStack style={{ width: "100%", marginTop: 20 }} gap={12}>
+      <VStack style={styles.footer} gap={12}>
         <CustomButton
           title="Sign Up"
           onPress={handleSubmit(onSubmit)}
-          style={{ paddingVertical: 12, borderRadius: 10 }}
-          textStyle={{ fontSize: 12 }}
+          style={styles.submitBtn}
+          textStyle={styles.submitBtnText}
           disabled={!isValid || isPending}
           isLoading={isPending}
         />
-        <Text
-          style={{
-            fontSize: 11,
-            textAlign: "center",
-            color: Colors.textMuted,
-            fontFamily: Typography.family.regular,
-          }}
-        >
-          Already have an account?
-          <View style={{ width: 4 }} />
-          <Link
-            style={{
-              fontFamily: Typography.family.medium,
-
-              color: Colors.primary,
-            }}
-            href={{ pathname: "/(auth)/signin" }}
-          >
+        <HStack justifyContent="center" gap={4}>
+          <Text style={styles.footerText}>Already have an account?</Text>
+          <Link style={styles.signInLink} href={{ pathname: "/(auth)" }}>
             Sign In
           </Link>
-        </Text>
+        </HStack>
       </VStack>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    gap: 10,
+  },
+  inputHeight: {
+    height: 40,
+  },
+  smallInputText: {
+    fontSize: 12,
+  },
+  flex1: {
+    flex: 1,
+  },
+  footer: {
+    width: "100%",
+    marginTop: 20,
+  },
+  submitBtn: {
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+  submitBtnText: {
+    fontSize: 12,
+  },
+  footerText: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    fontFamily: Typography.family.regular,
+  },
+  signInLink: {
+    fontFamily: Typography.family.medium,
+    fontSize: 11,
+    color: Colors.primary,
+  },
+});

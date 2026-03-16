@@ -4,65 +4,52 @@ import HStack from "@/src/layouts/HStack";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 
 export default function TabNavigation() {
   const router = useRouter();
-  const sheetShownRef = useRef(false);
+  const isBusy = useRef(false);
 
   const handleTabPress = (path: string) => {
+    if (isBusy.current) return;
+
+    isBusy.current = true;
+
     if (path !== "/more") {
-      router.push(path as Parameters<typeof router.push>[0]);
+      router.push(path as any);
+      // Reset lock after a short delay to prevent double-pushing the same route
+      setTimeout(() => {
+        isBusy.current = false;
+      }, 500);
     } else {
-      // show the sheet only once per session
-      if (!sheetShownRef.current) {
-        SheetManager.show("options-sheet", {
-          onClose(data) {
-            sheetShownRef.current = false;
-          },
-        });
-        sheetShownRef.current = true;
-      }
+      SheetManager.show("options-sheet", {
+        onClose() {
+          isBusy.current = false;
+        },
+      });
     }
   };
 
   return (
-    <View
-      style={{
-        width: "100%",
-        alignSelf: "flex-start",
-      }}
-    >
+    <View style={styles.wrapper}>
       <HStack gap={0} alignItems="flex-start">
         {TABNAVIGATION.map((item) => (
           <Pressable
             key={item.name}
             onPress={() => handleTabPress(item.path)}
-            style={{ flex: 1 }}
+            style={styles.tabPressable}
           >
-            <View
-              style={{
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <View style={{ width: 30, height: 30 }}>
+            <View style={styles.tabContent}>
+              <View style={styles.iconWrapper}>
                 <Image
                   source={item.icon}
                   contentFit="contain"
-                  style={{ width: 30, height: 30 }}
+                  style={styles.icon}
                 />
               </View>
 
-              <Text
-                style={{
-                  fontSize: 8,
-                  textAlign: "center",
-                  width: 50,
-                  fontFamily: Typography.family.medium,
-                }}
-              >
+              <Text style={styles.tabLabel} numberOfLines={1}>
                 {item.name}
               </Text>
             </View>
@@ -72,3 +59,31 @@ export default function TabNavigation() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrapper: {
+    width: "100%",
+    alignSelf: "flex-start",
+  },
+  tabPressable: {
+    flex: 1,
+  },
+  tabContent: {
+    alignItems: "center",
+    gap: 4,
+  },
+  iconWrapper: {
+    width: 30,
+    height: 30,
+  },
+  icon: {
+    width: 30,
+    height: 30,
+  },
+  tabLabel: {
+    fontSize: 8,
+    textAlign: "center",
+    width: 50,
+    fontFamily: Typography.family.medium,
+  },
+});

@@ -1,19 +1,15 @@
 import React from "react";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-
 import { StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 type KeyBoardAvoidProps = {
   children: React.ReactNode;
   contentContainerStyle?: StyleProp<ViewStyle>;
-  // Buffer space between keyboard and focused input
-  extraScrollHeight?: number;
 };
 
 export default function KeyBoardAvoid({
   children,
   contentContainerStyle,
-  extraScrollHeight = 20,
 }: KeyBoardAvoidProps) {
   return (
     <>

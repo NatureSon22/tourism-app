@@ -1,105 +1,83 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Keychain from "react-native-keychain";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { EXPO_SERVICE_NAME, IS_EXPO_GO, TEMP_TOKEN_KEY } from "../config/constants";
+import { tokenStorage } from "../utils/tokenStorage";
 
 export type User = {
-  id: string;
+  id: number;
+  name: string;
   email: string;
 };
 
-export type AuthStore = {
+interface AuthState {
   user: User | null;
-  accessToken?: string;
-  refreshToken?: string;
-  rememberMe: boolean;
   onBoardingCompleted: boolean;
+  rememberMe: boolean;
+  accessToken: string | null;
+  refreshToken: string | null;
+}
+
+interface AuthActions {
   login: (
     user: User,
-    token: { accessToken: string; refreshToken: string },
+    tokens: { accessToken: string; refreshToken: string },
     rememberMe: boolean,
   ) => Promise<void>;
   logout: () => Promise<void>;
+  hydrateTokens: (tokens: {
+    accessToken: string;
+    refreshToken: string;
+  }) => void;
   completeOnBoarding: () => void;
-  resetOnBoarding: () => void;
   clearApp: () => void;
-};
+}
 
-const useAuthStore = create<AuthStore>()(
+const useAuthStore = create<AuthState & AuthActions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
-      rememberMe: false,
       onBoardingCompleted: false,
+      rememberMe: false,
+      accessToken: null,
+      refreshToken: null,
 
-      login: async (user, token, rememberMe) => {
-        // Persist tokens first to avoid init race where a user exists without stored tokens
-        const tokensObj = {
-          accessToken: token.accessToken,
-          refreshToken: token.refreshToken,
-        };
-
-        try {
-          if (rememberMe) {
-            if (IS_EXPO_GO) {
-              console.log("Storing tokens in AsyncStorage for development");
-              await AsyncStorage.setItem(
-                TEMP_TOKEN_KEY,
-                JSON.stringify(tokensObj),
-              );
-            } else {
-              // store the tokens JSON string in the hardware-encrypted vault
-              await Keychain.setGenericPassword(
-                "user-session",
-                JSON.stringify(tokensObj),
-                {
-                  service: EXPO_SERVICE_NAME,
-                },
-              );
-            }
-          }
-        } catch (err) {
-          console.error("Failed to persist auth tokens:", err);
-          // continue: still set user in-memory even if persistence failed
+      login: async (user, tokens, rememberMe) => {
+        if (rememberMe) {
+          tokenStorage.saveTokens(tokens);
         }
 
         set({
           user,
-          accessToken: token.accessToken,
-          refreshToken: token.refreshToken,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
           rememberMe,
         });
       },
 
+      hydrateTokens: (tokens) =>
+        set({
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        }),
+
       logout: async () => {
-        try {
-          if (IS_EXPO_GO) {
-            await AsyncStorage.removeItem(TEMP_TOKEN_KEY);
-          } else {
-            await Keychain.resetGenericPassword({ service: EXPO_SERVICE_NAME });
-          }
-        } catch (err) {
-          console.error("Failed to clear persisted tokens:", err);
-        }
+        await tokenStorage.clearTokens();
 
         set({
           user: null,
-          accessToken: undefined,
-          refreshToken: undefined,
+          accessToken: null,
+          refreshToken: null,
           rememberMe: false,
         });
       },
 
       completeOnBoarding: () => set({ onBoardingCompleted: true }),
 
-      resetOnBoarding: () => set({ onBoardingCompleted: false }),
-
       clearApp: () =>
         set({
           user: null,
-          accessToken: undefined,
-          refreshToken: undefined,
+          accessToken: null,
+          refreshToken: null,
           onBoardingCompleted: false,
           rememberMe: false,
         }),
@@ -107,9 +85,11 @@ const useAuthStore = create<AuthStore>()(
     {
       name: "auth-storage",
       storage: createJSONStorage(() => AsyncStorage),
+      // CRITICAL: Only persist non-sensitive UI state
       partialize: (state) => ({
         user: state.user,
         onBoardingCompleted: state.onBoardingCompleted,
+        rememberMe: state.rememberMe,
       }),
     },
   ),
