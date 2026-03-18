@@ -9,6 +9,7 @@ import {
 } from "@expo-google-fonts/poppins";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { SheetProvider } from "react-native-actions-sheet";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -18,6 +19,7 @@ import { useShallow } from "zustand/react/shallow";
 import queryClient from "../config/queryClient";
 import { Sheets } from "../config/sheets";
 import toastConfig from "../config/toastConfig";
+import { Colors } from "../constants/styles";
 import authService from "../services/api/authService";
 import useAuthStore from "../stores/authStore";
 import { tokenStorage } from "../utils/tokenStorage";
@@ -147,6 +149,7 @@ function Routes() {
     <>
       <SheetProvider>
         <Sheets />
+        <StatusBar backgroundColor={Colors.surface} />
         <KeyboardProvider>
           <Stack screenOptions={{ headerShown: false }}>
             {/* If no user object exists, go to Auth */}
@@ -168,6 +171,7 @@ function Routes() {
               <Stack.Screen name="dining" />
               <Stack.Screen name="activity" />
               <Stack.Screen name="event" />
+              <Stack.Screen name="transportation" />
               {/* <Stack.Screen name="(bookmark)" /> */}
               {/* <Stack.Screen name="(forum)" /> */}
             </Stack.Protected>

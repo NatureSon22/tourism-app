@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type SafeAreaProps = {
   children: React.ReactNode;
-  edges?: Array<"top" | "right" | "bottom" | "left">;
+  edges?: ("top" | "right" | "bottom" | "left")[];
 };
 
 export default function SafeArea({
