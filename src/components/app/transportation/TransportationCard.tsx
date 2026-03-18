@@ -20,31 +20,35 @@ export default function TransportationCard({
 }: Props) {
   return (
     <Pressable style={styles.card}>
-      {/* 1. Image Container with Bookmark */}
+      {/* Image Section - Square/Fixed Aspect for Grid Consistency */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUrl }} style={styles.image} contentFit="cover" />
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          contentFit="cover"
+          transition={200}
+        />
         <View style={styles.bookmarkBadge}>
-          <Ionicons name="bookmark" size={20} color="#FFB800" />
+          <Ionicons name="bookmark" size={18} color={Colors.rating} />
         </View>
       </View>
 
-      <VStack style={styles.content} gap={4}>
-        {/* 2. Location (Subtle/Muted) */}
-        <Text style={styles.location}>{location}</Text>
+      {/* Content Section */}
+      <VStack style={styles.content} gap={2}>
+        <Text style={styles.location} numberOfLines={1}>
+          {location}
+        </Text>
 
-        {/* 3. Name (Large/Bold) */}
         <Text style={styles.name} numberOfLines={2}>
           {name}
         </Text>
 
-        {/* 4. Rating Row */}
         <HStack gap={4} alignItems="center">
-          <Ionicons name="star" size={16} color="#E67E22" />
+          <Ionicons name="star" size={14} color={Colors.rating} />
           <Text style={styles.ratingText}>{rating}</Text>
           <Text style={styles.reviewsText}>({reviews})</Text>
         </HStack>
 
-        {/* 5. Price */}
         <Text style={styles.price}>{formatCurrency(price)}</Text>
       </VStack>
     </Pressable>
@@ -53,20 +57,22 @@ export default function TransportationCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    overflow: "hidden", // Important for image corners
-    width: '100%',
-    // Subtle shadow
+    // backgroundColor: Colors.surface,
+    borderRadius: 16,
+    overflow: "hidden",
+    flex: 1, // Allows card to grow in a grid
+    margin: 4, // Space between columns
+    // Shadow/Elevation
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowRadius: 8,
+    elevation: 3,
+    backgroundColor: "yellow",
   },
   imageContainer: {
     width: "100%",
-    height: 180,
+    aspectRatio: 1.1, // Slightly taller than a square, looks better in 2-col
     position: "relative",
   },
   image: {
@@ -75,38 +81,38 @@ const styles = StyleSheet.create({
   },
   bookmarkBadge: {
     position: "absolute",
-    top: 12,
-    right: 12,
+    top: 8,
+    right: 8,
   },
   content: {
-    padding: 16,
+    padding: 10,
   },
   location: {
-    fontSize: 14,
-    color: "#888",
+    fontSize: 12,
+    color: Colors.textMuted,
     fontFamily: Typography.family.regular,
   },
   name: {
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: Typography.family.semiBold,
-    color: "#1A1A1A",
-    marginVertical: 2,
-    lineHeight: 22,
+    color: Colors.textHeading,
+    minHeight: 38, // Ensures alignment even if one title is 1 line and another is 2
+    lineHeight: 18,
   },
   ratingText: {
-    fontSize: 15,
+    fontSize: 13,
     fontFamily: Typography.family.bold,
-    color: "#E67E22",
+    color: Colors.rating,
   },
   reviewsText: {
-    fontSize: 15,
-    color: "#AAA",
+    fontSize: 13,
+    color: Colors.textCaption,
     fontFamily: Typography.family.regular,
   },
   price: {
-    fontSize: 22,
+    fontSize: 18,
     fontFamily: Typography.family.bold,
-    color: "#2C3E50",
-    marginTop: 8,
+    color: Colors.textHeading,
+    marginTop: 4,
   },
 });
