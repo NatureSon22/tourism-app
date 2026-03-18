@@ -1,12 +1,12 @@
 import PlaceFilterTabs from "@/src/components/app/main/PlaceFilterTabs";
+import { PlaceList } from "@/src/constants/placeList";
 import { Colors, Typography } from "@/src/constants/styles";
-import { useOnRefresh } from "@/src/hooks/useOnRefresh";
-import { useGetPlaces } from "@/src/services/places";
+import { useGetPlaces } from "@/src/services/request/usePlace";
+import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
-import NoResourceFound from "../NoResourceFound";
-import ReloadPage from "../ReloadPage";
+import ListEmptyState from "../ListEmptyState";
 import PlaceCard from "./PlaceCard";
 import PlaceCardSkeleton from "./PlaceCardSkeleton";
 
@@ -16,53 +16,62 @@ type PlaceListProps = {
 
 type FilterType = "Recommended" | "Nearby";
 
-export default function PlaceList({ searchQuery }: PlaceListProps) {
+// TODO: fix when there is only 1 item
+
+export default function PlaceListing({ searchQuery }: PlaceListProps) {
   const [filter, setFilter] = useState<FilterType>("Recommended");
-  const { data, isLoading } = useGetPlaces(filter, searchQuery);
-  const netInfo = useNetInfo();
-  const isConnected = netInfo.isConnected;
-  const { refreshing, onRefresh } = useOnRefresh();
+  const { data, isLoading, isFetched, refetch } = useGetPlaces({
+    search: searchQuery,
+    filter,
+  });
+  const { isConnected } = useNetInfo();
+  const isEmpty = isFetched && !isLoading && data?.data.length === 0;
+  const [isRefetching, setIsRefetching] = useState(false);
 
-  const notFound = !isLoading && data?.length === 0;
-
-  // TODO: handle filter when only one data is connected
+  const handleRefresh = async () => {
+    setIsRefetching(true);
+    await refetch();
+    setIsRefetching(false);
+  };
 
   return (
     <View style={styles.container}>
       <PlaceFilterTabs value={filter} onChange={setFilter} />
 
-      <FlatList
-        data={data ?? []}
+      <FlatList<Skeleton | PlaceList>
+        data={isLoading ? createSkeletons(6) : data?.data || []}
+        key="two-column-list"
         numColumns={2}
         columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item, index) =>
-          isLoading ? `skeleton-${index}` : item.id.toString()
-        }
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
-          if (isLoading) {
-            return <PlaceCardSkeleton />;
+          if ("isSkeleton" in item) {
+            return (
+              <View style={styles.itemWrapper}>
+                <PlaceCardSkeleton />
+              </View>
+            );
           }
-          return <PlaceCard {...item} />;
+          return (
+            <View style={styles.itemWrapper}>
+              <PlaceCard {...item} />
+            </View>
+          );
         }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
         }
         ListEmptyComponent={
-          !isConnected ? (
-            <ReloadPage
-              refetch={() => {}}
-              message="Listings failed to load. Retry loading the page."
-            />
-          ) : notFound ? (
-            <NoResourceFound
-              message="Oh no! There’s no dining option that matches the search or filter criteria."
-              onRetry={() => {}}
-            />
-          ) : (
-            <></>
-          )
+          <ListEmptyState
+            isLoading={isLoading}
+            isConnected={isConnected}
+            onRetry={refetch}
+            resourceName="events"
+            customNoResultsMessage="No events found."
+            isEmpty={isEmpty}
+          />
         }
       />
     </View>
@@ -72,7 +81,7 @@ export default function PlaceList({ searchQuery }: PlaceListProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 30,
+    gap: 20,
     padding: 16,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -98,6 +107,13 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 10,
     height: 180,
+    justifyContent: "space-between",
+  },
+  itemWrapper: {
+    flex: 1,
+    maxWidth: "48%",
+    minWidth: 0,
+    marginBottom: 10,
   },
   listContent: {
     flexGrow: 1,

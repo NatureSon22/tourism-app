@@ -1,5 +1,5 @@
 export type Accommodation = {
-  id: number;
+  id: string;
   name: string;
   location: string;
   pricePerNight: number;
@@ -14,7 +14,7 @@ const IMAGE_URL =
 
 const accomodations: Accommodation[] = [
   {
-    id: 1,
+    id: "1",
     name: "Diamond Hotel Philippines",
     location: "Roxas Boulevard, Manila",
     pricePerNight: 8500.0,
@@ -24,7 +24,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 2.5,
   },
   {
-    id: 2,
+    id: "2",
     name: "Shangri-La The Fort",
     location: "30th Street, Bonifacio Global City, Taguig",
     pricePerNight: 15500.0,
@@ -34,7 +34,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 0.5,
   },
   {
-    id: 3,
+    id: "3",
     name: "Okada Manila",
     location: "New Seaside Drive, Entertainment City, Parañaque",
     pricePerNight: 12500.0,
@@ -44,7 +44,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 7.2,
   },
   {
-    id: 4,
+    id: "4",
     name: "The Manila Hotel",
     location: "One Rizal Park, Ermita, Manila",
     pricePerNight: 6200.0,
@@ -54,7 +54,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 1.8,
   },
   {
-    id: 5,
+    id: "5",
     name: "Fairmont Makati",
     location: "1 Raffles Drive, Makati Avenue, Makati City",
     pricePerNight: 9800.0,
@@ -64,7 +64,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 0.2,
   },
   {
-    id: 6,
+    id: "6",
     name: "El Nido Resorts - Pangulasian Island",
     location: "Bacuit Bay, El Nido, Palawan",
     pricePerNight: 35000.0,
@@ -74,7 +74,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 420.0, // Distance from Manila as reference
   },
   {
-    id: 7,
+    id: "7",
     name: "Conrad Manila",
     location: "Seaside Boulevard, Coral Way, Pasay City",
     pricePerNight: 11200.0,
@@ -84,7 +84,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 5.5,
   },
   {
-    id: 8,
+    id: "8",
     name: "Crimson Resort and Spa Boracay",
     location: "Station Zero, Boracay Island, Malay",
     pricePerNight: 14000.0,
@@ -94,7 +94,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 315.0,
   },
   {
-    id: 9,
+    id: "9",
     name: "Seda BGC",
     location: "30th Street cor. 11th Avenue, BGC, Taguig",
     pricePerNight: 7500.0,
@@ -104,7 +104,7 @@ const accomodations: Accommodation[] = [
     distanceFromCityCenter: 0.8,
   },
   {
-    id: 10,
+    id: "10",
     name: "Discovery Primea",
     location: "6749 Ayala Avenue, Makati City",
     pricePerNight: 10500.0,

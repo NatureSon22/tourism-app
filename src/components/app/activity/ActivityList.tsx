@@ -1,49 +1,47 @@
-import ActivityCard from "@/src/components/app/ActivityCard";
+import ActivityCard from "@/src/components/app/activity/ActivityCard";
 import ListEmptyState from "@/src/components/app/ListEmptyState";
-import ActivityCardSkeleton from "@/src/components/app/activity/ActivityCardSkeleton";
-import type { Activity } from "@/src/constants/activity";
-import { useActivity } from "@/src/hooks/activity/useActivity";
+import { Activity } from "@/src/constants/activity";
+import { useActivities } from "@/src/services/request/useActivity";
+import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
+import ActivityCardSkeleton from "./ActivityCardSkeleton";
 
 type Props = {
   search: string;
-  isRefetching: boolean;
-  onRefresh: () => void;
 };
 
-function ActivityList({ search, isRefetching, onRefresh }: Props) {
-  const { isConnected } = useNetInfo();
-  const {
-    data = [],
-    isLoading,
-    isFetched,
-    refetch,
-  } = useActivity({
+function ActivityList({ search }: Props) {
+  const { data, isLoading, isFetched, refetch } = useActivities({
     search,
   });
+  const { isConnected } = useNetInfo();
+  const isEmpty = isFetched && !isLoading && data?.data.length === 0;
+  const [isRefetching, setIsRefetching] = useState(false);
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingWrap}>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <ActivityCardSkeleton key={i} />
-        ))}
-      </View>
-    );
-  }
+  const handleRefresh = async () => {
+    setIsRefetching(true);
+    await refetch();
+    setIsRefetching(false);
+  };
 
   return (
-    <FlatList
-      data={data as Activity[]}
+    <FlatList<Skeleton | Activity>
+      data={isLoading ? createSkeletons(6) : data?.data || []}
       keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={styles.content}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item }) => <ActivityCard {...item} />}
+      renderItem={({ item }) => {
+        if ("isSkeleton" in item) {
+          return <ActivityCardSkeleton />;
+        }
+
+        return <ActivityCard {...item} />;
+      }}
       refreshControl={
-        <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />
+        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
       }
       ListEmptyComponent={
         <ListEmptyState
@@ -51,8 +49,8 @@ function ActivityList({ search, isRefetching, onRefresh }: Props) {
           isConnected={isConnected}
           onRetry={() => refetch()}
           resourceName="activities"
-          customNoResultsMessage="Oh no! There’s no activity that matches the search or filter criteria."
-          isEmpty={isFetched && data.length === 0}
+          customNoResultsMessage="Oh no! There's no activity that matches the search or filter criteria."
+          isEmpty={isEmpty}
         />
       }
     />

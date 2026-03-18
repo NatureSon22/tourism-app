@@ -246,3 +246,23 @@ GOAL: REFACTOR ACCOMMODATION MODULE FOR PERFORMANCE AND REUSABILITY
     - Props to pass:
         * isEmpty: (!isLoading && isFetched && data.length === 0) -> Renders NoResourceFound.
         * isConnected: From useNetInfo -> Renders ReloadPage.
+
+
+refresh token response:
+{
+    data: { accessToken, refreshToken }
+    message
+}
+
+
+initialize:
+    - /me
+    
+    - user creates request for some endpoint
+        - token refresh if expired
+
+    - if is remember me longer expiration for refreshtoken 
+
+
+    e0377ab8f216d0d68ea07bff431d83677e2530b94e1a4719cb29d3b3e2bfedcb.e4bdd1aee1327030abf5c61808f72a0c2dc778b51852904af0fb8660eff9cfcca93dd6214fbd452729d62fd01fc9c93e072c6c65d3fabac62ccef2578689c6aa
+    e0377ab8f216d0d68ea07bff431d83677e2530b94e1a4719cb29d3b3e2bfedcb.e4bdd1aee1327030abf5c61808f72a0c2dc778b51852904af0fb8660eff9cfcca93dd6214fbd452729d62fd01fc9c93e072c6c65d3fabac62ccef2578689c6aa

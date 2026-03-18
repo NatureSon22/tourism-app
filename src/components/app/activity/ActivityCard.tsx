@@ -4,14 +4,14 @@ import HStack from "@/src/layouts/HStack";
 import formatCurrency from "@/src/utils/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import React from "react";
+import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = Activity & {
   onPress?: () => void;
 };
 
-export default function ActivityCard({
+function ActivityCard({
   name,
   location,
   distanceFromCityCenter,
@@ -197,3 +197,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
   },
 });
+
+export default memo(ActivityCard);

@@ -1,11 +1,11 @@
-import { useGetDining } from "@/src/hooks/request/useGetDining";
-import { useOnRefresh } from "@/src/hooks/useOnRefresh";
-import { getSkeletonCount } from "@/src/utils/getSkeletonCount";
+import { Dining } from "@/src/constants/dining";
+import { useDining } from "@/src/services/request/useDining";
+import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React from "react";
+import React, { useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
-import DiningCard from "../DiningCard";
 import ListEmptyState from "../ListEmptyState";
+import DiningCard from "./DiningCard";
 import DiningCardSkeleton from "./DiningCardSkeleton";
 
 type DiningListProps = {
@@ -14,38 +14,41 @@ type DiningListProps = {
 };
 
 const DiningList = ({ filter, search }: DiningListProps) => {
-  const { data, isLoading, isFetched } = useGetDining(filter, search);
-  const { refreshing, onRefresh } = useOnRefresh();
-  const netInfo = useNetInfo();
-  const isConnected = netInfo.isConnected;
-  const isEmpty = isFetched && !isLoading && data?.length === 0;
+  const { data, isLoading, isFetched, refetch } = useDining({ filter, search });
+  const { isConnected } = useNetInfo();
+  const isEmpty = isFetched && !isLoading && data?.data.length === 0;
+  const [isRefetching, setIsRefetching] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefetching(true);
+    await refetch();
+    setIsRefetching(false);
+  };
 
   return (
-    <FlatList
-      data={isLoading ? getSkeletonCount() : data}
-      keyExtractor={(item, index) =>
-        isLoading ? `place-skel-${index}` : item.id.toString()
-      }
+    <FlatList<Skeleton | Dining>
+      data={isLoading ? createSkeletons(6) : data?.data || []}
+      keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContent}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => {
-        if (isLoading) {
+        if ("isSkeleton" in item) {
           return <DiningCardSkeleton />;
         }
 
         return <DiningCard {...item} />;
       }}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
       }
       ListEmptyComponent={
         <ListEmptyState
           isLoading={isLoading}
           isConnected={isConnected}
-          onRetry={onRefresh}
-          resourceName="dining options"
-          customNoResultsMessage="No dining options found."
+          onRetry={refetch}
+          resourceName="dining"
+          customNoResultsMessage="Oh no! There's no dining option that matches the search or filter criteria."
           isEmpty={isEmpty}
         />
       }

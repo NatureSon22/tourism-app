@@ -1,5 +1,5 @@
 export type Dining = {
-  id: number;
+  id: string;
   name: string;
   location: string;
   price: number;
@@ -13,7 +13,7 @@ export type Dining = {
 
 export const PHILIPPINE_DINING_DATA: Dining[] = [
   {
-    id: 1,
+    id: "1",
     name: "Mang Larry's Isawan",
     location: "UP Diliman, Quezon City",
     price: 150, // Average cost per person
@@ -27,7 +27,7 @@ export const PHILIPPINE_DINING_DATA: Dining[] = [
     ],
   },
   {
-    id: 2,
+    id: "2",
     name: "Balay Dako",
     location: "Tagaytay, Cavite",
     price: 850,
@@ -42,7 +42,7 @@ export const PHILIPPINE_DINING_DATA: Dining[] = [
     ],
   },
   {
-    id: 3,
+    id: "3",
     name: "Lantaw Floating Native Restaurant",
     price: 600,
     location: "Cordova, Cebu",
@@ -56,7 +56,7 @@ export const PHILIPPINE_DINING_DATA: Dining[] = [
     ),
   },
   {
-    id: 4,
+    id: "4",
     name: "Antonio's Garden",
     price: 2500,
     location: "Tagaytay, Cavite",
@@ -70,7 +70,7 @@ export const PHILIPPINE_DINING_DATA: Dining[] = [
     ),
   },
   {
-    id: 5,
+    id: "5",
     name: "Dampa Seafood Market",
     price: 1200,
     location: "Macapagal Blvd, Pasay",

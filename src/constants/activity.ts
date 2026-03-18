@@ -1,5 +1,5 @@
 export type Activity = {
-  id: number;
+  id: string;
   name: string;
   location: string;
   price: number;
@@ -14,7 +14,7 @@ export type Activity = {
 
 export const PHILIPPINE_ACTIVITY_DATA: Activity[] = [
   {
-    id: 1,
+    id: "1",
     name: "Intramuros Walking Tour",
     location: "Intramuros, Manila",
     price: 500,
@@ -28,7 +28,7 @@ export const PHILIPPINE_ACTIVITY_DATA: Activity[] = [
       "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?q=80&w=1000",
   },
   {
-    id: 2,
+    id: "2",
     name: "El Nido Island Hopping",
     location: "El Nido, Palawan",
     price: 1200,
@@ -42,7 +42,7 @@ export const PHILIPPINE_ACTIVITY_DATA: Activity[] = [
       "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?q=80&w=1000",
   },
   {
-    id: 3,
+    id: "3",
     name: "Oslob Whale Shark Swim",
     location: "Oslob, Cebu",
     price: 2500,
@@ -56,7 +56,7 @@ export const PHILIPPINE_ACTIVITY_DATA: Activity[] = [
       "https://images.unsplash.com/photo-1560769629-975ec94e6a86?q=80&w=1000",
   },
   {
-    id: 4,
+    id: "4",
     name: "Banaue Rice Terraces Trek",
     location: "Banaue, Ifugao",
     price: 800,
@@ -70,7 +70,7 @@ export const PHILIPPINE_ACTIVITY_DATA: Activity[] = [
       "https://images.unsplash.com/photo-1555400038-63f5ba517a47?q=80&w=1000",
   },
   {
-    id: 5,
+    id: "5",
     name: "Chocolate Hills Sightseeing",
     location: "Carmen, Bohol",
     price: 450,
@@ -83,7 +83,7 @@ export const PHILIPPINE_ACTIVITY_DATA: Activity[] = [
       "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=1000",
   },
   {
-    id: 6,
+    id: "6",
     name: "Boracay Sunset Sailing",
     location: "White Beach, Boracay",
     price: 900,
@@ -97,7 +97,7 @@ export const PHILIPPINE_ACTIVITY_DATA: Activity[] = [
       "https://images.unsplash.com/photo-1502759683299-cdcd6974244f?q=80&w=1000",
   },
   {
-    id: 7,
+    id: "7",
     name: "Hinatuan Enchanted River",
     location: "Hinatuan, Surigao",
     price: 300,

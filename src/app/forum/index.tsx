@@ -9,7 +9,7 @@ import { FlatList, Text, TouchableOpacity } from "react-native";
 export default function Forum() {
   return (
     <SafeArea>
-      <Screen padding={0}>
+      <Screen>
         <Stack.Screen
           options={{
             title: "Forum",
@@ -33,6 +33,7 @@ export default function Forum() {
 
         <FlatList
           data={forumData}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => <FormCard {...item} />}
         />

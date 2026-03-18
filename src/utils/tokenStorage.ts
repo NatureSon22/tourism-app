@@ -17,9 +17,7 @@ export const tokenStorage = {
       if (IS_EXPO_GO) {
         const raw = await AsyncStorage.getItem(TEMP_TOKEN_KEY);
         return raw ? (JSON.parse(raw) as StoredTokens) : null;
-      } else {
       }
-
       const credentials = await Keychain.getGenericPassword({
         service: EXPO_SERVICE_NAME,
       });

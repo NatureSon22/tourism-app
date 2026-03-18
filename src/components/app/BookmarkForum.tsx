@@ -10,8 +10,7 @@ export default function BookmarkForum() {
   const [isRefetching, setIsRefetching] = useState(false);
   // useQuery for fetching bookmarked accommodations
   const [notFound, setNotFound] = useState(true);
-  const netInfo = useNetInfo();
-  const isConnected = netInfo.isConnected;
+  const { isConnected } = useNetInfo();
 
   const onRefresh = useCallback(() => {
     setIsRefetching(true);

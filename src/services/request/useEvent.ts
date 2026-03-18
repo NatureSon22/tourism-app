@@ -1,0 +1,71 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Alert } from "react-native";
+import eventService, { EventParams } from "../api/eventService";
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+
+const eventKeys = {
+  all: ["events"] as const,
+  lists: () => [...eventKeys.all, "list"] as const,
+  list: (params: EventParams) => [...eventKeys.lists(), params] as const,
+  details: () => [...eventKeys.all, "detail"] as const,
+  detail: (id: string) => [...eventKeys.details(), id] as const,
+};
+
+export const useEvents = (params: EventParams) => {
+  return useQuery({
+    queryKey: eventKeys.list(params),
+    queryFn: () => eventService.getEventData(params),
+    placeholderData: (prev) => prev,
+    select: (data) => {
+      return {
+        ...data,
+        data: data.data.map((event) => ({
+          ...event,
+          id: String(event.id),
+          formattedDate: dateFormatter.format(new Date(event.date)),
+        })),
+      };
+    },
+  });
+};
+
+export const useEventDetails = (id: string) => {
+  return useQuery({
+    queryKey: eventKeys.detail(id),
+    queryFn: () => eventService.getEventById(id),
+    enabled: !!id, // Prevent running if ID is missing
+    staleTime: 1000 * 60 * 5, // Keep detail fresh for 5 mins
+  });
+};
+
+export const useRegisterEvent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ eventId, userId }: { eventId: number; userId: number }) =>
+      eventService.registerForEvent(eventId, userId),
+
+    // Logic after successful registration
+    onSuccess: (data, variables) => {
+      // 1. Refresh this specific event's details (e.g., to update attendee count)
+      queryClient.invalidateQueries({
+        queryKey: eventKeys.detail(variables.eventId.toString()),
+      });
+
+      // 2. Optionally refresh the lists if status labels (e.g., "Joined") change
+      // queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+
+      Alert.alert("Success", "You are now registered for this event!");
+    },
+
+    onError: (error) => {
+      Alert.alert("Registration Failed", "Please try again later.");
+      console.error("Mutation Error:", error);
+    },
+  });
+};

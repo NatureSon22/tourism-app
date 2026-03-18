@@ -1,4 +1,4 @@
-import PlaceList from "@/src/components/app/main/PlaceList";
+import PlaceListing from "@/src/components/app/main/PlaceListing";
 import TabNavigation from "@/src/components/app/TabNavigation";
 import CustomTextInput from "@/src/components/ui/CustomTextInput";
 import { Colors } from "@/src/constants/styles";
@@ -37,7 +37,7 @@ export default function Index() {
 
         {/* Results List */}
         <View style={styles.listWrapper}>
-          <PlaceList searchQuery={debouncedSearch} />
+          <PlaceListing searchQuery={debouncedSearch} />
         </View>
       </Screen>
     </SafeArea>

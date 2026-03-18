@@ -26,20 +26,26 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // Important for CSRF cookies
 });
 
 // 1. Request Interceptor
+// src/config/axios.ts (request interceptor)
 api.interceptors.request.use(async (config) => {
   try {
     const tokens = await tokenStorage.getTokens();
 
+    config.headers = config.headers || {};
     if (tokens?.accessToken) {
-      config.headers.set("Authorization", `Bearer ${tokens.accessToken}`);
+      config.headers["Authorization"] = `Bearer ${tokens.accessToken}`;
     }
 
     const csrf = await AsyncStorage.getItem("@temp_dev_csrf_token");
+
+    console.log("CSRF HEADER : " + csrf);
+
     if (csrf) {
-      config.headers.set("X-XSRF-TOKEN", csrf);
+      config.headers["X-CSRF-TOKEN"] = csrf;
     }
   } catch (error) {
     console.error("Request interceptor error:", error);
@@ -51,17 +57,41 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Guard: if this is not an Axios request error with a config, just reject
+    if (!error || !error.config) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
 
+    try {
+      console.log("Response error intercepted:", {
+        url: originalRequest.url,
+        method: originalRequest.method,
+        status: error.response?.status,
+      });
+    } catch (logErr) {
+      // ignore logging errors
+    }
+
+    const isAuthRequest =
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/register");
+
     // If 401 and we haven't tried refreshing yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthRequest
+    ) {
       if (isRefreshing) {
         // Queue the request while refreshing
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers["Authorization"] = `Bearer ${token}`;
             return api(originalRequest);
           })
           .catch((err) => Promise.reject(err));
@@ -73,6 +103,8 @@ api.interceptors.response.use(
       try {
         const tokens = await tokenStorage.getTokens();
 
+        console.log("Attempting token refresh with tokens: ", tokens);
+
         if (!tokens?.refreshToken)
           throw new Error("No refresh token available");
 
@@ -81,6 +113,8 @@ api.interceptors.response.use(
         const res = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {
           refreshToken: tokens.refreshToken,
         });
+
+        console.log("Refresh response: ", res.data);
 
         const { accessToken, refreshToken: newRefreshToken } = res.data.data;
         console.log("Token refreshed successfully: ", {
@@ -96,12 +130,14 @@ api.interceptors.response.use(
         processQueue(null, accessToken);
 
         // Update the original request with the NEW token and retry
+        originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         // If refresh fails, logout user
         processQueue(refreshError, null);
-        console.error("Refresh token expired or invalid");
+        console.log("WENT HERE");
+        console.error(error.response?.data?.message);
         await useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       } finally {

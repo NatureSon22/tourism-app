@@ -1,5 +1,4 @@
 import React from "react";
-import { Text } from "react-native";
 import NoResourceFound from "./NoResourceFound";
 import ReloadPage from "./ReloadPage";
 
@@ -44,5 +43,5 @@ export default function ListEmptyState({
     );
   }
 
-  return <Text>No results found</Text>;
+  return null;
 }

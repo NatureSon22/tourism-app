@@ -19,8 +19,8 @@ import evaluatePasswordStrength from "../utils/evaluatePassword";
 
 const SignUpSchema = z
   .object({
-    firstname: z.string().min(1, "First name is required"),
-    lastname: z.string().min(1, "Last name is required"),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
     username: z.string().min(3, "Username must be at least 3 characters"),
     email: z.string().email("Invalid email address"), // Fixed: z.string().email()
     password: z.string().min(1, { message: "Password is required" }),
@@ -53,8 +53,8 @@ export default function SignUpForm() {
       email: "",
       password: "",
       confirmPassword: "",
-      firstname: "",
-      lastname: "",
+      firstName: "",
+      lastName: "",
       username: "",
     },
     mode: "onTouched",
@@ -75,20 +75,27 @@ export default function SignUpForm() {
       const current = errors.password as any;
       if (current?.type === "manual") clearErrors("password");
     }
-  }, [passwordValue, setError, clearErrors, errors.password]);
+    // only run when password text changes
+  }, [passwordValue, setError, clearErrors]);
 
   const onSubmit = (data: SignUpFormData) => {
     mutate(data, {
       onSuccess: async (res) => {
         const { user, accessToken, refreshToken } = res.data;
-        await login(
-          { id: 1, email: user.email, name: "" },
-          { accessToken, refreshToken },
-          false,
-        );
-        router.replace("/onboarding/index");
+        console.log("Registration successful:", res.data);
+        // await login(
+        //   { id: user.id, email: user.email },
+        //   { accessToken, refreshToken },
+        //   false,
+        // );
+        // router.replace("/onboarding");
       },
       onError: (error: any) => {
+        console.log(
+          "Registration error:",
+          error.response.data.message || error.message,
+        );
+
         Toast.show({
           type: "error",
           text1: "Registration failed",
@@ -156,6 +163,30 @@ export default function SignUpForm() {
 
       <ControllerTextInput
         control={control}
+        name="firstName"
+        isRequired
+        placeholder="First Name"
+        label="First Name"
+        errors={errors}
+        textInputStyle={styles.smallInputText}
+        containerStyle={styles.inputHeight}
+        style={styles.flex1}
+      />
+
+      <ControllerTextInput
+        control={control}
+        name="lastName"
+        isRequired
+        placeholder="Last Name"
+        label="Last Name"
+        errors={errors}
+        textInputStyle={styles.smallInputText}
+        containerStyle={styles.inputHeight}
+        style={styles.flex1}
+      />
+
+      <ControllerTextInput
+        control={control}
         name="confirmPassword"
         placeholder="Confirm Password"
         isRequired
@@ -179,31 +210,6 @@ export default function SignUpForm() {
           </Pressable>
         }
       />
-
-      <HStack gap={10}>
-        <ControllerTextInput
-          control={control}
-          name="firstname"
-          isRequired
-          placeholder="First Name"
-          label="First Name"
-          errors={errors}
-          textInputStyle={styles.smallInputText}
-          containerStyle={styles.inputHeight}
-          style={styles.flex1}
-        />
-        <ControllerTextInput
-          control={control}
-          name="lastname"
-          isRequired
-          placeholder="Last Name"
-          label="Last Name"
-          errors={errors}
-          textInputStyle={styles.smallInputText}
-          containerStyle={styles.inputHeight}
-          style={styles.flex1}
-        />
-      </HStack>
 
       <VStack style={styles.footer} gap={12}>
         <CustomButton

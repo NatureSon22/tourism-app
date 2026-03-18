@@ -3,10 +3,12 @@ import { Colors, Typography } from "@/src/constants/styles";
 import formatCurrency from "@/src/utils/currency";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function PlaceCard({
+  id,
   imageUrl,
   location,
   name,
@@ -14,8 +16,14 @@ export default function PlaceCard({
   rating,
   reviews,
 }: PlaceList) {
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push({ pathname: "/accommodation/[id]", params: { id } });
+  };
+
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={handlePress}>
       <View style={styles.imageContainer}>
         <Image
           source={imageUrl}
@@ -46,7 +54,7 @@ export default function PlaceCard({
 
         <Text style={styles.priceText}>From {formatCurrency(price)}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

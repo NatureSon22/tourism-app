@@ -13,6 +13,7 @@ import VStack from "@/src/layouts/VStack";
 import formatCurrency from "@/src/utils/currency";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -29,6 +30,7 @@ export default function AccomodationDetailsPage() {
   const [showHeader, setShowHeader] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const imageHeight = width / (16 / 9);
+  const router = useRouter();
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -237,7 +239,7 @@ export default function AccomodationDetailsPage() {
           <CustomButton
             title="Book Now"
             textStyle={{ fontSize: 12 }}
-            onPress={() => console.log("Book")}
+            onPress={() => router.push("/bookmark")}
             variant="solid"
             style={{
               paddingHorizontal: 24,

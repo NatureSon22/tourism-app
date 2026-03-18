@@ -6,12 +6,12 @@ import VStack from "@/src/layouts/VStack";
 import formatCurrency from "@/src/utils/currency";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
-import React from "react";
+import React, { memo } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 type Props = Accommodation;
 
-export default function AccommodationCard({
+function AccommodationCard({
   imageUrl,
   name,
   location,
@@ -108,3 +108,5 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
   },
 });
+
+export default memo(AccommodationCard);

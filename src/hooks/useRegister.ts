@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import authService from "../services/auth";
 import { SignUpFormData } from "../forms/SignUpForm";
+import authService from "../services/api/authService";
 
 export const useRegister = () => {
   return useMutation({

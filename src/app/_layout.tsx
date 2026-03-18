@@ -18,6 +18,7 @@ import { useShallow } from "zustand/react/shallow";
 import queryClient from "../config/queryClient";
 import { Sheets } from "../config/sheets";
 import toastConfig from "../config/toastConfig";
+import authService from "../services/api/authService";
 import useAuthStore from "../stores/authStore";
 import { tokenStorage } from "../utils/tokenStorage";
 
@@ -35,34 +36,72 @@ function Routes() {
     "Poppins-MediumItalic": Poppins_500Medium_Italic,
   });
 
-  const { onBoardingCompleted, user, clear, logout, rememberMe, login } =
-    useAuthStore(
-      useShallow((state) => ({
-        onBoardingCompleted: state.onBoardingCompleted,
-        user: state.user,
-        clear: state.clearApp,
-        logout: state.logout,
-        rememberMe: state,
-        login: state.login,
-      })),
-    );
+  const {
+    onBoardingCompleted,
+    user,
+    clear,
+    logout,
+    rememberMe,
+    login,
+    refreshToken,
+  } = useAuthStore(
+    useShallow((state) => ({
+      onBoardingCompleted: state.onBoardingCompleted,
+      user: state.user,
+      clear: state.clearApp,
+      logout: state.logout,
+      rememberMe: state,
+      login: state.login,
+      refreshToken: state.refreshToken,
+    })),
+  );
 
   // useEffect(() => {
   //   clear();
   // }, []);
 
   // request for crsf token
+  useEffect(() => {
+    async function fetchCsrfToken() {
+      try {
+        const token = await authService.requestCrsfToken();
+        console.log("CSRF token:", token);
+      } catch (error) {
+        console.error("Failed to fetch CSRF token:", error);
+      }
+    }
+
+    fetchCsrfToken();
+  }, []);
+
   // useEffect(() => {
-  //   async function fetchCsrfToken() {
+  //   async function refreshToken() {
   //     try {
-  //       const token = await authService.requestCrsfToken();
-  //       console.log("CSRF token:", token);
+  //       const tokens = await tokenStorage.getTokens();
+  //       const response = await authService.refreshToken(tokens?.refreshToken || "");
+  //       console.log("REFRESH RESPONSE: " + response.data)
   //     } catch (error) {
   //       console.error("Failed to fetch CSRF token:", error);
   //     }
   //   }
 
-  //   fetchCsrfToken();
+  //   // refreshToken();
+  // }, []);
+
+  // useEffect(() => {
+  //   async function test() {
+  //     try {
+  //       const response = await authService.testReq();
+  //       console.log("Test request successful:", response);
+  //     } catch (error) {
+  //       console.error(
+  //         "Test request failed:",
+  //         error.response?.data?.message || error.message,
+  //       );
+  //     }
+  //   }
+
+  //   test();
   // }, []);
 
   const initializeAuth = useCallback(async () => {
@@ -75,9 +114,8 @@ function Routes() {
       const tokens = await tokenStorage.getTokens();
 
       if (tokens) {
-        // TODO: validate tokens
-        // If valid: hydrateStore(tokens)
-        // If invalid: await logout()
+        // Hydrate tokens into the store so interceptors can attach access token
+        useAuthStore.getState().hydrateTokens(tokens);
       } else {
         await logout();
       }
@@ -122,6 +160,8 @@ function Routes() {
             </Stack.Protected>
 
             {/* User exists and onboarding is done */}
+            {/* TODO: turn back the auth */}
+
             <Stack.Protected guard={!!user && onBoardingCompleted}>
               <Stack.Screen name="(main)" />
               <Stack.Screen name="accommodation" />

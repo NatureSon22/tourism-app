@@ -1,3 +1,4 @@
+import EventListing from "@/src/components/app/event/EventListing";
 import FilterBar from "@/src/components/app/FilterBar";
 import SearchableHeader from "@/src/components/app/SearchableHeader";
 import { DINING_FILTERS } from "@/src/constants/filterOptions";
@@ -41,6 +42,8 @@ export default function EventPage() {
           onPress={handleAreaPress}
           containerStyle={styles.filterBarPadding}
         />
+
+        <EventListing search={debouncedSearch} />
       </Screen>
     </SafeArea>
   );
@@ -52,7 +55,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingTop: 0,
     paddingHorizontal: 0,
-    backgroundColor: Colors.overlay,
+    backgroundColor: Colors.surface,
   },
 
   filterBarPadding: {

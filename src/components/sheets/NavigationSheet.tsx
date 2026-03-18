@@ -20,9 +20,8 @@ export default function OptionSheet(props: SheetProps) {
 
     // then navigate if a path was provided
     if (path) {
-      // small timeout to allow sheet hide animation to start before navigation
       setTimeout(() => {
-        //router.push(path as Parameters<typeof router.push>[0]);
+        router.push(path as Parameters<typeof router.push>[0]);
       }, 200);
     }
   };

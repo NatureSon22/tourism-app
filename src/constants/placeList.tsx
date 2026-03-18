@@ -1,7 +1,7 @@
-const imagePlaceholder = require("../assets/images/imagecontainer.png");
+const imagePlaceholder = require("../assets/images/placeholder.jpg");
 
 export type PlaceList = {
-  id: number;
+  id: string;
   name: string;
   location: string;
   price: number;
@@ -12,7 +12,7 @@ export type PlaceList = {
 
 const PLACE_LIST: PlaceList[] = [
   {
-    id: 1,
+    id: "1",
     name: "Lions Head",
     location: "Baguio",
     price: 1234,
@@ -21,7 +21,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 2,
+    id: "2",
     name: "Camp John Hay",
     location: "Baguio",
     price: 850,
@@ -30,7 +30,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 3,
+    id: "3",
     name: "Burnham Park",
     location: "Baguio",
     price: 0,
@@ -39,7 +39,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 4,
+    id: "4",
     name: "Mines View",
     location: "Baguio",
     price: 300,
@@ -48,7 +48,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 5,
+    id: "5",
     name: "Botanical Garden",
     location: "Baguio",
     price: 150,
@@ -57,7 +57,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 6,
+    id: "6",
     name: "Session Road Cafe",
     location: "Baguio",
     price: 450,
@@ -66,7 +66,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 7,
+    id: "7",
     name: "BenCab Museum",
     location: "Tuba",
     price: 600,
@@ -75,7 +75,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 8,
+    id: "8",
     name: "Wright Park",
     location: "Baguio",
     price: 120,
@@ -84,7 +84,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 9,
+    id: "9",
     name: "Tam-Awan Village",
     location: "Baguio",
     price: 200,
@@ -93,7 +93,7 @@ const PLACE_LIST: PlaceList[] = [
     imageUrl: imagePlaceholder,
   },
   {
-    id: 10,
+    id: "10",
     name: "Strawberry Farm",
     location: "La Trinidad",
     price: 250,

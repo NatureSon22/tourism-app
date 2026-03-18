@@ -1,11 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { tokenStorage } from "../utils/tokenStorage";
+import { tokenStorage } from "./../utils/tokenStorage";
 
 export type User = {
-  id: number;
-  name: string;
+  id: string;
   email: string;
 };
 
@@ -42,9 +41,7 @@ const useAuthStore = create<AuthState & AuthActions>()(
       refreshToken: null,
 
       login: async (user, tokens, rememberMe) => {
-        if (rememberMe) {
-          tokenStorage.saveTokens(tokens);
-        }
+        await tokenStorage.saveTokens(tokens);
 
         set({
           user,
@@ -62,6 +59,7 @@ const useAuthStore = create<AuthState & AuthActions>()(
 
       logout: async () => {
         await tokenStorage.clearTokens();
+        await AsyncStorage.clear();
 
         set({
           user: null,
@@ -71,21 +69,24 @@ const useAuthStore = create<AuthState & AuthActions>()(
         });
       },
 
-      completeOnBoarding: () => set({ onBoardingCompleted: true }),
+      completeOnBoarding: async () => set({ onBoardingCompleted: true }),
 
-      clearApp: () =>
+      clearApp: async () => {
+        await tokenStorage.clearTokens();
+        await AsyncStorage.clear();
+
         set({
           user: null,
           accessToken: null,
           refreshToken: null,
           onBoardingCompleted: false,
           rememberMe: false,
-        }),
+        });
+      },
     }),
     {
       name: "auth-storage",
       storage: createJSONStorage(() => AsyncStorage),
-      // CRITICAL: Only persist non-sensitive UI state
       partialize: (state) => ({
         user: state.user,
         onBoardingCompleted: state.onBoardingCompleted,

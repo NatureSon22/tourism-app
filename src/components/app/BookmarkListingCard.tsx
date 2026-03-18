@@ -7,12 +7,12 @@ import VStack from "@/src/layouts/VStack";
 import formatCurrency from "@/src/utils/currency";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
-import React from "react";
+import React, { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 type Props = Listing;
-
-export default function BookmarkListingCard({
+ 
+function BookmarkListingCard({
   imageUrl,
   name,
   location,
@@ -22,7 +22,7 @@ export default function BookmarkListingCard({
 }: Props) {
   return (
     <View style={styles.card}>
-      <HStack gap={17} alignItems="stretch">
+      <HStack gap={17} alignItems="flex-start">
         <View style={styles.imageWrapper}>
           <Image source={imageUrl} contentFit="cover" style={styles.image} />
           <Image
@@ -31,16 +31,16 @@ export default function BookmarkListingCard({
             style={styles.bookmarkIcon}
           />
         </View>
-
+ 
         <VStack style={styles.content} gap={5}>
           <Text style={styles.name} numberOfLines={1}>
             {name}
           </Text>
-
+ 
           <Text style={styles.location} numberOfLines={1}>
             {location}
           </Text>
-
+ 
           <VStack gap={0} style={{ alignItems: "flex-start" }}>
             <HStack alignItems="center" gap={5}>
               <FontAwesome6 name="star" size={10} color="#E28F0B" solid />
@@ -48,7 +48,7 @@ export default function BookmarkListingCard({
               <Text style={styles.reviewText}>({reviews})</Text>
             </HStack>
           </VStack>
-
+ 
           <Text style={styles.price}>{formatCurrency(pricePerNight)}</Text>
         </VStack>
       </HStack>
@@ -116,3 +116,5 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
 });
+
+export default memo(BookmarkListingCard);

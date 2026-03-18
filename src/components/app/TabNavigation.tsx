@@ -21,7 +21,7 @@ export default function TabNavigation() {
       // Reset lock after a short delay to prevent double-pushing the same route
       setTimeout(() => {
         isBusy.current = false;
-      }, 500);
+      }, 500); 
     } else {
       SheetManager.show("options-sheet", {
         onClose() {

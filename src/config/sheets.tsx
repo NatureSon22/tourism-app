@@ -1,5 +1,5 @@
 import { SheetDefinition, SheetRegister } from "react-native-actions-sheet";
-import OptionSheet from "../components/sheets/AccommodationOptionSheet";
+import OptionSheet from "../components/sheets/NavigationSheet";
 import DiningFilterSheet from "../components/sheets/DiningFilterSheet";
 import AccommodationAreaSheet from "../components/sheets/accommodation/AccommodationAreaSheet";
 import AccommodationFilterSheet from "../components/sheets/accommodation/AccommodationFilterSheet";

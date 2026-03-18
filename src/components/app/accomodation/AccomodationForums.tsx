@@ -2,6 +2,7 @@ import { ForumPost } from "@/src/constants/forum";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import { useRouter } from "expo-router";
 import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import CustomButton from "../../ui/CustomButton";
@@ -14,7 +15,14 @@ type AccomodationForumsProps = {
 export default function AccomodationForums({
   forums,
 }: AccomodationForumsProps) {
+  const router = useRouter();
   // useQuery
+
+  const handleSeeAllPress = () => {
+    // must be accommodation/forums
+    router.push("/forum");
+  };
+
   return (
     <VStack style={styles.sectionContainer}>
       <HStack gap={8} style={styles.sectionHeader}>
@@ -44,7 +52,7 @@ export default function AccomodationForums({
           fontFamily: Typography.family.light,
           color: Colors.text,
         }}
-        onPress={() => {}}
+        onPress={handleSeeAllPress}
       />
     </VStack>
   );

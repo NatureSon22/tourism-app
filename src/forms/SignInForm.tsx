@@ -7,6 +7,7 @@ import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 import ControllerTextInput from "../components/ui/ControllerTextInput";
@@ -25,7 +26,7 @@ const SignInSchema = z.object({
   password: z.string().min(1, { message: "Password is required" }),
 });
 
-type SignInFormData = z.infer<typeof SignInSchema>;
+export type SignInFormData = z.infer<typeof SignInSchema>;
 
 export default function SignInForm() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function SignInForm() {
     formState: { errors, isValid },
   } = useForm<SignInFormData>({
     resolver: zodResolver(SignInSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "consumer1@gmail.com", password: "cons1" },
     mode: "onTouched",
   });
 
@@ -53,33 +54,39 @@ export default function SignInForm() {
   const togglePasswordVisibility = () => setShowPassword((p) => !p);
 
   const onSubmit = async (data: SignInFormData) => {
-    await login(
-      { id: 1, email: "bantajio22@gmail.com", name: "" },
-      { accessToken: "sampletoken", refreshToken: "samplerefreshtoken" },
-      isChecked,
-    );
-    // mutate(
-    //   { email: data.email, password: data.password },
-    //   {
-    //     onSuccess: async (res) => {
-    //       const { user, accessToken, refreshToken } = res.data;
-    //       const token = { accessToken, refreshToken };
-
-    //       await login({ id: user.id, email: user.email }, token, isChecked);
-
-    //       if (!onBoardingCompleted) {
-    //         router.replace("/(onboarding)/welcome");
-    //       }
-    //     },
-    //     onError: (error: any) => {
-    //       Toast.show({
-    //         type: "error",
-    //         text1: "Login failed",
-    //         text2: error.message,
-    //       });
-    //     },
-    //   },
+    // await login(
+    //   { id: "1", email: "bantajio22@gmail.com" },
+    //   { accessToken: "sampletoken", refreshToken: "samplerefreshtoken" },
+    //   isChecked,
     // );
+    mutate(
+      { email: data.email, password: data.password },
+      {
+        onSuccess: async (res) => {
+          const { user, accessToken, refreshToken } = res.data;
+          console.log("Login successful:", res.data);
+          const token = { accessToken, refreshToken };
+
+          // console.log(token);
+
+          // // console.log("Login successful:", user, token, isChecked);
+
+          await login({ id: user.id, email: user.email }, token, isChecked);
+
+          if (!onBoardingCompleted) {
+            router.replace("/onboarding");
+          }
+        },
+        onError: (error: any) => {
+          const errorMessage = error.response?.data?.message || error.message;
+          Toast.show({
+            type: "error",
+            text1: errorMessage,
+            text2: error.message,
+          });
+        },
+      },
+    );
   };
 
   return (
