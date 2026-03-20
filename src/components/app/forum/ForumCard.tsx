@@ -8,7 +8,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image } from "expo-image";
 import React from "react";
 import { Text, View } from "react-native";
-import CustomButton from "../ui/CustomButton";
+import CustomButton from "../../ui/CustomButton";
 import ForumMedia from "./ForumMedia";
 
 export default function ForumCard({

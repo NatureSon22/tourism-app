@@ -1,5 +1,6 @@
-import BookmarkForum from "@/src/components/app/BookmarkForum";
-import BookmarkListing from "@/src/components/app/BookmarkListing";
+import BookmarkForum from "@/src/components/app/bookmark/BookmarkForum";
+import BookmarkListing from "@/src/components/app/bookmark/BookmarkListing";
+
 
 import CustomPopupMenu from "@/src/components/ui/CustomPopupMenu";
 import FORUMS_OPTIONS, {

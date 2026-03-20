@@ -28,7 +28,7 @@ export default function TransportationLayout() {
           headerLeft: () => null,
           headerTitle: () => (
             <SearchableHeader
-              search={debouncedSearch}
+              search={search}
               setSearch={setSearch}
               title="Transporation Information"
             />

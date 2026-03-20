@@ -9,7 +9,6 @@ import {
 } from "@expo-google-fonts/poppins";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { SplashScreen, Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
 import { SheetProvider } from "react-native-actions-sheet";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -19,7 +18,6 @@ import { useShallow } from "zustand/react/shallow";
 import queryClient from "../config/queryClient";
 import { Sheets } from "../config/sheets";
 import toastConfig from "../config/toastConfig";
-import { Colors } from "../constants/styles";
 import authService from "../services/api/authService";
 import useAuthStore from "../stores/authStore";
 import { tokenStorage } from "../utils/tokenStorage";
@@ -38,15 +36,7 @@ function Routes() {
     "Poppins-MediumItalic": Poppins_500Medium_Italic,
   });
 
-  const {
-    onBoardingCompleted,
-    user,
-    clear,
-    logout,
-    rememberMe,
-    login,
-    refreshToken,
-  } = useAuthStore(
+  const { onBoardingCompleted, user, clear, logout } = useAuthStore(
     useShallow((state) => ({
       onBoardingCompleted: state.onBoardingCompleted,
       user: state.user,
@@ -66,8 +56,7 @@ function Routes() {
   useEffect(() => {
     async function fetchCsrfToken() {
       try {
-        const token = await authService.requestCrsfToken();
-        console.log("CSRF token:", token);
+        await authService.requestCrsfToken();
       } catch (error) {
         console.error("Failed to fetch CSRF token:", error);
       }
@@ -76,35 +65,21 @@ function Routes() {
     fetchCsrfToken();
   }, []);
 
-  // useEffect(() => {
-  //   async function refreshToken() {
-  //     try {
-  //       const tokens = await tokenStorage.getTokens();
-  //       const response = await authService.refreshToken(tokens?.refreshToken || "");
-  //       console.log("REFRESH RESPONSE: " + response.data)
-  //     } catch (error) {
-  //       console.error("Failed to fetch CSRF token:", error);
-  //     }
-  //   }
+  useEffect(() => {
+    async function test() {
+      try {
+        const response = await authService.testReq();
+        console.log("Test request successful:", response);
+      } catch (error) {
+        console.error(
+          "Test request failed:",
+          error.response?.data?.message || error.message,
+        );
+      }
+    }
 
-  //   // refreshToken();
-  // }, []);
-
-  // useEffect(() => {
-  //   async function test() {
-  //     try {
-  //       const response = await authService.testReq();
-  //       console.log("Test request successful:", response);
-  //     } catch (error) {
-  //       console.error(
-  //         "Test request failed:",
-  //         error.response?.data?.message || error.message,
-  //       );
-  //     }
-  //   }
-
-  //   test();
-  // }, []);
+    test();
+  }, []);
 
   const initializeAuth = useCallback(async () => {
     try {
@@ -119,6 +94,7 @@ function Routes() {
         // Hydrate tokens into the store so interceptors can attach access token
         useAuthStore.getState().hydrateTokens(tokens);
       } else {
+        console.log("No tokens found during initialization");
         await logout();
       }
     } catch (e) {
@@ -149,7 +125,7 @@ function Routes() {
     <>
       <SheetProvider>
         <Sheets />
-        <StatusBar backgroundColor={Colors.surface} />
+
         <KeyboardProvider>
           <Stack screenOptions={{ headerShown: false }}>
             {/* If no user object exists, go to Auth */}
@@ -163,8 +139,6 @@ function Routes() {
             </Stack.Protected>
 
             {/* User exists and onboarding is done */}
-            {/* TODO: turn back the auth */}
-
             <Stack.Protected guard={!!user && onBoardingCompleted}>
               <Stack.Screen name="(main)" />
               <Stack.Screen name="accommodation" />

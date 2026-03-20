@@ -33,6 +33,8 @@ export const tokenStorage = {
   saveTokens: async (tokens: StoredTokens) => {
     try {
       if (IS_EXPO_GO) {
+        console.log("Saving tokens to AsyncStorage:", tokens);
+
         await AsyncStorage.setItem(TEMP_TOKEN_KEY, JSON.stringify(tokens));
         return;
       }

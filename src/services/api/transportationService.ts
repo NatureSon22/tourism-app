@@ -1,26 +1,7 @@
-import { Transportation } from "@/src/constants/transportationList";
-
-// Mock Data for Development
-const MOCK_TRANSPORT: Transportation[] = [
-  {
-    id: "1",
-    name: "Fast Ferry - Cebu to Bohol",
-    location: "Cebu Pier 1",
-    price: 800,
-    rating: 4.8,
-    reviews: 120,
-    imageUrl: "...",
-  },
-  {
-    id: "2",
-    name: "Private Van - PPS to El Nido",
-    location: "Puerto Princesa",
-    price: 600,
-    rating: 4.5,
-    reviews: 85,
-    imageUrl: "...",
-  },
-];
+import {
+  PHILIPPINE_TRANSPORTATION_DATA,
+  Transportation,
+} from "@/src/constants/transportationList";
 
 export type GetTransportationParams = {
   search?: string;
@@ -39,7 +20,7 @@ const transportationService = {
   ): Promise<TransportationResponse> => {
     await new Promise((r) => setTimeout(r, 1000));
 
-    let list = [...MOCK_TRANSPORT];
+    let list = PHILIPPINE_TRANSPORTATION_DATA;
     const search = params.search?.toLowerCase().trim();
 
     // 1. Filter by Search
@@ -68,7 +49,7 @@ const transportationService = {
     id: string,
   ): Promise<Transportation | undefined> => {
     await new Promise((r) => setTimeout(r, 500));
-    return MOCK_TRANSPORT.find((item) => item.id === id);
+    return PHILIPPINE_TRANSPORTATION_DATA.find((item) => item.id === id);
   },
 };
 

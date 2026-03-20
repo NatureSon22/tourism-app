@@ -67,10 +67,6 @@ export default function SignInForm() {
           console.log("Login successful:", res.data);
           const token = { accessToken, refreshToken };
 
-          // console.log(token);
-
-          // // console.log("Login successful:", user, token, isChecked);
-
           await login({ id: user.id, email: user.email }, token, isChecked);
 
           if (!onBoardingCompleted) {

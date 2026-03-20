@@ -2,9 +2,11 @@ import { Listing, listings } from "@/src/constants/listings";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
+import ReloadPage from "../ReloadPage";
+import NoResourceFound from "../NoResourceFound";
 import BookmarkListingCard from "./BookmarkListingCard";
-import NoResourceFound from "./NoResourceFound";
-import ReloadPage from "./ReloadPage";
+
+
 
 export default function BookmarkListing() {
   const [isRefetching, setIsRefetching] = useState(false);

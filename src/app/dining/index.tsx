@@ -1,6 +1,6 @@
-import DiningHeader from "@/src/components/app/dining/DiningHeader";
 import DiningList from "@/src/components/app/dining/DiningList";
 import FilterBar from "@/src/components/app/FilterBar";
+import SearchableHeader from "@/src/components/app/SearchableHeader";
 import { DINING_FILTERS } from "@/src/constants/filterOptions";
 import { Colors } from "@/src/constants/styles";
 import useDebounce from "@/src/hooks/useDebounce";
@@ -27,7 +27,11 @@ export default function DiningPage() {
           headerBackVisible: false,
           headerLeft: () => null,
           headerTitle: () => (
-            <DiningHeader search={search} setSearch={setSearch} />
+            <SearchableHeader
+              search={search}
+              setSearch={setSearch}
+              title={"Food and Dining"}
+            />
           ),
         }}
       />

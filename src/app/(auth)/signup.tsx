@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
     padding: 16,
     width: "100%",
     gap: 30,
+    borderColor: "pink",
   },
   header: {
     gap: 5,

@@ -2,9 +2,10 @@ import forumData, { ForumPost } from "@/src/constants/forum";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useState } from "react";
 import { FlatList, RefreshControl } from "react-native";
-import FormCard from "./ForumCard";
-import NoResourceFound from "./NoResourceFound";
-import ReloadPage from "./ReloadPage";
+
+import NoResourceFound from "../NoResourceFound";
+import ReloadPage from "../ReloadPage";
+import ForumCard from "../forum/ForumCard";
 
 export default function BookmarkForum() {
   const [isRefetching, setIsRefetching] = useState(false);
@@ -30,7 +31,7 @@ export default function BookmarkForum() {
       }}
       // ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item }) => <FormCard {...item} />}
+      renderItem={({ item }) => <ForumCard {...item} />}
       //refresh pull to refresh
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={onRefresh} />

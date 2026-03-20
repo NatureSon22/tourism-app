@@ -69,7 +69,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     paddingHorizontal: 5,
-    height: 50, // Added height for vertical centering consistency
   },
   middleSection: {
     flex: 1,
@@ -85,7 +84,6 @@ const styles = StyleSheet.create({
   searchContainer: {
     height: 42,
     width: "100%",
-    backgroundColor: "transparent", // Ensure it doesn't overlap header style
   },
   searchInput: {
     fontSize: 13,

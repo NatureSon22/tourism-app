@@ -5,7 +5,7 @@ import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback } from "react";
 import { FlatList, RefreshControl, StyleSheet, ListRenderItem } from "react-native";
-import ItemSeparator from "../../ItemSeparator";
+import ItemSeparator from "../../ui/ItemSeparator";
 import ListEmptyState from "../ListEmptyState";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "./EventCardSkeleton";

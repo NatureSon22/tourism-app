@@ -1,4 +1,4 @@
-import FormCard from "@/src/components/app/ForumCard";
+import ForumCard from "@/src/components/app/forum/ForumCard";
 import forumData from "@/src/constants/forum";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
@@ -35,7 +35,7 @@ export default function Forum() {
           data={forumData}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <FormCard {...item} />}
+          renderItem={({ item }) => <ForumCard {...item} />}
         />
       </Screen>
     </SafeArea>

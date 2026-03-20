@@ -22,24 +22,28 @@ export default function TransportationCard({
     <Pressable style={styles.card}>
       {/* 1. Image Container with Bookmark */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: imageUrl }} style={styles.image} contentFit="cover" />
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          contentFit="cover"
+        />
         <View style={styles.bookmarkBadge}>
-          <Ionicons name="bookmark" size={20} color="#FFB800" />
+          <Ionicons name="bookmark-outline" size={20} color={Colors.rating} />
         </View>
       </View>
 
-      <VStack style={styles.content} gap={4}>
+      <VStack style={styles.content} gap={0}>
         {/* 2. Location (Subtle/Muted) */}
         <Text style={styles.location}>{location}</Text>
 
         {/* 3. Name (Large/Bold) */}
-        <Text style={styles.name} numberOfLines={2}>
+        <Text style={styles.name} numberOfLines={1}>
           {name}
         </Text>
 
         {/* 4. Rating Row */}
-        <HStack gap={4} alignItems="center">
-          <Ionicons name="star" size={16} color="#E67E22" />
+        <HStack gap={4} alignItems="center" justifyContent="flex-start">
+          <Ionicons name="star" size={10} color={Colors.rating} />
           <Text style={styles.ratingText}>{rating}</Text>
           <Text style={styles.reviewsText}>({reviews})</Text>
         </HStack>
@@ -54,9 +58,9 @@ export default function TransportationCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
-    borderRadius: 20,
+    borderRadius: 10,
     overflow: "hidden", // Important for image corners
-    width: '100%',
+    width: "100%",
     // Subtle shadow
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -66,7 +70,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     width: "100%",
-    height: 180,
+    height: 120,
     position: "relative",
   },
   image: {
@@ -79,34 +83,37 @@ const styles = StyleSheet.create({
     right: 12,
   },
   content: {
-    padding: 16,
+    padding: 10,
   },
   location: {
-    fontSize: 14,
-    color: "#888",
+    fontSize: 10,
+    color: Colors.textMuted,
     fontFamily: Typography.family.regular,
+    includeFontPadding: false,
   },
   name: {
-    fontSize: 18,
+    fontSize: 12,
     fontFamily: Typography.family.semiBold,
-    color: "#1A1A1A",
     marginVertical: 2,
     lineHeight: 22,
+    includeFontPadding: false,
   },
   ratingText: {
-    fontSize: 15,
+    fontSize: 10,
     fontFamily: Typography.family.bold,
     color: "#E67E22",
+    includeFontPadding: false,
   },
   reviewsText: {
-    fontSize: 15,
+    fontSize: 10,
     color: "#AAA",
     fontFamily: Typography.family.regular,
+    includeFontPadding: false,
   },
   price: {
-    fontSize: 22,
-    fontFamily: Typography.family.bold,
+    marginTop: 5,
+    fontSize: 12,
+    fontFamily: Typography.family.medium,
     color: "#2C3E50",
-    marginTop: 8,
   },
 });

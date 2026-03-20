@@ -59,7 +59,6 @@ const useAuthStore = create<AuthState & AuthActions>()(
 
       logout: async () => {
         await tokenStorage.clearTokens();
-        await AsyncStorage.clear();
 
         set({
           user: null,
@@ -73,7 +72,6 @@ const useAuthStore = create<AuthState & AuthActions>()(
 
       clearApp: async () => {
         await tokenStorage.clearTokens();
-        await AsyncStorage.clear();
 
         set({
           user: null,

@@ -34,15 +34,19 @@ export default function TransportationList({
       keyExtractor={(item) => item.id}
       key="two-column-list"
       numColumns={2}
+      columnWrapperStyle={styles.columnWrapper}
       contentContainerStyle={styles.listContent}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => {
         if ("isSkeleton" in item) {
           return <Text>Text</Text>;
         }
 
-        return <TransportationCard {...item} />;
+        return (
+          <View style={styles.itemWrapper}>
+            <TransportationCard {...item} />
+          </View>
+        );
       }}
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
@@ -67,5 +71,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingBottom: 20,
   },
-  separator: { height: 20 },
+  columnWrapper: {
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  itemWrapper: {
+    flex: 1,
+    paddingHorizontal: 6,
+  },
 });

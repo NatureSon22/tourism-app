@@ -64,16 +64,6 @@ api.interceptors.response.use(
 
     const originalRequest = error.config;
 
-    try {
-      console.log("Response error intercepted:", {
-        url: originalRequest.url,
-        method: originalRequest.method,
-        status: error.response?.status,
-      });
-    } catch (logErr) {
-      // ignore logging errors
-    }
-
     const isAuthRequest =
       originalRequest.url?.includes("/auth/login") ||
       originalRequest.url?.includes("/auth/register");
@@ -84,6 +74,8 @@ api.interceptors.response.use(
       !originalRequest._retry &&
       !isAuthRequest
     ) {
+      console.log("401 detected. Attempting token refresh...");
+
       if (isRefreshing) {
         // Queue the request while refreshing
         return new Promise((resolve, reject) => {
@@ -103,24 +95,29 @@ api.interceptors.response.use(
       try {
         const tokens = await tokenStorage.getTokens();
 
-        console.log("Attempting token refresh with tokens: ", tokens);
+        // console.log("Attempting token refresh with tokens: ", tokens);
 
         if (!tokens?.refreshToken)
           throw new Error("No refresh token available");
 
         // Call refresh endpoint
         // Use a separate axios instance or the full URL to avoid interceptor interference
-        const res = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {
-          refreshToken: tokens.refreshToken,
-        });
-
-        console.log("Refresh response: ", res.data);
+        const res = await axios.post(
+          `${api.defaults.baseURL}/auth/refresh`,
+          {
+            refreshToken: tokens.refreshToken,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              "X-CSRF-TOKEN": await AsyncStorage.getItem(
+                "@temp_dev_csrf_token",
+              ),
+            },
+          },
+        );
 
         const { accessToken, refreshToken: newRefreshToken } = res.data.data;
-        console.log("Token refreshed successfully: ", {
-          accessToken,
-          refreshToken: newRefreshToken,
-        });
 
         await tokenStorage.saveTokens({
           accessToken,
@@ -136,7 +133,6 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // If refresh fails, logout user
         processQueue(refreshError, null);
-        console.log("WENT HERE");
         console.error(error.response?.data?.message);
         await useAuthStore.getState().logout();
         return Promise.reject(refreshError);

@@ -28,12 +28,28 @@ const authService = {
         },
       );
 
-      if (!response.ok) throw new Error("Failed to fetch CSRF token");
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `Failed to fetch CSRF token: ${response.status} - ${errorBody}`,
+        );
+      }
 
       const result = await response.json();
-      const csrfToken = result.data.csrfToken;
 
+      // --- GUARD START ---
+      // Check if result.data exists AND result.data.csrfToken is a valid string
+      const csrfToken = result?.data?.csrfToken;
+
+      if (!csrfToken || typeof csrfToken !== "string") {
+        console.error("Malformed API Response. Received:", result);
+        throw new Error("CSRF Token was not found in the server response.");
+      }
+      // --- GUARD END ---
+
+      // AsyncStorage only accepts strings. The guard above ensures this is a string.
       await AsyncStorage.setItem("@temp_dev_csrf_token", csrfToken);
+      console.log("CSRF token stored in AsyncStorage:", csrfToken);
 
       return csrfToken;
     } catch (error) {
@@ -70,6 +86,10 @@ const authService = {
 
     console.log("REFRESH TOKEN RESPONSE: ", data);
 
+    const { accessToken, refreshToken } = data.data;
+
+    await tokenStorage.saveTokens({ accessToken, refreshToken });
+
     return data.data;
   },
 
@@ -81,7 +101,7 @@ const authService = {
   logout: async () => {
     // Clear secure token storage and remove temporary CSRF token
     await tokenStorage.clearTokens();
-    await AsyncStorage.removeItem("@temp_dev_csrf_token");
+    //await AsyncStorage.removeItem("@temp_dev_csrf_token");
   },
 };
 
