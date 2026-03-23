@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   errorText: {
-    color: Colors.error, // Deep red text
+    color: Colors.error,
     fontSize: 13,
     fontFamily: Typography.family.medium,
   },

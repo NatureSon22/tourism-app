@@ -1,5 +1,20 @@
 import { FilterOption } from "../components/app/FilterBar";
 
+export const ACCOMMODATION_FILTERS: FilterOption[] = [
+  {
+    label: "Area",
+    sheet: "area-sheet",
+  },
+  {
+    label: "Filter",
+    sheet: "accommodation-filter-sheet",
+  },
+  {
+    label: "Sort",
+    sheet: "sort-sheet",
+  },
+];
+
 export const DINING_FILTERS: FilterOption[] = [
   {
     label: "Area",

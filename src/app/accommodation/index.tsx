@@ -1,23 +1,31 @@
 import AccommodationList from "@/src/components/app/accomodation/AccommodationList";
 import FilterBar from "@/src/components/app/FilterBar";
 import CustomTextInput from "@/src/components/ui/CustomTextInput";
-import { ACTIVITY_FILTERS } from "@/src/constants/filterOptions";
+import { ACCOMMODATION_FILTERS } from "@/src/constants/filterOptions";
 import { Colors, Typography } from "@/src/constants/styles";
 import useDebounce from "@/src/hooks/useDebounce";
 import HStack from "@/src/layouts/HStack";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import { useFilterStore } from "@/src/stores/filterStore";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 
 export default function AccommodationPage() {
   const sheetShownRef = useRef(false);
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 350);
+  const debouncedSearch = useDebounce(search);
   const router = useRouter();
+  const resetCategory = useFilterStore((state) => state.resetCategory);
+
+  useEffect(() => {
+    return () => {
+      resetCategory("accommodation");
+    };
+  }, []);
 
   const handleAreaPress = (sheet: string) => {
     if (!sheetShownRef.current) {
@@ -60,7 +68,7 @@ export default function AccommodationPage() {
         </HStack>
 
         <FilterBar
-          filters={ACTIVITY_FILTERS}
+          filters={ACCOMMODATION_FILTERS}
           onPress={handleAreaPress}
           containerStyle={styles.filterBar}
         />

@@ -29,7 +29,7 @@ const ALLTABNAVIGATION: TabNavigationItem[] = [
   },
   {
     name: "Local Services",
-    path: "/local-services",
+    path: "/service",
     icon: require("../assets/images/local.png"),
   },
   {

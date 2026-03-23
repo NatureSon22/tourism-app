@@ -38,7 +38,8 @@ export default function OptionSheet(props: SheetProps) {
           paddingVertical: 20,
           paddingHorizontal: 40,
           gap: 12,
-          height: 370,
+          minHeight: 200,
+          height: "55%",
         }}
       >
         <Text style={{ fontFamily: Typography.family.bold, fontSize: 20 }}>

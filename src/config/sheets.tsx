@@ -1,6 +1,6 @@
 import { SheetDefinition, SheetRegister } from "react-native-actions-sheet";
-import OptionSheet from "../components/sheets/NavigationSheet";
 import DiningFilterSheet from "../components/sheets/DiningFilterSheet";
+import OptionSheet from "../components/sheets/NavigationSheet";
 import AccommodationAreaSheet from "../components/sheets/accommodation/AccommodationAreaSheet";
 import AccommodationFilterSheet from "../components/sheets/accommodation/AccommodationFilterSheet";
 import AccommodationSortSheet from "../components/sheets/accommodation/AccommodationSortSheet";
@@ -12,6 +12,7 @@ declare module "react-native-actions-sheet" {
     "filter-sheet": SheetDefinition;
     "sort-sheet": SheetDefinition;
     "dining-filter-sheet": SheetDefinition;
+    "accommodation-filter-sheet": SheetDefinition;
   }
 }
 
@@ -24,6 +25,7 @@ export const Sheets = () => {
         "filter-sheet": AccommodationFilterSheet,
         "sort-sheet": AccommodationSortSheet,
         "dining-filter-sheet": DiningFilterSheet,
+        "accommodation-filter-sheet": AccommodationFilterSheet,
       }}
     />
   );

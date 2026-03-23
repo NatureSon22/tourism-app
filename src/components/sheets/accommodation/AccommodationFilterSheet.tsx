@@ -1,16 +1,14 @@
 import CustomButton from "@/src/components/ui/CustomButton";
-import { CustomRadioGroup } from "@/src/components/ui/CustomRadioGroup";
 import {
-  ACCOMODATION_TYPES,
   AMMENITIES,
   FILTER_DEFAULTS,
   PROPERTY_TYPES,
-  REVIEW_OPTIONS,
   STAR_OPTIONS,
 } from "@/src/constants/filterConstants";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import { useFilterStore } from "@/src/stores/filterStore";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Checkbox } from "expo-checkbox";
 import React, { useState } from "react";
@@ -21,9 +19,9 @@ import ActionSheet, {
 } from "react-native-actions-sheet";
 import { ScrollView } from "react-native-gesture-handler";
 
-// TODO: create store to persist the state
-
 export default function AccommodationFilterSheet(props: SheetProps) {
+  const updateOptions = useFilterStore((state) => state.updateOptions);
+  const resetCategory = useFilterStore((state) => state.resetCategory);
   const [selectedStar, setSelectedStar] = useState<number>(
     FILTER_DEFAULTS.selectedStar,
   );
@@ -33,9 +31,8 @@ export default function AccommodationFilterSheet(props: SheetProps) {
   const [propertyType, setPropertyType] = useState<string>(
     FILTER_DEFAULTS.propertyType,
   );
-  const [accomodationType, setAccomodationType] = useState<string[]>(
-    FILTER_DEFAULTS.accommodationType,
-  );
+  const [propertySubtypes, setPropertySubtypes] = useState<string[]>([]);
+
   const [ammenities, setAmmenities] = useState<string[]>(
     FILTER_DEFAULTS.amenities,
   );
@@ -47,25 +44,31 @@ export default function AccommodationFilterSheet(props: SheetProps) {
     );
   };
 
-  const toggleAccomodation = (name: string) => {
-    setAccomodationType((prev) =>
-      prev.includes(name) ? prev.filter((p) => p !== name) : [...prev, name],
-    );
+  const handleSelectStar = (value: number) => {
+    setSelectedStar(value);
   };
 
   const handleClear = () => {
     setSelectedStar(FILTER_DEFAULTS.selectedStar);
     setReviewScore(FILTER_DEFAULTS.reviewScore);
     setPropertyType(FILTER_DEFAULTS.propertyType);
-    setAccomodationType(FILTER_DEFAULTS.accommodationType);
+    setPropertySubtypes([]);
+
     setAmmenities(FILTER_DEFAULTS.amenities);
+    resetCategory("accommodation");
+
+    handleCloseSheet();
   };
 
   const handleApply = () => {
-    // You can emit the selected filters via SheetManager, event emitter, or callback
+    updateOptions("accommodation", {
+      filter: {
+        type: { type: propertyType, subtypes: propertySubtypes },
+        amenities: ammenities,
+      },
+    });
+
     SheetManager.hide(props.sheetId);
-    // Example: SheetManager.resolve might be used to pass data back — depending on sheet lib support
-    // SheetManager.resolve(props.sheetId, { selectedStar, reviewScore, propertyType, accomodationType, ammenities });
   };
 
   const handleCloseSheet = () => {
@@ -76,6 +79,19 @@ export default function AccommodationFilterSheet(props: SheetProps) {
     setShowAllAmenities((prev) => !prev);
   };
 
+  const handleSelectPropertyType = (type: string) => {
+    setPropertyType(type);
+    setPropertySubtypes([]); // reset subtype when type changes
+  };
+
+  const handleToggleSubtype = (subtype: string) => {
+    setPropertySubtypes((prev) =>
+      prev.includes(subtype)
+        ? prev.filter((item) => item !== subtype)
+        : [...prev, subtype],
+    );
+  };
+
   return (
     <ActionSheet
       id={props.sheetId}
@@ -84,13 +100,13 @@ export default function AccommodationFilterSheet(props: SheetProps) {
       useBottomSafeAreaPadding={false}
       containerStyle={{ borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
     >
-      <View style={{ height: 600 }}>
+      <View style={{ height: 500 }}>
         {/* header */}
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "space-evenly",
             paddingVertical: 10,
             paddingHorizontal: 35,
             borderBottomWidth: 1,
@@ -135,7 +151,7 @@ export default function AccommodationFilterSheet(props: SheetProps) {
               {STAR_OPTIONS.map((s) => (
                 <Pressable
                   key={s}
-                  onPress={() => setSelectedStar(s)}
+                  onPress={() => handleSelectStar(s)}
                   style={{
                     padding: 10,
                     paddingVertical: 7,
@@ -170,7 +186,7 @@ export default function AccommodationFilterSheet(props: SheetProps) {
             </View>
           </VStack>
 
-          <VStack gap={8}>
+          {/* <VStack gap={8}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
             >
@@ -201,7 +217,6 @@ export default function AccommodationFilterSheet(props: SheetProps) {
                       width: "100%",
                     }}
                   >
-                    {/* Top Row: The Score */}
                     <Text
                       style={{
                         color: reviewScore === r ? "#fff" : Colors.text,
@@ -212,7 +227,6 @@ export default function AccommodationFilterSheet(props: SheetProps) {
                       {r}+
                     </Text>
 
-                    {/* Bottom Row: The Label */}
                     <Text
                       style={{
                         color: reviewScore === r ? "#fff" : Colors.textMuted, // Use a lighter color for label when not selected
@@ -226,7 +240,7 @@ export default function AccommodationFilterSheet(props: SheetProps) {
                 </Pressable>
               ))}
             </View>
-          </VStack>
+          </VStack> */}
 
           <VStack gap={8}>
             <Text
@@ -235,53 +249,76 @@ export default function AccommodationFilterSheet(props: SheetProps) {
               Property Type
             </Text>
 
-            <CustomRadioGroup
-              selectedValue={propertyType}
-              onSelect={(v) => setPropertyType(v)}
-              options={PROPERTY_TYPES}
-            />
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+              {PROPERTY_TYPES.map((item) => {
+                const active = propertyType === item.type;
+                return (
+                  <Pressable
+                    key={item.type}
+                    onPress={() => handleSelectPropertyType(item.type)}
+                    style={{
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: active ? Colors.primary : Colors.border,
+                      backgroundColor: active ? Colors.primary : Colors.surface,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: active ? "#fff" : Colors.text,
+                        fontFamily: Typography.family.medium,
+                        fontSize: 13,
+                      }}
+                    >
+                      {item.type}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </VStack>
 
+          {/** subtype toggles for the selected property type **/}
           <VStack gap={8}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
             >
-              Accommodation Type
+              {`Subtypes (${propertyType})`}
             </Text>
 
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-              {ACCOMODATION_TYPES.map((a) => (
-                <View
-                  key={a}
-                  style={{
-                    width: "50%",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 10,
-                    paddingVertical: 6,
-                  }}
-                >
-                  <Checkbox
-                    value={accomodationType.includes(a)}
-                    color={
-                      accomodationType.includes(a)
-                        ? Colors.primary
-                        : Colors.border
-                    }
-                    onValueChange={() => toggleAccomodation(a)}
-                    style={{ transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }] }}
-                  />
-
-                  <Text
+              {PROPERTY_TYPES.find(
+                (p) => p.type === propertyType,
+              )?.subtypes.map((subtype) => {
+                const selected = propertySubtypes.includes(subtype);
+                return (
+                  <Pressable
+                    key={subtype}
+                    onPress={() => handleToggleSubtype(subtype)}
                     style={{
-                      color: Colors.text,
-                      fontFamily: Typography.family.regular,
+                      padding: 10,
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      borderColor: selected ? Colors.primary : Colors.border,
+                      backgroundColor: selected
+                        ? Colors.primary
+                        : Colors.surface,
                     }}
                   >
-                    {a}
-                  </Text>
-                </View>
-              ))}
+                    <Text
+                      style={{
+                        color: selected ? "#fff" : Colors.text,
+                        fontFamily: Typography.family.medium,
+                        fontSize: 12,
+                      }}
+                    >
+                      {subtype}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
           </VStack>
 
@@ -344,6 +381,7 @@ export default function AccommodationFilterSheet(props: SheetProps) {
             paddingHorizontal: 20,
             borderTopWidth: 1,
             borderColor: Colors.border,
+            borderWidth: 1,
           }}
         >
           <HStack gap={12} justifyContent="space-between">

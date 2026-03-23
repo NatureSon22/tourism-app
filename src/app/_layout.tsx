@@ -48,42 +48,31 @@ function Routes() {
     })),
   );
 
+// clear();  
+
+  // // (optional) Keep test request for debugging; comment out in production
   // useEffect(() => {
-  //   clear();
+  //   async function test() {
+  //     try {
+  //       const response = await authService.testReq();
+  //       console.log("Test request successful:", response);
+  //     } catch (error) {
+  //       console.error(
+  //         "Test request failed:",
+  //         error.response?.data?.message || error.message,
+  //       );
+  //     }
+  //   }
+
+  //   test();
   // }, []);
-
-  // request for crsf token
-  useEffect(() => {
-    async function fetchCsrfToken() {
-      try {
-        await authService.requestCrsfToken();
-      } catch (error) {
-        console.error("Failed to fetch CSRF token:", error);
-      }
-    }
-
-    fetchCsrfToken();
-  }, []);
-
-  useEffect(() => {
-    async function test() {
-      try {
-        const response = await authService.testReq();
-        console.log("Test request successful:", response);
-      } catch (error) {
-        console.error(
-          "Test request failed:",
-          error.response?.data?.message || error.message,
-        );
-      }
-    }
-
-    test();
-  }, []);
 
   const initializeAuth = useCallback(async () => {
     try {
-      if (user) {
+      await authService.requestCrsfToken();
+
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser) {
         setIsAuthChecking(false);
         return;
       }
@@ -100,24 +89,26 @@ function Routes() {
     } catch (e) {
       console.error(e);
     } finally {
-      // THIS IS CRITICAL: Always set to false to unblock the UI
       setIsAuthChecking(false);
     }
-  }, [logout, user]);
+  }, [logout]);
 
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
 
+  const fontsReady = loaded || error;
+  const appReady = fontsReady && !isAuthChecking;
+
   // Hide splash screen only when BOTH fonts and auth check are done
   useEffect(() => {
-    if ((loaded || error) && !isAuthChecking) {
+    if (appReady) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error, isAuthChecking]);
+  }, [appReady]);
 
   // Prevent rendering anything until we are ready
-  if ((!loaded && !error) || isAuthChecking) {
+  if (!appReady) {
     return null;
   }
 
@@ -146,6 +137,7 @@ function Routes() {
               <Stack.Screen name="activity" />
               <Stack.Screen name="event" />
               <Stack.Screen name="transportation" />
+              <Stack.Screen name="service" />
               {/* <Stack.Screen name="(bookmark)" /> */}
               {/* <Stack.Screen name="(forum)" /> */}
             </Stack.Protected>

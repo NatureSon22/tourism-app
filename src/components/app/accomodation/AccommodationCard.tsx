@@ -1,8 +1,9 @@
-import type { Accommodation } from "@/src/constants/accomodations";
+import DEFAULT_ACCOMMODATION from "@/src/constants/accomodations";
 import { Colors, Typography } from "@/src/constants/styles";
 import { useSafeNavigation } from "@/src/hooks/useSafeNavigation";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import type { Accommodation } from "@/src/types/accommodation";
 import formatCurrency from "@/src/utils/currency";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
@@ -12,8 +13,9 @@ import { Pressable, StyleSheet, Text } from "react-native";
 type Props = Accommodation;
 
 function AccommodationCard({
+  id,
   imageUrl,
-  name,
+  title,
   location,
   pricePerNight,
   rating,
@@ -23,38 +25,53 @@ function AccommodationCard({
   const router = useSafeNavigation();
 
   const handlePress = () => {
-    router.push({ pathname: `/accommodation/[id]`, params: { id: name } });
+    router.push({ pathname: `/accommodation/[id]`, params: { id: id } });
   };
 
   return (
     <Pressable style={styles.card} onPress={handlePress}>
       <HStack gap={17} alignItems="flex-start">
-        <Image source={imageUrl} contentFit="cover" style={styles.image} />
+        <Image
+          source={imageUrl ?? DEFAULT_ACCOMMODATION.imageUrl}
+          contentFit="cover"
+          style={styles.image}
+        />
 
         <VStack style={styles.content} gap={5}>
           <Text style={styles.name} numberOfLines={1}>
-            {name}
+            {title ?? DEFAULT_ACCOMMODATION.title}
           </Text>
 
           <Text style={styles.location} numberOfLines={1}>
-            {location}
+            {location ?? DEFAULT_ACCOMMODATION.location}
           </Text>
 
           <VStack gap={0} style={{ alignItems: "flex-start" }}>
             <HStack gap={5}>
               <Text style={styles.distanceText}>
-                {">"} {distanceFromCityCenter} km away
+                {">"}{" "}
+                {distanceFromCityCenter ??
+                  DEFAULT_ACCOMMODATION.distanceFromCityCenter}{" "}
+                km away
               </Text>
             </HStack>
 
             <HStack alignItems="center" gap={5}>
               <FontAwesome6 name="star" size={10} color="#E28F0B" solid />
-              <Text style={styles.ratingText}>{rating}</Text>
-              <Text style={styles.reviewText}>({reviews})</Text>
+              <Text style={styles.ratingText}>
+                {rating ?? DEFAULT_ACCOMMODATION.rating}
+              </Text>
+              <Text style={styles.reviewText}>
+                ({reviews ?? DEFAULT_ACCOMMODATION.reviews})
+              </Text>
             </HStack>
           </VStack>
 
-          <Text style={styles.price}>{formatCurrency(pricePerNight)}</Text>
+          <Text style={styles.price}>
+            {formatCurrency(
+              pricePerNight ?? DEFAULT_ACCOMMODATION.pricePerNight,
+            )}
+          </Text>
         </VStack>
       </HStack>
     </Pressable>
@@ -94,11 +111,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: Typography.family.medium,
     color: "#E28F0B",
+    includeFontPadding: false,
   },
   reviewText: {
     fontSize: 10,
     fontFamily: Typography.family.regular,
     color: Colors.textMuted,
+    includeFontPadding: false,
   },
   price: {
     marginTop: 5,

@@ -10,7 +10,7 @@ export default function AccommodationCardSkeleton() {
     <View style={styles.card}>
       <HStack gap={17} alignItems="flex-start">
         {/* Image Placeholder */}
-        <Skeleton.Rect width={95} height={110} borderRadius={10} />
+        <Skeleton.Rect width={95} height={120} borderRadius={10} />
 
         <VStack style={styles.content} gap={5}>
           {/* Name Placeholder */}
@@ -26,7 +26,7 @@ export default function AccommodationCardSkeleton() {
 
           {/* Price Placeholder - Aligned to the end like the original */}
           <View style={styles.priceWrapper}>
-            <Skeleton.Rect width={80} height={20} borderRadius={4} />
+            <Skeleton.Rect width={80} height={30} borderRadius={4} />
           </View>
         </VStack>
       </HStack>
@@ -37,7 +37,6 @@ export default function AccommodationCardSkeleton() {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
-    paddingVertical: 10,
   },
   content: {
     flex: 1,
@@ -45,7 +44,6 @@ const styles = StyleSheet.create({
   },
   metaContainer: {
     marginTop: 15,
-
     width: "100%",
   },
   priceWrapper: {

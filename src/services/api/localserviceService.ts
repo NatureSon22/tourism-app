@@ -1,22 +1,23 @@
 import api from "@/src/config/axios";
-import { Accommodation } from "@/src/types/accommodation";
+import PHILIPPINE_LOCAL_SERVICE from "@/src/constants/localServiceList";
 import { QueryParams } from "@/src/types/filter";
+import { Service } from "@/src/types/service";
 import { buildQueryString } from "@/src/utils/buildQueryString";
 
-export type AccommodationResponse = {
-  data: { listings: Accommodation[] };
+export type ServiceResponse = {
+  data: Service[];
   total?: number;
   page?: number;
   limit?: number;
 };
 
-export const accommodationService = {
-  getAvailableAccommodations: async (
+export const localserviceService = {
+  getAvailableServices: async (
     params: QueryParams,
-  ): Promise<AccommodationResponse> => {
+  ): Promise<ServiceResponse> => {
     console.log("params: ", params);
     const qs = buildQueryString(params);
     const response = await api.get(`/consumer/listings?${qs.toString()}`);
-    return response.data;
+    return { data: PHILIPPINE_LOCAL_SERVICE };
   },
 };

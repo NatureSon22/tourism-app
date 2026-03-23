@@ -57,10 +57,9 @@ export const useLogin = (rememberMe: boolean) => {
 export const useRegister = () => {
   return useMutation({
     mutationFn: async (userData: SignUpFormData) => {
-      await authService.requestCrsfToken();
       return authService.register(userData);
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
       Alert.alert("Success", "Account created! Please login.");
     },
     onError: (error: any) => {
