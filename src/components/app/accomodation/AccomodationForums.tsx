@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     alignSelf: "stretch",
     gap: 5,
-    marginVertical: 10, // Gives breathing room between different sections
+    marginVertical: 10,
   },
   sectionHeader: {
     justifyContent: "flex-start",

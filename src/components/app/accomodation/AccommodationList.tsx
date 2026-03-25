@@ -5,7 +5,7 @@ import { useFilterStore } from "@/src/stores/filterStore";
 import { Accommodation } from "@/src/types/accommodation";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   FlatList,
   ListRenderItem,
@@ -22,7 +22,7 @@ type AccommodationListProps = {
 function AccommodationList({ search }: AccommodationListProps) {
   const categories = useFilterStore((state) => state.categories);
   const accommodationState = categories.accommodation;
-  const { data, isLoading, isFetched, refetch } = useAccommodations({
+  const { data, isLoading, isFetched, isError, refetch } = useAccommodations({
     search,
     area: accommodationState.options.area,
     sort: accommodationState.options.sort,
@@ -35,11 +35,6 @@ function AccommodationList({ search }: AccommodationListProps) {
   const isEmpty =
     isFetched && !isLoading && (data?.data?.listings?.length ?? 0) === 0;
   const [isRefetching, setIsRefetching] = useState(false);
-
-  useEffect(
-    () => console.log("NetInfo", isConnected, isInternetReachable),
-    [isConnected, isInternetReachable],
-  );
 
   const handleRefresh = async () => {
     setIsRefetching(true);
@@ -78,6 +73,7 @@ function AccommodationList({ search }: AccommodationListProps) {
         <ListEmptyState
           isLoading={isLoading}
           isConnected={online}
+          isError={isError}
           isEmpty={isEmpty}
           resourceName="accommodations"
           customNoResultsMessage="Oh no! There's no accommodation option that matches the search or filter criteria."

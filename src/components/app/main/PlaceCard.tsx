@@ -19,7 +19,8 @@ export default function PlaceCard({
   const router = useRouter();
 
   const handlePress = () => {
-    router.push({ pathname: "/accommodation/[id]", params: { id } });
+    // router.push({ pathname: "/accommodation/[id]", params: { id } });
+    router.push({ pathname: "/service/[id]", params: { id } });
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Expectation } from "@/src/constants/accomodationListing";
+import { Expectation } from "@/src/constants/accommodationdetail";
 import { Colors, Typography } from "@/src/constants/styles";
 import VStack from "@/src/layouts/VStack";
 import { Image } from "expo-image";

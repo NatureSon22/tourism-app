@@ -54,35 +54,35 @@ export default function SignInForm() {
   const togglePasswordVisibility = () => setShowPassword((p) => !p);
 
   const onSubmit = async (data: SignInFormData) => {
-    // await login(
-    //   { id: "1", email: "bantajio22@gmail.com" },
-    //   { accessToken: "sampletoken", refreshToken: "samplerefreshtoken" },
-    //   isChecked,
-    // );
-    mutate(
-      { email: data.email, password: data.password },
-      {
-        onSuccess: async (res) => {
-          const { user, accessToken, refreshToken } = res.data;
-          console.log("Login successful:", res.data);
-          const token = { accessToken, refreshToken };
-
-          await login({ id: user.id, email: user.email }, token, isChecked);
-
-          if (!onBoardingCompleted) {
-            router.replace("/onboarding");
-          }
-        },
-        onError: (error: any) => {
-          const errorMessage = error.response?.data?.message || error.message;
-          Toast.show({
-            type: "error",
-            text1: errorMessage,
-            text2: error.message,
-          });
-        },
-      },
+    await login(
+      { id: "1", email: "bantajio22@gmail.com" },
+      { accessToken: "sampletoken", refreshToken: "samplerefreshtoken" },
+      isChecked,
     );
+    // mutate(
+    //   { email: data.email, password: data.password },
+    //   {
+    //     onSuccess: async (res) => {
+    //       const { user, accessToken, refreshToken } = res.data;
+    //       console.log("Login successful:", res.data);
+    //       const token = { accessToken, refreshToken };
+
+    //       await login({ id: user.id, email: user.email }, token, isChecked);
+
+    //       if (!onBoardingCompleted) {
+    //         router.replace("/onboarding");
+    //       }
+    //     },
+    //     onError: (error: any) => {
+    //       const errorMessage = error.response?.data?.message || error.message;
+    //       Toast.show({
+    //         type: "error",
+    //         text1: errorMessage,
+    //         text2: error.message,
+    //       });
+    //     },
+    //   },
+    // );
   };
 
   return (

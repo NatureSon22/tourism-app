@@ -18,9 +18,12 @@ import { useShallow } from "zustand/react/shallow";
 import queryClient from "../config/queryClient";
 import { Sheets } from "../config/sheets";
 import toastConfig from "../config/toastConfig";
-import authService from "../services/api/authService";
 import useAuthStore from "../stores/authStore";
 import { tokenStorage } from "../utils/tokenStorage";
+
+// TODO: - check and handle when the backend is down or unreachable during app initialization, to prevent infinite loading state and provide user feedback
+// TODO: - explore tanstack query retry and delay
+// TODO: - check if stored crsf is being checked and why is it still working without open backend
 
 SplashScreen.preventAutoHideAsync();
 
@@ -48,28 +51,12 @@ function Routes() {
     })),
   );
 
-// clear();  
+  // clear()
 
-  // // (optional) Keep test request for debugging; comment out in production
-  // useEffect(() => {
-  //   async function test() {
-  //     try {
-  //       const response = await authService.testReq();
-  //       console.log("Test request successful:", response);
-  //     } catch (error) {
-  //       console.error(
-  //         "Test request failed:",
-  //         error.response?.data?.message || error.message,
-  //       );
-  //     }
-  //   }
-
-  //   test();
-  // }, []);
 
   const initializeAuth = useCallback(async () => {
     try {
-      await authService.requestCrsfToken();
+      // await authService.requestCrsfToken();
 
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {

@@ -1,7 +1,6 @@
-import api from "@/src/config/axios";
+import { SAMPLE_ACCOMMODATIONS } from "@/src/constants/accomodations";
 import { Accommodation } from "@/src/types/accommodation";
 import { QueryParams } from "@/src/types/filter";
-import { buildQueryString } from "@/src/utils/buildQueryString";
 
 export type AccommodationResponse = {
   data: { listings: Accommodation[] };
@@ -14,9 +13,19 @@ export const accommodationService = {
   getAvailableAccommodations: async (
     params: QueryParams,
   ): Promise<AccommodationResponse> => {
-    console.log("params: ", params);
-    const qs = buildQueryString(params);
-    const response = await api.get(`/consumer/listings?${qs.toString()}`);
-    return response.data;
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const mockResponse: AccommodationResponse = {
+          data: { listings: SAMPLE_ACCOMMODATIONS },
+        };
+
+        resolve(mockResponse);
+      }, 1000);
+    });
+
+    // const qs = buildQueryString(params);
+    // const response = await api.get(`/consumer/listings?${qs.toString()}`);
+    // console.log("API Response:", response.data); // Debug log
+    // return response.data;
   },
 };

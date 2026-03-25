@@ -46,6 +46,9 @@ api.interceptors.request.use(async (config) => {
 
     if (csrf) {
       config.headers["X-CSRF-TOKEN"] = csrf;
+    } else {
+      // if there is no crsf token, then logout
+      //useAuthStore.getState().logout;
     }
   } catch (error) {
     console.error("Request interceptor error:", error);

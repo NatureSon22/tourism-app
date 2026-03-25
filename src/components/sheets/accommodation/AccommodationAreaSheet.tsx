@@ -18,6 +18,7 @@ const AREAS = [
 
 export default function AreaSheet(props: SheetProps) {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  
 
   const handleSelectArea = (value: string) => {
     setSelectedArea((prev) => (prev === value ? null : value));

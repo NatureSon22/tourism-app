@@ -1,4 +1,4 @@
-import DEFAULT_ACCOMMODATION from "@/src/constants/accomodations";
+import { DEFAULT_ACCOMMODATION } from "@/src/constants/accomodations";
 import { Colors, Typography } from "@/src/constants/styles";
 import { useSafeNavigation } from "@/src/hooks/useSafeNavigation";
 import HStack from "@/src/layouts/HStack";
@@ -69,7 +69,7 @@ function AccommodationCard({
 
           <Text style={styles.price}>
             {formatCurrency(
-              pricePerNight ?? DEFAULT_ACCOMMODATION.pricePerNight,
+              pricePerNight ?? DEFAULT_ACCOMMODATION.pricePerNight ?? 0,
             )}
           </Text>
         </VStack>

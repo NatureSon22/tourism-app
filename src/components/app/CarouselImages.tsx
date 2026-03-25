@@ -11,64 +11,61 @@ import PagerView from "react-native-pager-view";
 
 type Props = {
   images: string[];
+  isBookmarked?: boolean;
+  onBookmark?: () => void;
+  onShare?: () => void;
 };
 
-// create a component out of this where it will receive images, and functions 
-
-export default function AccomodationImages({ images }: Props) {
+export default function CarouselImages({
+  images = [],
+  isBookmarked = false,
+  onBookmark,
+  onShare,
+}: Props) {
   const [currentPage, setCurrentPage] = useState(0);
   const pagerRef = useRef<PagerView>(null);
   const router = useRouter();
 
-  // automatic scrolling every 3 seconds
   useEffect(() => {
     if (images.length <= 1) return;
 
     const timer = setInterval(() => {
-      setCurrentPage((prevPage) => {
-        const isAtEnd = prevPage === images.length - 1;
-        const nextPage = isAtEnd ? 0 : prevPage + 1;
+      const nextPageIndex = (currentPage + 1) % images.length;
 
-        if (isAtEnd) {
-          pagerRef.current?.setPageWithoutAnimation(nextPage);
-        } else {
-          // Normal smooth slide to the next image
-          pagerRef.current?.setPage(nextPage);
-        }
+      // If we are moving back to the start, skip animation for a "loop" feel
+      if (nextPageIndex === 0) {
+        pagerRef.current?.setPageWithoutAnimation(0);
+      } else {
+        pagerRef.current?.setPage(nextPageIndex);
+      }
 
-        return nextPage;
-      });
-    }, 3000);
+      setCurrentPage(nextPageIndex);
+    }, 4000);
 
     return () => clearInterval(timer);
-  }, [images.length]);
-
-  const handleBackPage = () => {
-    router.back();
-  };
-
-  
+  }, [images.length, currentPage]);
 
   return (
     <View style={styles.carouselContainer}>
-      {/* THE BLENDING FADE: 
-         This sits ON TOP of the image and matches your screen background 
-      */}
       <LinearGradient
-        colors={[Colors.background, "transparent"]} // Fades from BG color to nothing
+        colors={[Colors.background, "transparent"]}
         style={styles.topBlendGradient}
       />
 
       <HStack justifyContent="space-between" style={styles.headerActions}>
-        <Pressable onPress={handleBackPage} style={styles.iconButton}>
+        <Pressable onPress={() => router.back()} style={styles.iconButton}>
           <Ionicons name="chevron-back-outline" size={20} color={Colors.text} />
         </Pressable>
 
         <HStack gap={10}>
-          <Pressable style={styles.iconButton}>
-            <Feather name="heart" size={20} color={Colors.text} />
+          <Pressable onPress={onBookmark} style={styles.iconButton}>
+            <Feather
+              name={isBookmarked ? "heart" : "heart"}
+              size={20}
+              color={isBookmarked ? Colors.primary : Colors.text}
+            />
           </Pressable>
-          <Pressable style={styles.iconButton}>
+          <Pressable onPress={onShare} style={styles.iconButton}>
             <Ionicons name="share-outline" size={20} color={Colors.text} />
           </Pressable>
         </HStack>
@@ -82,10 +79,11 @@ export default function AccomodationImages({ images }: Props) {
       >
         {images.map((image, idx) => (
           <Image
-            key={idx}
+            key={`${image}-${idx}`}
             source={{ uri: image }}
             style={styles.carouselImage}
             contentFit="cover"
+            transition={500} // Smooth fade-in for expo-image
           />
         ))}
       </PagerView>
@@ -112,32 +110,32 @@ const styles = StyleSheet.create({
     width: "100%",
     aspectRatio: 16 / 10,
     backgroundColor: Colors.background,
-    zIndex: 0,
   },
   topBlendGradient: {
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    height: 60, // How deep the fade goes
+    height: 80,
     zIndex: 1,
   },
   headerActions: {
     position: "absolute",
-    top: 10,
+    top: 15, // Adjusted for slightly more breathing room
     zIndex: 2,
     paddingHorizontal: 15,
     width: "100%",
   },
   iconButton: {
     padding: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
-    borderRadius: 20,
-    elevation: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.9)", // Slightly more opaque for visibility
+    borderRadius: 25,
+    // Standard shadow logic for both platforms
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   mainPager: {
     flex: 1,
@@ -148,22 +146,24 @@ const styles = StyleSheet.create({
   },
   pagination: {
     position: "absolute",
-    bottom: 15,
+    bottom: 30,
     flexDirection: "row",
-    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 6,
-    paddingHorizontal: 20,
+    paddingHorizontal: 40,
     width: "100%",
   },
   bar: {
     height: 4,
     borderRadius: 10,
     flex: 1,
+    maxWidth: 40, // Prevents bars from becoming too long on wide screens
   },
   activeBar: {
-    backgroundColor: Colors.textOnPrimary,
+    backgroundColor: "#FFFFFF",
   },
   inactiveBar: {
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.4)", // White with transparency looks better over images
   },
 });

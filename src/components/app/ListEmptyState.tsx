@@ -5,6 +5,7 @@ import ReloadPage from "./ReloadPage";
 type ListEmptyStateProps = {
   isLoading: boolean;
   isConnected: boolean | null;
+  isError?: boolean;
   onRetry: () => void;
   resourceName?: string;
   customNoResultsMessage?: string;
@@ -14,6 +15,7 @@ type ListEmptyStateProps = {
 export default function ListEmptyState({
   isLoading,
   isConnected,
+  isError = false,
   onRetry,
   resourceName = "results",
   customNoResultsMessage,
@@ -24,7 +26,7 @@ export default function ListEmptyState({
     return null;
   }
 
-  if (isConnected === false) {
+  if (isConnected === false || isError) {
     return (
       <ReloadPage
         refetch={onRetry}

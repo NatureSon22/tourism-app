@@ -4,7 +4,7 @@ import AccomodationHeader from "@/src/components/app/accomodation/AccomodationHe
 import AccomodationImages from "@/src/components/app/accomodation/AccomodationImages";
 import AccomodationReviews from "@/src/components/app/accomodation/AccomodationReviews";
 import CustomButton from "@/src/components/ui/CustomButton";
-import { LISTING_INFO } from "@/src/constants/accomodationListing";
+import { LISTING_INFO } from "@/src/constants/accommodationdetail";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import SafeArea from "@/src/layouts/SafeArea";

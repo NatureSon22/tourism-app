@@ -1,4 +1,4 @@
-import { Review } from "@/src/constants/accomodationListing";
+import { Review } from "@/src/constants/accommodationdetail";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
