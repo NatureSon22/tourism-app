@@ -49,9 +49,9 @@ export default function TabNavigation() {
                 />
               </View>
 
-              <Text style={styles.tabLabel} numberOfLines={1}>
+              {/* <Text style={styles.tabLabel} numberOfLines={1}>
                 {item.name}
-              </Text>
+              </Text> */}
             </View>
           </Pressable>
         ))}

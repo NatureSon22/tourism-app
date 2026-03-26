@@ -6,7 +6,6 @@ import { Colors, Typography } from "@/src/constants/styles";
 import useDebounce from "@/src/hooks/useDebounce";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
-import { Stack } from "expo-router";
 import React, { useRef, useState } from "react";
 import { StyleSheet } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
@@ -29,19 +28,11 @@ export default function ActivityPage() {
   };
 
   return (
-    <SafeArea edges={["bottom"]}>
-      <Stack.Screen
-        options={{
-          headerBackVisible: false,
-          headerLeft: () => null,
-          headerTitle: () => (
-            <SearchableHeader
-              search={search}
-              setSearch={setSearch}
-              title={"General Activities"}
-            />
-          ),
-        }}
+    <SafeArea edges={["bottom", "top"]}>
+      <SearchableHeader
+        search={search}
+        setSearch={setSearch}
+        title={"General Activities"}
       />
 
       <Screen style={styles.screen}>

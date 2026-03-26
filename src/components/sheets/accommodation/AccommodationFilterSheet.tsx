@@ -14,10 +14,10 @@ import { Checkbox } from "expo-checkbox";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import ActionSheet, {
+  ScrollView,
   SheetManager,
   SheetProps,
 } from "react-native-actions-sheet";
-import { ScrollView } from "react-native-gesture-handler";
 
 export default function AccommodationFilterSheet(props: SheetProps) {
   const updateOptions = useFilterStore((state) => state.updateOptions);

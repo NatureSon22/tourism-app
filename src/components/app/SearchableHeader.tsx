@@ -68,7 +68,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    paddingHorizontal: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderColor: "#d0dbcb80",
+    borderBottomWidth: 1,
   },
   middleSection: {
     flex: 1,

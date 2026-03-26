@@ -7,7 +7,6 @@ import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
-import { Stack } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 
@@ -21,19 +20,11 @@ export default function EventPage() {
   };
 
   return (
-    <SafeArea edges={["bottom"]}>
-      <Stack.Screen
-        options={{
-          headerBackVisible: false,
-          headerLeft: () => null,
-          headerTitle: () => (
-            <SearchableHeader
-              search={search}
-              setSearch={setSearch}
-              title={"Events and Festivals"}
-            />
-          ),
-        }}
+    <SafeArea edges={["bottom", "top"]}>
+      <SearchableHeader
+        search={search}
+        setSearch={setSearch}
+        title={"Events and Festivals"}
       />
 
       <Screen style={styles.screen}>
@@ -54,7 +45,7 @@ const styles = StyleSheet.create({
     gap: 20,
     paddingBottom: 10,
     paddingTop: 0,
-    paddingHorizontal: 0,
+    paddingHorizontal: 10,
     backgroundColor: Colors.surface,
   },
 

@@ -19,7 +19,7 @@ type AccommodationListProps = {
   search: string;
 };
 
-function AccommodationList({ search }: AccommodationListProps) {
+export default function AccommodationList({ search }: AccommodationListProps) {
   const categories = useFilterStore((state) => state.categories);
   const accommodationState = categories.accommodation;
   const { data, isLoading, isFetched, isError, refetch } = useAccommodations({
@@ -83,8 +83,6 @@ function AccommodationList({ search }: AccommodationListProps) {
     />
   );
 }
-
-export default AccommodationList;
 
 const styles = StyleSheet.create({
   content: {

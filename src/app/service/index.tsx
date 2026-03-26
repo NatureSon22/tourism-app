@@ -7,7 +7,6 @@ import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
-import { Stack } from "expo-router";
 import { useState } from "react";
 import { StyleSheet } from "react-native";
 
@@ -21,19 +20,11 @@ export default function ServicePage() {
   };
 
   return (
-    <SafeArea edges={["bottom"]}>
-      <Stack.Screen
-        options={{
-          headerBackVisible: false,
-          headerLeft: () => null,
-          headerTitle: () => (
-            <SearchableHeader
-              search={search}
-              setSearch={setSearch}
-              title={"Local Services"}
-            />
-          ),
-        }}
+    <SafeArea edges={["bottom", "top"]}>
+      <SearchableHeader
+        search={search}
+        setSearch={setSearch}
+        title={"Local Services"}
       />
 
       <Screen style={styles.screen}>
@@ -55,7 +46,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingTop: 0,
     paddingHorizontal: 0,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.overlay,
   },
 
   filterBarPadding: {

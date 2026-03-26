@@ -2,5 +2,12 @@ import { Stack } from "expo-router";
 import React from "react";
 
 export default function ActivityLayout() {
-  return <Stack />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: "white" },
+      }}
+    />
+  );
 }

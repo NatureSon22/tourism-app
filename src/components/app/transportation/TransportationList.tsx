@@ -2,10 +2,17 @@ import { Transportation } from "@/src/constants/transportationList";
 import { useTransportation } from "@/src/services/request/useTransportation";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  FlatList,
+  ListRenderItem,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from "react-native";
 import ListEmptyState from "../ListEmptyState";
 import { FilterType } from "../main/PlaceFilterTabs";
+import TransportationCardSkeleton from "./TransportaionCardSkeleton";
 import TransportationCard from "./TransportationCard";
 
 type TransportationListProps = {
@@ -28,6 +35,25 @@ export default function TransportationList({
     setIsRefetching(false);
   };
 
+  const renderItem = useCallback<ListRenderItem<Skeleton | Transportation>>(
+    ({ item }) => {
+      if ("isSkeleton" in item) {
+        return (
+          <View style={styles.itemWrapper}>
+            <TransportationCardSkeleton />
+          </View>
+        );
+      }
+
+      return (
+        <View style={styles.itemWrapper}>
+          <TransportationCard {...item} />
+        </View>
+      );
+    },
+    [],
+  );
+
   return (
     <FlatList<Skeleton | Transportation>
       data={isLoading ? createSkeletons(6) : data?.data || []}
@@ -37,17 +63,7 @@ export default function TransportationList({
       columnWrapperStyle={styles.columnWrapper}
       contentContainerStyle={styles.listContent}
       showsVerticalScrollIndicator={false}
-      renderItem={({ item }) => {
-        if ("isSkeleton" in item) {
-          return <Text>Text</Text>;
-        }
-
-        return (
-          <View style={styles.itemWrapper}>
-            <TransportationCard {...item} />
-          </View>
-        );
-      }}
+      renderItem={renderItem}
       refreshControl={
         <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
       }
@@ -69,7 +85,6 @@ const styles = StyleSheet.create({
   listContent: {
     flexGrow: 1,
     paddingHorizontal: 10,
-    paddingBottom: 20,
   },
   columnWrapper: {
     justifyContent: "space-between",
@@ -78,5 +93,6 @@ const styles = StyleSheet.create({
   itemWrapper: {
     flex: 1,
     paddingHorizontal: 6,
+    maxWidth: "50%",
   },
 });

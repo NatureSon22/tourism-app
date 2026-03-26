@@ -5,12 +5,14 @@ import VStack from "@/src/layouts/VStack";
 import formatCurrency from "@/src/utils/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = Transportation;
 
 export default function TransportationCard({
+  id,
   name,
   location,
   price,
@@ -18,8 +20,14 @@ export default function TransportationCard({
   reviews,
   imageUrl,
 }: Props) {
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push({ pathname: "/transportation/[id]", params: { id } });
+  };
+
   return (
-    <Pressable style={styles.card}>
+    <Pressable style={styles.card} onPress={handlePress}>
       {/* 1. Image Container with Bookmark */}
       <View style={styles.imageContainer}>
         <Image

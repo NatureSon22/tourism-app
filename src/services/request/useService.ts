@@ -10,7 +10,7 @@ export const serviceKeys = {
   detail: (id: string) => [...serviceKeys.details(), id] as const,
 };
 
-export const useAccommodations = (params: QueryParams) => {
+export const useGetServices = (params: QueryParams) => {
   return useQuery({
     queryKey: serviceKeys.list(params),
     queryFn: () => localserviceService.getAvailableServices(params),

@@ -1,9 +1,9 @@
 import { SheetDefinition, SheetRegister } from "react-native-actions-sheet";
-import DiningFilterSheet from "../components/sheets/DiningFilterSheet";
-import OptionSheet from "../components/sheets/NavigationSheet";
-import AccommodationAreaSheet from "../components/sheets/accommodation/AccommodationAreaSheet";
 import AccommodationFilterSheet from "../components/sheets/accommodation/AccommodationFilterSheet";
 import AccommodationSortSheet from "../components/sheets/accommodation/AccommodationSortSheet";
+import AreaSheet from "../components/sheets/AreaSheet";
+import DiningFilterSheet from "../components/sheets/DiningFilterSheet";
+import OptionSheet from "../components/sheets/NavigationSheet";
 
 declare module "react-native-actions-sheet" {
   interface Sheets {
@@ -21,7 +21,7 @@ export const Sheets = () => {
     <SheetRegister
       sheets={{
         "options-sheet": OptionSheet,
-        "area-sheet": AccommodationAreaSheet,
+        "area-sheet": AreaSheet,
         "filter-sheet": AccommodationFilterSheet,
         "sort-sheet": AccommodationSortSheet,
         "dining-filter-sheet": DiningFilterSheet,

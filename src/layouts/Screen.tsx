@@ -15,8 +15,6 @@ export default function Screen({ children, style, padding = 16 }: ScreenProps) {
         {
           flex: 1,
           padding,
-          borderWidth: 1,
-          borderColor: "#ec4899",
           backgroundColor: Colors.surface,
         },
         style,

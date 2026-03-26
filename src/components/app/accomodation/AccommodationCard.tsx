@@ -49,9 +49,9 @@ function AccommodationCard({
           <VStack gap={0} style={{ alignItems: "flex-start" }}>
             <HStack gap={5}>
               <Text style={styles.distanceText}>
-                {">"}{" "}
+                {">"}
                 {distanceFromCityCenter ??
-                  DEFAULT_ACCOMMODATION.distanceFromCityCenter}{" "}
+                  DEFAULT_ACCOMMODATION.distanceFromCityCenter}
                 km away
               </Text>
             </HStack>

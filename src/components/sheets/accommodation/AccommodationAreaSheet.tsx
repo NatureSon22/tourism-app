@@ -1,8 +1,9 @@
 import { CustomRadioGroup } from "@/src/components/ui/CustomRadioGroup";
 import { Colors, Typography } from "@/src/constants/styles";
 import VStack from "@/src/layouts/VStack";
+import { getAllRegions } from "@aivangogh/ph-address";
 import Feather from "@expo/vector-icons/Feather";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ActionSheet, {
   SheetManager,
@@ -18,7 +19,7 @@ const AREAS = [
 
 export default function AreaSheet(props: SheetProps) {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
-  
+  const regions = useMemo(() => getAllRegions(), []);
 
   const handleSelectArea = (value: string) => {
     setSelectedArea((prev) => (prev === value ? null : value));
@@ -38,10 +39,7 @@ export default function AreaSheet(props: SheetProps) {
       <View style={styles.wrapper}>
         {/* Header */}
         <View style={styles.header}>
-          <Pressable
-            onPress={handleCloseSheet}
-            hitSlop={15} // UX: Easier to tap
-          >
+          <Pressable onPress={handleCloseSheet} hitSlop={15}>
             <Feather name="x" size={24} color={Colors.text} />
           </Pressable>
 

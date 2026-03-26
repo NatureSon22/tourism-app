@@ -1,8 +1,6 @@
-import api from "@/src/config/axios";
 import PHILIPPINE_LOCAL_SERVICE from "@/src/constants/localServiceList";
 import { QueryParams } from "@/src/types/filter";
 import { Service } from "@/src/types/service";
-import { buildQueryString } from "@/src/utils/buildQueryString";
 
 export type ServiceResponse = {
   data: Service[];
@@ -16,8 +14,9 @@ export const localserviceService = {
     params: QueryParams,
   ): Promise<ServiceResponse> => {
     console.log("params: ", params);
-    const qs = buildQueryString(params);
-    const response = await api.get(`/consumer/listings?${qs.toString()}`);
+    // const qs = buildQueryString(params);
+    // const response = await api.get(`/consumer/listings?${qs.toString()}`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return { data: PHILIPPINE_LOCAL_SERVICE };
   },
 };

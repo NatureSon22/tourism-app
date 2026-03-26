@@ -3,5 +3,6 @@ export type Service = {
   name: string;
   location: string;
   imageUrl: string;
+  province: string;
   distanceFromCityCenter: number; // in kilometers
 };

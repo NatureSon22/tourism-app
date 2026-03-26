@@ -7,7 +7,6 @@ import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
-import { Stack } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 
@@ -21,19 +20,11 @@ export default function TransportationLayout() {
   };
 
   return (
-    <SafeArea edges={["bottom"]}>
-      <Stack.Screen
-        options={{
-          headerBackVisible: false,
-          headerLeft: () => null,
-          headerTitle: () => (
-            <SearchableHeader
-              search={search}
-              setSearch={setSearch}
-              title="Transporation Information"
-            />
-          ),
-        }}
+    <SafeArea edges={["bottom", "top"]}>
+      <SearchableHeader
+        search={search}
+        setSearch={setSearch}
+        title="Transporation Information"
       />
 
       <Screen style={styles.screen}>
