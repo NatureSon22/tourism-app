@@ -53,7 +53,6 @@ function Routes() {
 
   // clear()
 
-
   const initializeAuth = useCallback(async () => {
     try {
       // await authService.requestCrsfToken();
@@ -118,7 +117,7 @@ function Routes() {
 
             {/* User exists and onboarding is done */}
             <Stack.Protected guard={!!user && onBoardingCompleted}>
-              <Stack.Screen name="(main)" />
+              <Stack.Screen name="(tabs)" />
               <Stack.Screen name="accommodation" />
               <Stack.Screen name="dining" />
               <Stack.Screen name="activity" />

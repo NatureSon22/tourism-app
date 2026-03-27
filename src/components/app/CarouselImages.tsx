@@ -54,7 +54,11 @@ export default function CarouselImages({
 
       <HStack justifyContent="space-between" style={styles.headerActions}>
         <Pressable onPress={() => router.back()} style={styles.iconButton}>
-          <Ionicons name="chevron-back-outline" size={20} color={Colors.text} />
+          <Ionicons
+            name="chevron-back-outline"
+            size={20}
+            color={Colors.textOnPrimary}
+          />
         </Pressable>
 
         <HStack gap={10}>
@@ -62,11 +66,15 @@ export default function CarouselImages({
             <Feather
               name={isBookmarked ? "heart" : "heart"}
               size={20}
-              color={isBookmarked ? Colors.primary : Colors.text}
+              color={isBookmarked ? Colors.primary : Colors.textOnPrimary}
             />
           </Pressable>
           <Pressable onPress={onShare} style={styles.iconButton}>
-            <Ionicons name="share-outline" size={20} color={Colors.text} />
+            <Ionicons
+              name="share-outline"
+              size={20}
+              color={Colors.textOnPrimary}
+            />
           </Pressable>
         </HStack>
       </HStack>
@@ -128,7 +136,7 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     padding: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.9)", // Slightly more opaque for visibility
+    backgroundColor: "#484A47E5", // Slightly more opaque for visibility
     borderRadius: 25,
     // Standard shadow logic for both platforms
     elevation: 4,

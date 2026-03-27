@@ -3,6 +3,7 @@ import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React, { memo, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -16,16 +17,20 @@ function EventCard({
   types,
   formattedDate,
 }: EventCardProps) {
+  const router = useRouter();
   const [showAllTypes, setShowAllTypes] = useState(false);
-
   const hasMoreTypes = types.length > 2;
   const visibleTypes = useMemo(
     () => (showAllTypes ? types : types.slice(0, 2)),
     [showAllTypes, types],
   );
 
+  const handlePress = () => {
+    router.push({ pathname: "/event", params: { id: name } });
+  };
+
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={handlePress}>
       <HStack gap={16} alignItems="center">
         {/* Event Image */}
         <Image source={imageUrl} style={styles.image} contentFit="cover" />
@@ -67,7 +72,7 @@ function EventCard({
           </View>
         </VStack>
       </HStack>
-    </View>
+    </Pressable>
   );
 }
 

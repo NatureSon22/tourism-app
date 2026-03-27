@@ -1,7 +1,7 @@
 import { Review } from "./accommodationdetail";
 import forumData, { ForumPost } from "./forum";
 
-type HotlineEntry = {
+export type HotlineEntry = {
   label: string;
   phone: string;
 };
@@ -27,14 +27,16 @@ type FoodDetail = {
   forums: ForumPost[];
   reviewsData: Review[];
   hotlines: HotlineEntry[];
+  price: number;
+  discount?: number;
 };
 
 export const FOOD_DETAIL: FoodDetail = {
   id: "localservice-ph-001",
   images: [
-    "https://ocbarchitects.com/wp-content/uploads/2015/09/binangonan.jpg",
-    "https://images.real.ph/real/uploads/listings/large/listing_66cd8e8a47a4f7_1724747402.jpg",
-    "https://static.wixstatic.com/media/81e04c_184b0e2452b041cab44af36e8cf5c537~mv2.png/v1/fill/w_640,h_520,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/81e04c_184b0e2452b041cab44af36e8cf5c537~mv2.png",
+    "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhkvyJ87cMdqb7I6h0e_TMfO9N9OGC5vrRnhRJourg1phzN_Ku5aqKQhAPDF56eDOcHo9xxITbdILUMtkKJ3eR-x4rm3vGkcvrKbwTNg_ELcT4aLTPqjYVcRIOVAxAUva_pHXPoK8Pl-otpNQGzPX4aITa3VKUpaRUEweGgq4gWAgp8KDQeT2DfDOThNA/s1600/20230212-BGCSEDA-P30-0170.jpg",
+    "https://grandhyattmanilaresidences.ph/wp-content/uploads/2021/10/shutterstock_484771681.jpg",
+    "https://kubo.com.ph/wp-content/uploads/2023/09/bgc-borough-1.jpg.webp",
   ],
   name: "BGC: The Alley by VIKINGS",
   rating: 4.9,
@@ -111,4 +113,5 @@ export const FOOD_DETAIL: FoodDetail = {
     { label: "Reservations", phone: "(02) 1234-5678" },
     { label: "Customer Service", phone: "(02) 8765-4321" },
   ],
+  price: 1138,
 };

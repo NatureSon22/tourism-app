@@ -4,12 +4,11 @@ import HStack from "@/src/layouts/HStack";
 import formatCurrency from "@/src/utils/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type Props = Activity & {
-  onPress?: () => void;
-};
+type Props = Activity;
 
 function ActivityCard({
   name,
@@ -22,10 +21,15 @@ function ActivityCard({
   prevPrice,
   types,
   image,
-  onPress,
 }: Props) {
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push({ pathname: "/activity/[id]", params: { id: name } });
+  };
+
   return (
-    <Pressable onPress={onPress} style={styles.card}>
+    <Pressable onPress={handlePress} style={styles.card}>
       {/* Hero image */}
       <View style={styles.imageWrapper}>
         <Image

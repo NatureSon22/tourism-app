@@ -5,6 +5,11 @@ type Package = {
   price: number;
 };
 
+export type HotlineEntry = {
+  label: string;
+  phone: string;
+};
+
 export type Review = {
   id: string;
   author: Author;
@@ -33,6 +38,7 @@ type AccommodationListing = {
   forums: ForumPost[]; // dont put data
   reviewsData: Review[];
   expects: Expectation[];
+  hotlines: HotlineEntry[];
 };
 
 export const LISTING_INFO: AccommodationListing = {
@@ -99,6 +105,10 @@ export const LISTING_INFO: AccommodationListing = {
       comment:
         "The kayaking tour included in the stay was the highlight of our trip!",
     },
+  ],
+  hotlines: [
+    { label: "Reservations", phone: "(02) 1234-5678" },
+    { label: "Customer Service", phone: "(02) 8765-4321" },
   ],
   expects: [
     {

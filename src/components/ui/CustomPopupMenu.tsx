@@ -1,6 +1,6 @@
 import VStack from "@/src/layouts/VStack";
 import React, { useState } from "react";
-import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 import CustomPopupMenuItem from "./CustomPopupMenuItem";
 
 export type PopupOption = {
@@ -14,7 +14,7 @@ type CustomPopupMenuProps = {
   options: PopupOption[];
   selectedValue?: any;
   onSelect: (value: any) => void;
-  menuStyle?: ViewStyle;
+  menuStyle?: StyleProp<ViewStyle>;
 };
 
 export default function CustomPopupMenu({

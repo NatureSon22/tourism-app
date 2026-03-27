@@ -1,12 +1,10 @@
 import React from "react";
 import CarouselImages from "../CarouselImages";
 
-type AccommodationImagesProps = {
+type DiningImagesProps = {
   images: string[];
 };
 
-export default function AccommodationImages({
-  images,
-}: AccommodationImagesProps) {
+export default function ActivityImages({ images }: DiningImagesProps) {
   return <CarouselImages images={images} />;
 }

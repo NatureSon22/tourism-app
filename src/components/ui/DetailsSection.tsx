@@ -27,7 +27,7 @@ export default function DetailSection({
         <Text style={styles.sectionTitle}>{title}</Text>
       </HStack>
 
-      <View style={styles.content}>{children}</View>
+      <View>{children}</View>
     </VStack>
   );
 }
@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
   sectionContainer: {
     alignSelf: "stretch",
     justifyContent: "flex-start",
-    paddingVertical: 12,
+    paddingVertical: 5,
+    // borderWidth: 1,
   },
   sectionHeader: {
     marginBottom: 8,
@@ -51,8 +52,5 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 2,
     backgroundColor: Colors.primary,
-  },
-  content: {
-    paddingLeft: 14,
   },
 });

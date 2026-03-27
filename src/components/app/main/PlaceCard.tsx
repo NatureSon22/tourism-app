@@ -20,7 +20,7 @@ export default function PlaceCard({
 
   const handlePress = () => {
     // router.push({ pathname: "/accommodation/[id]", params: { id } });
-    router.push({ pathname: "/dining/[id]", params: { id } });
+    router.push({ pathname: "/accommodation/[id]", params: { id } });
   };
 
   return (

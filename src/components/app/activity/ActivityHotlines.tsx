@@ -5,11 +5,11 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import DetailSection from "../../ui/DetailsSection";
 
-type DiningHotlinesProps = {
+type ActivityHotlinesProps = {
   hotlines: HotlineEntry[];
 };
 
-export default function DiningHotlines({ hotlines }: DiningHotlinesProps) {
+export default function ActivityHotlines({ hotlines }: ActivityHotlinesProps) {
   return (
     <DetailSection title="Nearby Local Hotlines">
       <View style={styles.hotlinesContainer}>

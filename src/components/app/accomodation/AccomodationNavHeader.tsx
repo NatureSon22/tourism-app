@@ -2,13 +2,13 @@ import { Typography } from "@/src/constants/styles";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type AccomodationHeaderProps = {
+type AccomodationNavHeaderProps = {
   showHeader: boolean;
 };
 
-export default function AccomodationHeader({
+export default function AccomodationNavHeader({
   showHeader,
-}: AccomodationHeaderProps) {
+}: AccomodationNavHeaderProps) {
   return (
     <View
       style={[styles.stickyHeader, { display: showHeader ? "flex" : "none" }]}

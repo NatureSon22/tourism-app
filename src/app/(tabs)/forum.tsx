@@ -9,8 +9,8 @@ import { FlatList, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function Forum() {
   return (
-    <SafeArea>
-      <Screen>
+    <SafeArea edges={["top"]}>
+      <Screen style={{ paddingBottom: 0 }}>
         <Stack.Screen
           options={{
             title: "Forum",

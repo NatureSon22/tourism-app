@@ -28,6 +28,7 @@ export default function BookmarkForum() {
       contentContainerStyle={{
         flexGrow: 1,
         paddingHorizontal: 10,
+        paddingBottom: 10,
       }}
       // ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
       showsVerticalScrollIndicator={false}

@@ -1,14 +1,22 @@
+import DiningForums from "@/src/components/app/dining/DiningForums";
 import DiningHeader from "@/src/components/app/dining/DiningHeader";
 import DiningHotlines from "@/src/components/app/dining/DiningHotlines";
 import DiningImages from "@/src/components/app/dining/DiningImages";
 import DiningPackages from "@/src/components/app/dining/DiningPackages";
+import DiningReviews from "@/src/components/app/dining/DiningReviews";
+import NavigationRow from "@/src/components/app/NavigationRow";
+import StickyFooter from "@/src/components/app/StickyFooter";
+import Divider from "@/src/components/ui/Divider";
 import { FOOD_DETAIL } from "@/src/constants/fooddetail";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function DiningDetailsPage() {
+  const router = useRouter();
+
   return (
     <SafeArea edges={["top", "bottom"]}>
       <Screen style={styles.screenContainer}>
@@ -30,11 +38,37 @@ export default function DiningDetailsPage() {
               description={FOOD_DETAIL.description}
             />
 
-            <DiningHotlines />
+            <DiningHotlines hotlines={FOOD_DETAIL.hotlines} />
 
             <DiningPackages packages={FOOD_DETAIL.packages} />
+
+            <Divider />
+
+            <NavigationRow
+              label="General Information"
+              onPress={() => {
+                router.push("/dining/about");
+              }}
+            />
+
+            <Divider />
+
+            <NavigationRow
+              label="Terms & Conditions"
+              onPress={() => {
+                router.push("/dining/about");
+              }}
+            />
+
+            <Divider />
+
+            <DiningForums forums={FOOD_DETAIL.forums} />
+
+            <DiningReviews reviews={FOOD_DETAIL.reviewsData} />
           </View>
         </ScrollView>
+
+        <StickyFooter price={FOOD_DETAIL.price} />
       </Screen>
     </SafeArea>
   );

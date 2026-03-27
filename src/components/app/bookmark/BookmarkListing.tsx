@@ -2,11 +2,9 @@ import { Listing, listings } from "@/src/constants/listings";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
-import ReloadPage from "../ReloadPage";
 import NoResourceFound from "../NoResourceFound";
+import ReloadPage from "../ReloadPage";
 import BookmarkListingCard from "./BookmarkListingCard";
-
-
 
 export default function BookmarkListing() {
   const [isRefetching, setIsRefetching] = useState(false);
@@ -29,6 +27,7 @@ export default function BookmarkListing() {
       contentContainerStyle={{
         flexGrow: 1,
         paddingHorizontal: 10,
+        paddingBottom: 10,
       }}
       ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
       showsVerticalScrollIndicator={false}

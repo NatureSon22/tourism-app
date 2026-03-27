@@ -13,7 +13,6 @@ export const localserviceService = {
   getAvailableServices: async (
     params: QueryParams,
   ): Promise<ServiceResponse> => {
-    console.log("params: ", params);
     // const qs = buildQueryString(params);
     // const response = await api.get(`/consumer/listings?${qs.toString()}`);
     await new Promise((resolve) => setTimeout(resolve, 1000));

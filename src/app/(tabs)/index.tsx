@@ -2,7 +2,7 @@ import PlaceListing from "@/src/components/app/main/PlaceListing";
 import TabNavigation from "@/src/components/app/TabNavigation";
 import CustomTextInput from "@/src/components/ui/CustomTextInput";
 import { Colors } from "@/src/constants/styles";
-import  useDebounce  from "@/src/hooks/useDebounce";
+import useDebounce from "@/src/hooks/useDebounce";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
@@ -14,7 +14,7 @@ export default function Index() {
   const debouncedSearch = useDebounce(search);
 
   return (
-    <SafeArea edges={["top", "bottom"]}>
+    <SafeArea edges={["top"]}>
       <Screen style={styles.screenOverride}>
         {/* Search Section */}
         <View style={styles.searchWrapper}>

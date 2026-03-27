@@ -1,4 +1,4 @@
-import { Colors } from "@/src/constants/styles";
+import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
@@ -30,7 +30,7 @@ export default function Accordion({
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={toggleAccordion}>
+      <Pressable onPress={toggleAccordion} style={styles.button}>
         <HStack justifyContent="space-between">
           <Text style={styles.title}>{title}</Text>
           <Ionicons
@@ -51,14 +51,16 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     paddingVertical: 5,
   },
-
   title: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: Typography.family.semiBold,
     color: Colors.text,
     includeFontPadding: false,
   },
   content: {
     padding: 16,
+  },
+  button: {
+    paddingHorizontal: 10,
   },
 });
