@@ -17,6 +17,7 @@ export interface CustomTextInputProps extends TextInputProps {
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<TextStyle>;
   error?: boolean;
+  editable?: boolean;
 }
 
 const CustomTextInput = ({
@@ -25,6 +26,7 @@ const CustomTextInput = ({
   containerStyle,
   inputStyle,
   error,
+  editable = true,
   ...rest
 }: CustomTextInputProps) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -52,6 +54,7 @@ const CustomTextInput = ({
 
       <TextInput
         ref={inputRef}
+        editable={editable}
         style={[styles.input, inputStyle]}
         placeholderTextColor={Colors.neutral}
         onFocus={() => setIsFocused(true)}

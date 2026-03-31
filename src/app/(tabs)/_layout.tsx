@@ -10,6 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
+      initialRouteName="account"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
@@ -23,6 +24,9 @@ export default function TabLayout() {
           },
         ],
         tabBarLabelStyle: styles.tabBarLabel,
+        sceneStyle: {
+          backgroundColor: "white",
+        },
       }}
     >
       <Tabs.Screen

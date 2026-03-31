@@ -6,6 +6,10 @@ import { tokenStorage } from "./../utils/tokenStorage";
 export type User = {
   id: string;
   email: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  profilePictureUrl: string;
 };
 
 interface AuthState {
@@ -29,6 +33,7 @@ interface AuthActions {
   }) => void;
   completeOnBoarding: () => void;
   clearApp: () => void;
+  updateUser: (user: Partial<User>) => void;
 }
 
 const useAuthStore = create<AuthState & AuthActions>()(
@@ -81,6 +86,12 @@ const useAuthStore = create<AuthState & AuthActions>()(
           onBoardingCompleted: false,
           rememberMe: false,
         });
+      },
+
+      updateUser: (updates) => {
+        const current = get().user;
+        if (!current) return;
+        set({ user: { ...current, ...updates } });
       },
     }),
     {

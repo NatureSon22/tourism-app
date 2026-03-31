@@ -25,6 +25,7 @@ interface Props<T extends FieldValues> extends Omit<
   textInputStyle?: StyleProp<TextStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   showStrength?: boolean;
+  editable?: boolean;
   strengthEvaluator?: (value: string) => StrengthResult | null;
 }
 
@@ -38,6 +39,7 @@ export default function ControllerTextInput<T extends FieldValues>({
   textInputStyle = {},
   containerStyle = {},
   showStrength = false,
+  editable = true,
   strengthEvaluator,
   ...rest
 }: Props<T>) {

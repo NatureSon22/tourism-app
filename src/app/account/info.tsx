@@ -1,0 +1,14 @@
+import AccountInformation from "@/src/forms/AccountInformation";
+import SafeArea from "@/src/layouts/SafeArea";
+import Screen from "@/src/layouts/Screen";
+import React from "react";
+
+export default function info() {
+  return (
+    <SafeArea edges={["top"]}>
+      <Screen>
+        <AccountInformation />
+      </Screen>
+    </SafeArea>
+  );
+}

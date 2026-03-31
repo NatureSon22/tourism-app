@@ -8,6 +8,7 @@ type FilterOptions = {
   filter: {
     rating: number;
     type: { type: string; subtypes: string[] };
+    // unique attribute: [ {  id:  , value: [] } ]
     amenities: string[];
   };
 };

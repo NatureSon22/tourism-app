@@ -124,6 +124,7 @@ function Routes() {
               <Stack.Screen name="event" />
               <Stack.Screen name="transportation" />
               <Stack.Screen name="service" />
+              <Stack.Screen name="account" />
               {/* <Stack.Screen name="(bookmark)" /> */}
               {/* <Stack.Screen name="(forum)" /> */}
             </Stack.Protected>
