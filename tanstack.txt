@@ -1,0 +1,42 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useBookmarkStore } from "@/src/stores/bookmarkStore"; // Your Zustand store
+
+export const useToggleBookmark = () => {
+  const queryClient = useQueryClient();
+  const setLastUpdated = useBookmarkStore((state) => state.setLastUpdated);
+
+  return useMutation({
+    mutationFn: (listingId: string) => toggleBookmarkApi(listingId),
+    
+    // Step 1: The moment the button is pressed
+    onMutate: async (newId) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["bookmarks"] });
+
+      // Step 2: Snapshot the previous value
+      const previousBookmarks = queryClient.getQueryData(["bookmarks"]);
+
+      // Step 3: Optimistically update the cache
+      queryClient.setQueryData(["bookmarks"], (old: any) => {
+        return [...(old || []), { id: newId }]; // Add the item instantly
+      });
+
+      // Step 4: Sync with Zustand (UI only)
+      setLastUpdated(new Date().toISOString());
+
+      // Return context for rollback
+      return { previousBookmarks };
+    },
+
+    // Step 5: If the server says "No"
+    onError: (err, newId, context) => {
+      queryClient.setQueryData(["bookmarks"], context?.previousBookmarks);
+      // Optional: Trigger a Zustand "Error Toast" here
+    },
+
+    // Step 6: Always refetch after error or success to sync with server
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+    },
+  });
+};

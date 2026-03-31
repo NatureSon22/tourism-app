@@ -186,62 +186,6 @@ export default function AccommodationFilterSheet(props: SheetProps) {
             </View>
           </VStack>
 
-          {/* <VStack gap={8}>
-            <Text
-              style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
-            >
-              Review Score
-            </Text>
-
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-              {REVIEW_OPTIONS.map((r) => (
-                <Pressable
-                  key={r}
-                  onPress={() => setReviewScore(r)}
-                  style={{
-                    width: "48%",
-                    padding: 10,
-                    borderRadius: 8,
-                    backgroundColor:
-                      reviewScore === r ? Colors.primary : Colors.surface,
-                    borderWidth: 1,
-                    borderColor:
-                      reviewScore === r ? Colors.primary : Colors.border, // Highlight border if selected
-                  }}
-                >
-                  <VStack
-                    gap={1}
-                    style={{
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: reviewScore === r ? "#fff" : Colors.text,
-                        fontFamily: Typography.family.semiBold,
-                        fontSize: 11,
-                      }}
-                    >
-                      {r}+
-                    </Text>
-
-                    <Text
-                      style={{
-                        color: reviewScore === r ? "#fff" : Colors.textMuted, // Use a lighter color for label when not selected
-                        fontSize: 11,
-                        fontFamily: Typography.family.medium,
-                      }}
-                    >
-                      {r >= 4 ? "Excellent" : r >= 3.5 ? "Good" : "Comfort"}
-                    </Text>
-                  </VStack>
-                </Pressable>
-              ))}
-            </View>
-          </VStack> */}
-
           <VStack gap={8}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}

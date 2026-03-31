@@ -1,22 +1,42 @@
 import FilterBar from "@/src/components/app/FilterBar";
 import SearchableHeader from "@/src/components/app/SearchableHeader";
 import ServiceList from "@/src/components/app/service/ServiceList";
-import { DINING_FILTERS } from "@/src/constants/filterOptions";
+import { SERVICE_SORT } from "@/src/config/sort";
+import { SERVICE_FILTERS } from "@/src/constants/filterOptions";
 import { Colors } from "@/src/constants/styles";
 import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
-import { useState } from "react";
+import { useFilterStore } from "@/src/stores/filterStore";
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
+import { useShallow } from "zustand/react/shallow";
 
 export default function ServicePage() {
   const { openSheet } = useSingleSheet();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
+  const { currentSort, updateOptions, resetCategory } = useFilterStore(
+    useShallow((state) => ({
+      updateOptions: state.updateOptions,
+      currentSort: state.categories.services.options.sort,
+      resetCategory: state.resetCategory,
+    })),
+  );
+
+  useEffect(() => {
+    return () => {
+      resetCategory("services");
+    };
+  }, []);
 
   const handleAreaPress = (area: string) => {
-    openSheet(area);
+    openSheet(area, {
+      options: SERVICE_SORT,
+      selectedValue: currentSort,
+      onSelect: (val: string) => updateOptions("services", { sort: val }),
+    });
   };
 
   return (
@@ -29,7 +49,7 @@ export default function ServicePage() {
 
       <Screen style={styles.screen}>
         <FilterBar
-          filters={DINING_FILTERS}
+          filters={SERVICE_FILTERS}
           onPress={handleAreaPress}
           containerStyle={styles.filterBarPadding}
         />

@@ -1,3 +1,5 @@
+import { User } from "../stores/authStore";
+
 type MediaType = "image" | "video";
 
 export type Attachment = {
@@ -16,12 +18,12 @@ export type Author = {
 export type Reply = {
   id: number;
   content: string;
-  author: Author;
+  author: Partial<User>;
   createdAt: Date;
   likes: number;
   dislikes: number;
   viewers: number;
-  media?: Attachment[]; // Media can now be added to replies
+  media?: Attachment[];
 };
 
 export type Comment = Reply & {
@@ -34,7 +36,7 @@ export type ForumPost = {
   content: string;
   category: string;
   place: string;
-  author: Author;
+  author: Partial<User>;
   viewers: number;
   likes: number;
   dislikes: number;
@@ -53,9 +55,9 @@ const forumData: ForumPost[] = [
     category: "Travel Tips",
     place: "Coron, Palawan",
     author: {
-      id: 10,
-      name: "IslandHopper",
-      avatarUrl: "https://ui-avatars.com/api/?name=Island+Hopper",
+      id: "10",
+      userName: "IslandHopper",
+      profilePictureUrl: "https://ui-avatars.com/api/?name=Island+Hopper",
     },
     viewers: 3420,
     likes: 156,
@@ -91,9 +93,9 @@ const forumData: ForumPost[] = [
         content:
           "Is it accessible by a standard tricycle or do I need a private boat?",
         author: {
-          id: 11,
-          name: "BackpackerPhil",
-          avatarUrl: "https://ui-avatars.com/api/?name=Phil",
+          id: "11",
+          userName: "BackpackerPhil",
+          profilePictureUrl: "https://ui-avatars.com/api/?name=Phil",
         },
         createdAt: new Date("2026-03-05T09:45:00Z"),
         likes: 8,
@@ -104,9 +106,10 @@ const forumData: ForumPost[] = [
             id: 3001,
             content: "Private boat is best, ask for the 'Secret Lagoon' route!",
             author: {
-              id: 10,
-              name: "IslandHopper",
-              avatarUrl: "https://ui-avatars.com/api/?name=Island+Hopper",
+              id: "10",
+              userName: "IslandHopper",
+              profilePictureUrl:
+                "https://ui-avatars.com/api/?name=Island+Hopper",
             },
             createdAt: new Date("2026-03-05T10:15:00Z"),
             likes: 12,
@@ -125,9 +128,9 @@ const forumData: ForumPost[] = [
     category: "Photography",
     place: "Vigan, Ilocos Sur",
     author: {
-      id: 15,
-      name: "LensMaster",
-      avatarUrl: "https://ui-avatars.com/api/?name=Lens+Master",
+      id: "15",
+      userName: "LensMaster",
+      profilePictureUrl: "https://ui-avatars.com/api/?name=Lens+Master",
     },
     viewers: 890,
     likes: 67,
@@ -166,9 +169,9 @@ const forumData: ForumPost[] = [
     category: "Sports",
     place: "Siargao",
     author: {
-      id: 22,
-      name: "SurferWannabe",
-      avatarUrl: "https://ui-avatars.com/api/?name=Surfer+W",
+      id: "22",
+      userName: "SurferWannabe",
+      profilePictureUrl: "https://ui-avatars.com/api/?name=Surfer+W",
     },
     viewers: 1100,
     likes: 24,
@@ -181,9 +184,9 @@ const forumData: ForumPost[] = [
         content:
           "Look for 'Kuya Jun' near the boardwalk. He's the legend of Cloud 9.",
         author: {
-          id: 25,
-          name: "LocalGuide",
-          avatarUrl: "https://ui-avatars.com/api/?name=Local+G",
+          id: "25",
+          userName: "LocalGuide",
+          profilePictureUrl: "https://ui-avatars.com/api/?name=Local+G",
         },
         createdAt: new Date("2026-03-10T12:30:00Z"),
         likes: 45,
@@ -200,9 +203,9 @@ const forumData: ForumPost[] = [
     category: "Safety",
     place: "Mountain Province",
     author: {
-      id: 30,
-      name: "RoadTripper",
-      avatarUrl: "https://ui-avatars.com/api/?name=Road+Tripper",
+      id: "30",
+      userName: "RoadTripper",
+      profilePictureUrl: "https://ui-avatars.com/api/?name=Road+Tripper",
     },
     viewers: 5600,
     likes: 89,
@@ -226,9 +229,9 @@ const forumData: ForumPost[] = [
     category: "Development",
     place: "Cainta, Rizal",
     author: {
-      id: 1,
-      name: "DevUser",
-      avatarUrl: "https://ui-avatars.com/api/?name=Dev+User",
+      id: "1",
+      userName: "DevUser",
+      profilePictureUrl: "https://ui-avatars.com/api/?name=Dev+User",
     },
     viewers: 450,
     likes: 33,

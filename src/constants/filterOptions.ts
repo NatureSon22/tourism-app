@@ -37,7 +37,52 @@ export const ACTIVITY_FILTERS: FilterOption[] = [
   },
   {
     label: "Filter",
-    sheet: "dining-filter-sheet",
+    sheet: "activity-filter-sheet",
+  },
+  {
+    label: "Sort",
+    sheet: "sort-sheet",
+  },
+];
+
+export const EVENT_FILTERS: FilterOption[] = [
+  {
+    label: "Area",
+    sheet: "area-sheet",
+  },
+  {
+    label: "Filter",
+    sheet: "event-filter-sheet",
+  },
+  {
+    label: "Sort",
+    sheet: "sort-sheet",
+  },
+];
+
+export const SERVICE_FILTERS: FilterOption[] = [
+  {
+    label: "Area",
+    sheet: "area-sheet",
+  },
+  {
+    label: "Filter",
+    sheet: "service-filter-sheet",
+  },
+  {
+    label: "Sort",
+    sheet: "sort-sheet",
+  },
+];
+
+export const TRANSPORTATION_FILTERS: FilterOption[] = [
+  {
+    label: "Area",
+    sheet: "area-sheet",
+  },
+  {
+    label: "Filter",
+    sheet: "transportation-filter-sheet",
   },
   {
     label: "Sort",

@@ -1,4 +1,4 @@
-import SORT_OPTIONS from "@/src/config/sort";
+import { ACCOMMODATION_SORT } from "@/src/config/sort";
 import { Typography } from "@/src/constants/styles";
 import VStack from "@/src/layouts/VStack";
 import { Feather } from "@expo/vector-icons";
@@ -11,7 +11,7 @@ import ActionSheet, {
 } from "react-native-actions-sheet";
 
 export default function AccommodationSortSheet(props: SheetProps) {
-  const [selectedSort, setSelectedSort] = useState(SORT_OPTIONS[0].value);
+  const [selectedSort, setSelectedSort] = useState(ACCOMMODATION_SORT[0].value);
 
   const handleCloseSheet = () => {
     // hide the current sheet
@@ -70,7 +70,7 @@ export default function AccommodationSortSheet(props: SheetProps) {
               gap: 5,
             }}
           >
-            {SORT_OPTIONS.map((option) => (
+            {ACCOMMODATION_SORT.map((option) => (
               <Pressable
                 key={option.value}
                 onPress={() => handleSelectSort(option.value)}

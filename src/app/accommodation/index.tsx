@@ -1,23 +1,29 @@
 import AccommodationList from "@/src/components/app/accomodation/AccommodationList";
 import FilterBar from "@/src/components/app/FilterBar";
 import SearchableHeader from "@/src/components/app/SearchableHeader";
+import { ACCOMMODATION_SORT } from "@/src/config/sort";
 import { ACCOMMODATION_FILTERS } from "@/src/constants/filterOptions";
 import { Typography } from "@/src/constants/styles";
 import useDebounce from "@/src/hooks/useDebounce";
+import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
-import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { SheetManager } from "react-native-actions-sheet";
+import { useShallow } from "zustand/react/shallow";
 
 export default function AccommodationPage() {
-  const sheetShownRef = useRef(false);
+  const { openSheet } = useSingleSheet();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
-  const router = useRouter();
-  const resetCategory = useFilterStore((state) => state.resetCategory);
+  const { currentSort, updateOptions, resetCategory } = useFilterStore(
+    useShallow((state) => ({
+      updateOptions: state.updateOptions,
+      currentSort: state.categories.accommodation.options.sort,
+      resetCategory: state.resetCategory,
+    })),
+  );
 
   useEffect(() => {
     return () => {
@@ -26,18 +32,11 @@ export default function AccommodationPage() {
   }, []);
 
   const handleAreaPress = (sheet: string) => {
-    if (!sheetShownRef.current) {
-      SheetManager.show(sheet, {
-        onClose(data) {
-          sheetShownRef.current = false;
-        },
-      });
-      sheetShownRef.current = true;
-    }
-  };
-
-  const handleBackButton = () => {
-    router.back();
+    openSheet(sheet, {
+      options: ACCOMMODATION_SORT,
+      selectedValue: currentSort,
+      onSelect: (val: string) => updateOptions("accommodation", { sort: val }),
+    });
   };
 
   return (

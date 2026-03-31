@@ -26,9 +26,10 @@ export default function AccommodationList({ search }: AccommodationListProps) {
     search,
     area: accommodationState.options.area,
     sort: accommodationState.options.sort,
-    rating: accommodationState.options.filter.rating,
-    subtypes: accommodationState.options.filter.type.subtypes,
-    amenities: accommodationState.options.filter.amenities,
+    rating: accommodationState.options.rating,
+    type: accommodationState.options.type.type,
+    amenities: accommodationState.options.amenities,
+    subtypes: accommodationState.options.type.subtypes,
   });
   const { isConnected, isInternetReachable } = useNetInfo();
   const online = isConnected && isInternetReachable;

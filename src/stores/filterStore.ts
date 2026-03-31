@@ -1,48 +1,111 @@
 import { create } from "zustand";
 
-type Category = "accommodation";
+type Category =
+  | "accommodation"
+  | "dining"
+  | "activity"
+  | "event"
+  | "services"
+  | "transportation";
 
-type FilterOptions = {
+type BaseFilter = {
   area: string[];
   sort: string;
-  filter: {
-    rating: number;
-    type: { type: string; subtypes: string[] };
-    // unique attribute: [ {  id:  , value: [] } ]
-    amenities: string[];
-  };
+  type: { type: string; subtypes: string[] };
+  attributes: Record<string, string[]>;
 };
 
-type UpdateOptionsPayload = Partial<Omit<FilterOptions, "filter">> & {
-  filter?: Partial<FilterOptions["filter"]>;
+type AccommodationFilter = BaseFilter & {
+  rating: number;
+  amenities: string[];
+};
+
+type DiningFilter = BaseFilter & {
+  rating: number;
+  amenities: string[];
+};
+
+type ActivityFilter = BaseFilter & {
+  amenities: string[];
+  duration: string;
+};
+
+type EventFilter = BaseFilter & {
+  amenities: string[];
+};
+
+type ServiceFilter = BaseFilter;
+
+type TransportationFilter = BaseFilter & {
+  rating: number;
+};
+
+// Map categories to their specific filter shapes
+type CategoryFilterMap = {
+  accommodation: AccommodationFilter;
+  dining: DiningFilter;
+  activity: ActivityFilter;
+  event: EventFilter;
+  services: ServiceFilter;
+  transportation: TransportationFilter;
 };
 
 type SearchState = {
-  categories: Record<
-    Category,
-    {
+  categories: {
+    [K in Category]: {
       search: string;
-      options: FilterOptions;
-    }
-  >;
-
-  // actions
+      options: CategoryFilterMap[K];
+    };
+  };
   setSearch: (cat: Category, text: string) => void;
-  updateOptions: (cat: Category, updates: UpdateOptionsPayload) => void;
+  updateOptions: <K extends Category>(
+    cat: K,
+    updates: Partial<CategoryFilterMap[K]>,
+  ) => void;
   resetCategory: (cat: Category) => void;
 };
 
-const createInitialCategory = () => ({
-  search: "",
-  options: {
+const createInitialOptions = (cat: Category): any => {
+  const base = {
     area: [],
     sort: "distance",
-    filter: { rating: 0, type: { type: "", subtypes: [] }, amenities: [] },
-  },
+    rating: 0,
+    type: { type: "", subtypes: [] },
+  };
+
+  switch (cat) {
+    case "accommodation":
+      return { ...base, amenities: [], attributes: {} };
+    case "dining":
+      return { ...base, amenities: [], attributes: {} };
+    case "activity":
+      return { ...base, amenities: [] };
+    case "event":
+      return { ...base, amenities: [] };
+    case "services":
+      return base;
+    case "transportation":
+      return { ...base, duration: "" };
+    default:
+      return base;
+  }
+};
+
+const createInitialCategory = (cat: Category) => ({
+  search: "",
+  options: createInitialOptions(cat),
 });
 
 export const useFilterStore = create<SearchState>((set) => ({
-  categories: { accommodation: createInitialCategory() },
+  categories: {
+    accommodation: createInitialCategory("accommodation"),
+    dining: createInitialCategory("dining"),
+    activity: createInitialCategory("activity"),
+    event: createInitialCategory("event"),
+    transportation: createInitialCategory("transportation"),
+    services: createInitialCategory("services"),
+  },
+
   setSearch: (cat, text) =>
     set((state) => ({
       categories: {
@@ -50,11 +113,10 @@ export const useFilterStore = create<SearchState>((set) => ({
         [cat]: { ...state.categories[cat], search: text },
       },
     })),
+
   updateOptions: (cat, updates) =>
     set((state) => {
       const currentCategory = state.categories[cat];
-      const currentOptions = currentCategory.options;
-      const currentFilter = currentOptions.filter;
 
       return {
         categories: {
@@ -62,24 +124,31 @@ export const useFilterStore = create<SearchState>((set) => ({
           [cat]: {
             ...currentCategory,
             options: {
-              ...currentOptions,
-              ...updates, 
-              filter: {
-                ...currentFilter,
-                ...updates.filter,
-             
-                type: {
-                  ...currentFilter.type,
-                  ...updates.filter?.type,
-                },
-              },
+              ...currentCategory.options,
+              ...updates,
+              // Handle deep merging for the 'type' object specifically
+              type: updates.type
+                ? { ...currentCategory.options.type, ...updates.type }
+                : currentCategory.options.type,
+              // Handle deep merging for 'attributes' specifically if they exist
+              attributes:
+                updates.attributes && "attributes" in currentCategory.options
+                  ? {
+                      ...currentCategory.options.attributes,
+                      ...updates.attributes,
+                    }
+                  : (currentCategory.options as any).attributes,
             },
           },
         },
       };
     }),
+
   resetCategory: (cat) =>
     set((state) => ({
-      categories: { ...state.categories, [cat]: createInitialCategory() },
+      categories: {
+        ...state.categories,
+        [cat]: createInitialCategory(cat),
+      },
     })),
 }));

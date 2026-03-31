@@ -15,7 +15,6 @@ export const useDining = (params: GetDiningParams) => {
   return useQuery({
     queryKey: diningKeys.list(params),
     queryFn: () => diningService.getDiningData(params),
-    placeholderData: (prev) => prev,
     select: (data) => {
       return {
         ...data,

@@ -1,13 +1,17 @@
-import EditEmailSheet from "@/src/sheets/EditEmailSheet";
-import EditNameSheet from "@/src/sheets/EditNameSheet";
-import EditUsernameSheet from "@/src/sheets/EditUsernameSheet";
-import EditProfileImageSheet from "@/src/sheets/EditProfileImageSheet";
+import EditEmailSheet from "@/src/components/sheets/account/EditEmailSheet";
+import EditNameSheet from "@/src/components/sheets/account/EditNameSheet";
+import EditProfileImageSheet from "@/src/components/sheets/account/EditProfileImageSheet";
+import EditUsernameSheet from "@/src/components/sheets/account/EditUsernameSheet";
 import { SheetDefinition, SheetRegister } from "react-native-actions-sheet";
-import AccommodationFilterSheet from "../components/sheets/accommodation/AccommodationFilterSheet";
-import AccommodationSortSheet from "../components/sheets/accommodation/AccommodationSortSheet";
+import FilterSheet from "../components/sheets/accommodation/FilterSheet";
+import ActivityFilterSheet from "../components/sheets/activity/ActivityFilterSheet";
 import AreaSheet from "../components/sheets/AreaSheet";
-import DiningFilterSheet from "../components/sheets/DiningFilterSheet";
+import DiningFilterSheet from "../components/sheets/dining/DiningFilterSheet";
+import EventFilterSheet from "../components/sheets/event/EventFilterSheet";
 import OptionSheet from "../components/sheets/NavigationSheet";
+import ServiceFilterSheet from "../components/sheets/service/ServiceFilterSheet";
+import TransportationFilterSheet from "../components/sheets/transportation/TransportationFilterSheet";
+import SortSheet from "../components/sheets/SortSheet";
 
 declare module "react-native-actions-sheet" {
   interface Sheets {
@@ -15,8 +19,19 @@ declare module "react-native-actions-sheet" {
     "area-sheet": SheetDefinition;
     "filter-sheet": SheetDefinition;
     "sort-sheet": SheetDefinition;
-    "dining-filter-sheet": SheetDefinition;
+
     "accommodation-filter-sheet": SheetDefinition;
+
+    "dining-filter-sheet": SheetDefinition;
+
+    "activity-filter-sheet": SheetDefinition;
+
+    "event-filter-sheet": SheetDefinition;
+
+    "service-filter-sheet": SheetDefinition;
+
+    "transportation-filter-sheet": SheetDefinition;
+
     "edit-name-sheet": SheetDefinition;
     "edit-username-sheet": SheetDefinition;
     "edit-email-sheet": SheetDefinition;
@@ -30,10 +45,21 @@ export const Sheets = () => {
       sheets={{
         "options-sheet": OptionSheet,
         "area-sheet": AreaSheet,
-        "filter-sheet": AccommodationFilterSheet,
-        "sort-sheet": AccommodationSortSheet,
+        "filter-sheet": FilterSheet,
+        "sort-sheet": SortSheet,
+
+        "accommodation-filter-sheet": FilterSheet,
+
         "dining-filter-sheet": DiningFilterSheet,
-        "accommodation-filter-sheet": AccommodationFilterSheet,
+
+        "activity-filter-sheet": ActivityFilterSheet,
+
+        "event-filter-sheet": EventFilterSheet,
+
+        "service-filter-sheet": ServiceFilterSheet,
+
+        "transportation-filter-sheet": TransportationFilterSheet,
+
         "edit-name-sheet": EditNameSheet,
         "edit-username-sheet": EditUsernameSheet,
         "edit-email-sheet": EditEmailSheet,
