@@ -1,32 +1,27 @@
+import { QueryParams } from "@/src/types/filter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  activityService,
-  GetAvailableActivitiesParams,
-} from "../api/activityService";
+import { activityService } from "../api/activityService";
 
 export const activityKeys = {
   all: ["activities"] as const,
   lists: () => [...activityKeys.all, "list"] as const,
-  list: (params: GetAvailableActivitiesParams) =>
-    [...activityKeys.lists(), params] as const,
+  list: (params: QueryParams) => [...activityKeys.lists(), params] as const,
   details: () => [...activityKeys.all, "detail"] as const,
   detail: (id: string) => [...activityKeys.details(), id] as const,
 };
 
-export const useActivities = (params: GetAvailableActivitiesParams) => {
+export const useActivities = (params: QueryParams) => {
   return useQuery({
     queryKey: activityKeys.list(params),
     queryFn: () => activityService.getAvailableActivities(params),
     placeholderData: (prev) => prev,
-    select: (data) => {
-      return {
-        ...data,
-        data: data.data.map((act) => ({
-          ...act,
-          id: String(act.id),
-        })),
-      };
-    },
+    select: (data) => ({
+      ...data,
+      data: data.data.map((act) => ({
+        ...act,
+        id: String(act.id),
+      })),
+    }),
   });
 };
 
@@ -47,9 +42,7 @@ export const useBookActivity = () => {
       new Promise((resolve) =>
         setTimeout(() => resolve({ success: true }), 1000),
       ),
-
     onSuccess: (_, activityId) => {
-      // Refresh the specific activity detail
       queryClient.invalidateQueries({
         queryKey: activityKeys.detail(activityId),
       });

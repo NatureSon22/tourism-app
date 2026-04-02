@@ -21,7 +21,7 @@ const authService = {
   requestCrsfToken: async (): Promise<string> => {
     try {
       const response = await fetch(
-        "https://t28c8v35-3000.asse.devtunnels.ms/api/csrf-token",
+        "https://t3w5zwg6-3000.asse.devtunnels.ms/api/csrf-token",
         {
           method: "GET",
           credentials: "include",

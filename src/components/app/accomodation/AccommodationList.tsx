@@ -1,14 +1,16 @@
 import AccommodationCard from "@/src/components/app/accomodation/AccommodationCard";
 import ListEmptyState from "@/src/components/app/ListEmptyState";
 import { useAccommodations } from "@/src/services/request/useAccomodation";
-import { useFilterStore } from "@/src/stores/filterStore";
 import { Accommodation } from "@/src/types/accommodation";
+import { QueryParams } from "@/src/types/filter";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   ListRenderItem,
+  Platform,
   RefreshControl,
   StyleSheet,
   View,
@@ -16,26 +18,68 @@ import {
 import AccommodationCardSkeleton from "./AccommodationCardSkeleton";
 
 type AccommodationListProps = {
-  search: string;
+  params: QueryParams;
 };
 
-export default function AccommodationList({ search }: AccommodationListProps) {
-  const categories = useFilterStore((state) => state.categories);
-  const accommodationState = categories.accommodation;
-  const { data, isLoading, isFetched, isError, refetch } = useAccommodations({
-    search,
-    area: accommodationState.options.area,
-    sort: accommodationState.options.sort,
-    rating: accommodationState.options.rating,
-    type: accommodationState.options.type.type,
-    amenities: accommodationState.options.amenities,
-    subtypes: accommodationState.options.type.subtypes,
-  });
+export default function AccommodationList({ params }: AccommodationListProps) {
+  const {
+    data,
+    isLoading,
+    isFetched,
+    isError,
+    refetch,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useAccommodations(
+    useMemo(
+      () => ({
+        search: params.search,
+        area: params.area,
+        sort: params.sort,
+        rating: params.rating,
+        type: params.type,
+        amenities: params.amenities,
+        subtypes: params.subtypes,
+        lat: params.lat,
+        lng: params.lng,
+        radius: params.radius,
+        page: params.page ?? 1,
+        limit: params.limit ?? 20,
+      }),
+      [
+        params.search,
+        params.area,
+        params.sort,
+        params.rating,
+        params.type,
+        params.amenities,
+        params.subtypes,
+        params.lat,
+        params.lng,
+        params.radius,
+        params.page,
+        params.limit,
+      ],
+    ),
+  );
   const { isConnected, isInternetReachable } = useNetInfo();
   const online = isConnected && isInternetReachable;
-  const isEmpty =
-    isFetched && !isLoading && (data?.data?.listings?.length ?? 0) === 0;
   const [isRefetching, setIsRefetching] = useState(false);
+
+  const listings = useMemo(() => {
+    return data?.pages.flatMap((page) => page.data.listings) ?? [];
+  }, [data]);
+
+  const isEmpty = isFetched && !isLoading && listings?.length === 0;
+
+  const handleEndReached = () => {
+    console.log("End reached. Has next page?", hasNextPage);
+    console.log("Is fetching next page?", isFetchingNextPage);
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
   const handleRefresh = async () => {
     setIsRefetching(true);
@@ -57,18 +101,28 @@ export default function AccommodationList({ search }: AccommodationListProps) {
 
   return (
     <FlatList<Skeleton | Accommodation>
-      data={isLoading ? createSkeletons(6) : data?.data.listings || []}
+      // Show skeletons only on first load, otherwise show listings
+      data={isLoading ? createSkeletons(6) : listings}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
+      // Infinite Scroll Props
+      onEndReached={handleEndReached}
+      onEndReachedThreshold={0.5} // Trigger when 50% from the bottom
+      ListFooterComponent={() =>
+        isFetchingNextPage ? (
+          <ActivityIndicator style={{ marginVertical: 20 }} color="#000" />
+        ) : null
+      }
+      // Optimization Props
       initialNumToRender={5}
-      maxToRenderPerBatch={5}
-      windowSize={10}
-      removeClippedSubviews
+      maxToRenderPerBatch={10}
+      windowSize={5}
+      removeClippedSubviews={Platform.OS === "android"}
       contentContainerStyle={styles.content}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       showsVerticalScrollIndicator={false}
       refreshControl={
-        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+        <RefreshControl refreshing={isLoading && !!data} onRefresh={refetch} />
       }
       ListEmptyComponent={
         <ListEmptyState
@@ -77,7 +131,6 @@ export default function AccommodationList({ search }: AccommodationListProps) {
           isError={isError}
           isEmpty={isEmpty}
           resourceName="accommodations"
-          customNoResultsMessage="Oh no! There's no accommodation option that matches the search or filter criteria."
           onRetry={refetch}
         />
       }

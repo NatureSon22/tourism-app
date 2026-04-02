@@ -1,22 +1,37 @@
 import { Dining } from "@/src/constants/dining";
 import { useDining } from "@/src/services/request/useDining";
+import { QueryParams } from "@/src/types/filter";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import ListEmptyState from "../ListEmptyState";
 import DiningCard from "./DiningCard";
 import DiningCardSkeleton from "./DiningCardSkeleton";
 
 type DiningListProps = {
-  filter: string;
-  search: string;
+  diningState: QueryParams;
 };
 
-const DiningList = ({ filter, search }: DiningListProps) => {
-  const { data, isLoading, isFetched, refetch } = useDining({ filter, search });
+const DiningList = ({ diningState }: DiningListProps) => {
+  const params = useMemo(
+    () => ({
+      search: diningState.search,
+      area: diningState.area,
+      sort: diningState.sort,
+      rating: diningState.rating,
+      type: diningState.type,
+      subtypes: diningState.subtypes,
+      amenities: diningState.amenities,
+      page: diningState.page,
+      limit: diningState.limit,
+    }),
+    [diningState],
+  );
+
+  const { data, isLoading, isFetched, refetch } = useDining(params);
   const { isConnected } = useNetInfo();
-  const isEmpty = isFetched && !isLoading && data?.data.length === 0;
+  const isEmpty = isFetched && !isLoading && data?.data?.listings?.length === 0;
   const [isRefetching, setIsRefetching] = useState(false);
 
   const handleRefresh = async () => {
@@ -27,7 +42,7 @@ const DiningList = ({ filter, search }: DiningListProps) => {
 
   return (
     <FlatList<Skeleton | Dining>
-      data={isLoading ? createSkeletons(6) : data?.data || []}
+      data={isLoading ? createSkeletons(6) : data?.data?.listings || []}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContent}
       ItemSeparatorComponent={() => <View style={styles.separator} />}

@@ -5,47 +5,55 @@ import { Pressable, Text, View } from "react-native";
 
 export const CategoryGroup = ({
   types,
-  selectedId,
-  selectedSubtypes,
+  selectedName, // Changed from selectedId
+  selectedSubnames, // Changed from selectedSubtypes
   onCategoryChange,
-  onSubtypeToggle,
+  onSubnameToggle,
 }: {
   types: any[];
-  selectedId: number | null;
-  selectedSubtypes: number[];
-  onCategoryChange: (id: number) => void;
-  onSubtypeToggle: (id: number) => void;
+  selectedName: string | null;
+  selectedSubnames: string[];
+  onCategoryChange: (name: string) => void;
+  onSubnameToggle: (name: string) => void;
 }) => {
-  const activeCategory = types.find((t) => t.id === selectedId);
+  // Find the active category by name
+  const activeCategory = types.find((t) => t.name === selectedName);
 
   return (
     <VStack gap={12}>
+      {/* Category Pills */}
       <HStack gap={10} style={{ flexWrap: "wrap" }} justifyContent="flex-start">
-        {types.map((cat) => (
-          <Pressable
-            key={cat.id}
-            onPress={() => onCategoryChange(cat.id)}
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 8,
-              borderRadius: 20,
-              borderWidth: 1,
-              backgroundColor:
-                selectedId === cat.id ? Colors.primary : Colors.surface,
-              borderColor:
-                selectedId === cat.id ? Colors.primary : Colors.border,
-            }}
-          >
-            <Text
-              style={{ color: selectedId === cat.id ? "#fff" : Colors.text }}
+        {types.map((cat) => {
+          const isCatSelected = selectedName === cat.name;
+          
+          return (
+            <Pressable
+              key={cat.name}
+              onPress={() => onCategoryChange(cat.name)}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 20,
+                borderWidth: 1,
+                backgroundColor: isCatSelected ? Colors.primary : Colors.surface,
+                borderColor: isCatSelected ? Colors.primary : Colors.border,
+              }}
             >
-              {cat.name}
-            </Text>
-          </Pressable>
-        ))}
+              <Text
+                style={{ 
+                  color: isCatSelected ? "#fff" : Colors.text,
+                  fontFamily: Typography.family.medium 
+                }}
+              >
+                {cat.name}
+              </Text>
+            </Pressable>
+          );
+        })}
       </HStack>
 
-      {activeCategory && activeCategory.subtypes.length > 0 && (
+      {/* Sub-category Container */}
+      {activeCategory && activeCategory.subtypes?.length > 0 && (
         <View
           style={{
             marginTop: 10,
@@ -58,7 +66,7 @@ export const CategoryGroup = ({
             style={{
               marginBottom: 10,
               fontFamily: Typography.family.semiBold,
-              fontSize: 18,
+              fontSize: 16,
             }}
           >
             Sub-categories
@@ -68,35 +76,33 @@ export const CategoryGroup = ({
             style={{ flexWrap: "wrap" }}
             justifyContent="flex-start"
           >
-            {activeCategory.subtypes.map((sub: any) => (
-              <Pressable
-                key={sub.id}
-                onPress={() => onSubtypeToggle(sub.id)}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  backgroundColor: selectedSubtypes.includes(sub.id)
-                    ? Colors.primary
-                    : "#fff",
-                  borderColor: selectedSubtypes.includes(sub.id)
-                    ? Colors.primary
-                    : Colors.border,
-                }}
-              >
-                <Text
+            {activeCategory.subtypes.map((sub: any) => {
+              const isSubSelected = selectedSubnames.includes(sub.name);
+
+              return (
+                <Pressable
+                  key={sub.name}
+                  onPress={() => onSubnameToggle(sub.name)}
                   style={{
-                    fontSize: 12,
-                    color: selectedSubtypes.includes(sub.id)
-                      ? "#fff"
-                      : Colors.text,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    backgroundColor: isSubSelected ? Colors.primary : "#fff",
+                    borderColor: isSubSelected ? Colors.primary : Colors.border,
                   }}
                 >
-                  {sub.name}
-                </Text>
-              </Pressable>
-            ))}
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: isSubSelected ? "#fff" : Colors.text,
+                    }}
+                  >
+                    {sub.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </HStack>
         </View>
       )}

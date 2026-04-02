@@ -9,41 +9,58 @@ import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
+import { QueryParams } from "@/src/types/filter";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 export default function ActivityPage() {
   const { openSheet } = useSingleSheet();
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 350);
-  const { currentSort, updateOptions, resetCategory } = useFilterStore(
-    useShallow((state) => ({
-      updateOptions: state.updateOptions,
-      currentSort: state.categories.activity.options.sort,
-      resetCategory: state.resetCategory,
-    })),
-  );
+  const [searchLocal, setSearchLocal] = useState("");
+  const debouncedSearch = useDebounce(searchLocal, 350);
+
+  const { activityState, updateOptions, resetCategory, setSearch } =
+    useFilterStore(
+      useShallow((state) => ({
+        activityState: state.categories.activity,
+        updateOptions: state.updateOptions,
+        resetCategory: state.resetCategory,
+        setSearch: state.setSearch,
+      })),
+    );
 
   useEffect(() => {
-    return () => {
-      resetCategory("activity");
-    };
-  }, []);
+    return () => resetCategory("activity");
+  }, [resetCategory]);
+
+  useEffect(() => {
+    setSearch("activity", debouncedSearch);
+  }, [debouncedSearch, setSearch]);
 
   const handleAreaPress = (sheet: string) => {
     openSheet(sheet, {
       options: ACTIVITY_SORT,
-      selectedValue: currentSort,
+      selectedValue: activityState.options.sort,
       onSelect: (val: string) => updateOptions("activity", { sort: val }),
     });
+  };
+
+  const params: QueryParams = {
+    search: activityState.search,
+    area: activityState.options.area,
+    sort: activityState.options.sort,
+    type: activityState.options.type.type || undefined,
+    subtypes: activityState.options.type.subtypes,
+    amenities: activityState.options.amenities,
+    page: 1,
+    limit: 20,
   };
 
   return (
     <SafeArea edges={["bottom", "top"]}>
       <SearchableHeader
-        search={search}
-        setSearch={setSearch}
+        search={searchLocal}
+        setSearch={setSearchLocal}
         title={"General Activities"}
       />
 
@@ -54,7 +71,7 @@ export default function ActivityPage() {
           containerStyle={styles.filterBar}
         />
 
-        <ActivityList search={debouncedSearch} />
+        <ActivityList params={params} />
       </Screen>
     </SafeArea>
   );

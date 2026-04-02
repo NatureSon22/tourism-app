@@ -2,6 +2,7 @@ import ActivityCard from "@/src/components/app/activity/ActivityCard";
 import ListEmptyState from "@/src/components/app/ListEmptyState";
 import { Activity } from "@/src/constants/activity";
 import { useActivities } from "@/src/services/request/useActivity";
+import { QueryParams } from "@/src/types/filter";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { memo, useState } from "react";
@@ -9,13 +10,11 @@ import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import ActivityCardSkeleton from "./ActivityCardSkeleton";
 
 type Props = {
-  search: string;
+  params: QueryParams;
 };
 
-function ActivityList({ search }: Props) {
-  const { data, isLoading, isFetched, refetch } = useActivities({
-    search,
-  });
+function ActivityList({ params }: Props) {
+  const { data, isLoading, isFetched, refetch } = useActivities(params);
   const { isConnected } = useNetInfo();
   const isEmpty = isFetched && !isLoading && data?.data.length === 0;
   const [isRefetching, setIsRefetching] = useState(false);
@@ -47,7 +46,7 @@ function ActivityList({ search }: Props) {
         <ListEmptyState
           isLoading={isLoading}
           isConnected={isConnected}
-          onRetry={() => refetch()}
+          onRetry={refetch}
           resourceName="activities"
           customNoResultsMessage="Oh no! There's no activity that matches the search or filter criteria."
           isEmpty={isEmpty}
@@ -66,9 +65,5 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 20,
-  },
-  loadingWrap: {
-    paddingHorizontal: 10,
-    gap: 20,
   },
 });

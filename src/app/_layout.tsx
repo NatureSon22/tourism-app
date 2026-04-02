@@ -20,6 +20,7 @@ import { Sheets } from "../config/sheets";
 import toastConfig from "../config/toastConfig";
 import useAuthStore from "../stores/authStore";
 import { tokenStorage } from "../utils/tokenStorage";
+import authService from "../services/api/authService";
 
 // TODO: - check and handle when the backend is down or unreachable during app initialization, to prevent infinite loading state and provide user feedback
 // TODO: - explore tanstack query retry and delay
@@ -55,7 +56,7 @@ function Routes() {
 
   const initializeAuth = useCallback(async () => {
     try {
-      // await authService.requestCrsfToken();
+      await authService.requestCrsfToken();
 
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {

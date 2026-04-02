@@ -18,24 +18,22 @@ import HeaderSheet from "../../app/HeaderSheet";
 export default function TransportationFilterSheet(props: SheetProps) {
   const updateOptions = useFilterStore((state) => state.updateOptions);
 
-  // Local Draft States
+  // Local Draft States - Switched to names
   const [draft, setDraft] = useState({
     rating: 0,
-    categoryId: null as number | null,
-    subtypes: [] as number[],
-    amenities: [] as number[],
-    attributes: {} as Record<number, number[]>,
+    categoryName: null as string | null,
+    subnames: [] as string[],
+    attributes: {} as Record<string, string[]>,
   });
 
   const handleApply = () => {
     updateOptions("transportation", {
+      rating: draft.rating,
       type: {
-        type: draft.categoryId?.toString() || "",
-        subtypes: draft.subtypes.map(String),
+        type: draft.categoryName || "",
+        subtypes: draft.subnames,
       },
-      attributes: Object.fromEntries(
-        Object.entries(draft.attributes).map(([k, v]) => [k, v.map(String)]),
-      ),
+      attributes: draft.attributes,
     });
     SheetManager.hide(props.sheetId);
   };
@@ -43,29 +41,28 @@ export default function TransportationFilterSheet(props: SheetProps) {
   const handleClear = () => {
     setDraft({
       rating: 0,
-      categoryId: null,
-      subtypes: [],
-      amenities: [],
+      categoryName: null,
+      subnames: [],
       attributes: {},
     });
   };
 
-  const toggleSubtype = (id: number) => {
+  const toggleSubname = (name: string) => {
     setDraft((prev) => ({
       ...prev,
-      subtypes: prev.subtypes.includes(id)
-        ? prev.subtypes.filter((i) => i !== id)
-        : [...prev.subtypes, id],
+      subnames: prev.subnames.includes(name)
+        ? prev.subnames.filter((n) => n !== name)
+        : [...prev.subnames, name],
     }));
   };
 
-  const toggleAttribute = (headerId: number, optionId: number) => {
+  const toggleAttribute = (attrName: string, optionName: string) => {
     setDraft((prev) => {
-      const current = prev.attributes[headerId] || [];
-      const next = current.includes(optionId)
-        ? current.filter((id) => id !== optionId)
-        : [...current, optionId];
-      return { ...prev, attributes: { ...prev.attributes, [headerId]: next } };
+      const current = prev.attributes[attrName] || [];
+      const next = current.includes(optionName)
+        ? current.filter((n) => n !== optionName)
+        : [...current, optionName];
+      return { ...prev, attributes: { ...prev.attributes, [attrName]: next } };
     });
   };
 
@@ -78,10 +75,10 @@ export default function TransportationFilterSheet(props: SheetProps) {
       <View style={styles.wrapper}>
         <HeaderSheet title="Filter" handleCloseSheet={handleCloseSheet} />
         <ScrollView contentContainerStyle={{ padding: 20, gap: 24 }}>
+          
+          {/* Rating Section */}
           <VStack gap={8} style={{ width: "100%" }}>
-            <Text
-              style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
-            >
+            <Text style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}>
               Star Rating
             </Text>
             <StarRatingGroup
@@ -91,31 +88,30 @@ export default function TransportationFilterSheet(props: SheetProps) {
             />
           </VStack>
 
+          {/* Transportation Type Section */}
           <VStack gap={8}>
-            <Text
-              style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
-            >
+            <Text style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}>
               Transportation Type
             </Text>
             <CategoryGroup
               types={TRANSPORTATION_FILTERS.types}
-              selectedId={draft.categoryId}
-              selectedSubtypes={draft.subtypes}
-              onCategoryChange={(id) =>
-                setDraft({ ...draft, categoryId: id, subtypes: [] })
+              selectedName={draft.categoryName}
+              selectedSubnames={draft.subnames}
+              onCategoryChange={(name) =>
+                setDraft({ ...draft, categoryName: name, subnames: [] })
               }
-              onSubtypeToggle={toggleSubtype}
+              onSubnameToggle={toggleSubname}
             />
           </VStack>
 
-          {/* Dynamic Attributes */}
+          {/* Dynamic Attributes (Vehicle Class, Transmission, etc.) */}
           {TRANSPORTATION_FILTERS.attributes.map((attr) => (
             <CheckboxGroup
-              key={attr.id}
+              key={attr.name}
               title={attr.name}
               options={attr.options}
-              selectedIds={draft.attributes[attr.id] || []}
-              onToggle={(optId) => toggleAttribute(attr.id, optId)}
+              selectedNames={draft.attributes[attr.name] || []}
+              onToggle={(optName) => toggleAttribute(attr.name, optName)}
             />
           ))}
         </ScrollView>
@@ -127,11 +123,6 @@ export default function TransportationFilterSheet(props: SheetProps) {
 }
 
 const styles = StyleSheet.create({
-  sheetContainer: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: "white",
-  },
   wrapper: {
     height: 500,
   },

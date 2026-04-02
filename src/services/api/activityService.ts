@@ -1,11 +1,5 @@
 import { Activity, PHILIPPINE_ACTIVITY_DATA } from "@/src/constants/activity";
-
-export type GetAvailableActivitiesParams = {
-  search?: string;
-  filter?: string | null;
-  area?: string | null;
-  sort?: string | null;
-};
+import { QueryParams } from "@/src/types/filter";
 
 export type ActivityResponse = {
   data: Activity[];
@@ -18,7 +12,7 @@ export const activityService = {
    * Handles Search and Sorting (Rating, etc.)
    */
   getAvailableActivities: async (
-    params: GetAvailableActivitiesParams,
+    params: QueryParams,
   ): Promise<ActivityResponse> => {
     const search = (params.search ?? "").trim().toLowerCase();
 
@@ -37,9 +31,11 @@ export const activityService = {
     }
 
     // 2. Filter by Area
-    if (params.area && params.area !== "all") {
-      list = list.filter((a) => 
-        a.location.toLowerCase().includes(params.area!.toLowerCase())
+    if (params.area && params.area.length > 0) {
+      list = list.filter((a) =>
+        params.area!.some((area) =>
+          a.location.toLowerCase().includes(area.toLowerCase()),
+        ),
       );
     }
 
@@ -47,6 +43,11 @@ export const activityService = {
     if (params.sort === "rating") {
       list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     }
+
+    // const qs = buildQueryString(params);
+    // const response = await api.get(`/consumer/listings?${qs.toString()}`);
+    // console.log("API Response:", response.data);
+    // return response.data;
 
     return {
       data: list,

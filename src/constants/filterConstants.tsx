@@ -16,20 +16,15 @@ export const ACCOMMODATION_FILTERS = {
     },
     {
       id: 2,
-      name: "Resorts",
+      name: "Resort",
       subtypes: [
-        { id: 20, name: "Beach Resort" },
+        { id: 20, name: "Beach Hotel" },
         { id: 21, name: "Mountain Resort" },
         { id: 22, name: "Spa & Wellness" },
       ],
     },
     {
       id: 3,
-      name: "Vacation Rentals",
-      subtypes: [], // Can be empty if no subtypes exist
-    },
-    {
-      id: 4,
       name: "Vacation Rentals",
       subtypes: [], // Can be empty if no subtypes exist
     },
@@ -61,7 +56,7 @@ export const ACCOMMODATION_FILTERS = {
   // Flattened Amenities (Property Level)
   amenities: [
     { id: 101, name: "Free WiFi" },
-    { id: 102, name: "Swimming Pool" },
+    { id: 102, name: "Private Pool" },
     { id: 103, name: "Gym/Fitness Center" },
     { id: 104, name: "Airport Shuttle" },
     { id: 105, name: "Pet Friendly" },
@@ -225,7 +220,7 @@ export const ACTIVITY_FILTERS = {
 
   // Floating Attributes (Dynamic Groups for logistics)
   attributes: [
-  {
+    {
       id: 5100,
       name: "Difficulty Level",
       options: [

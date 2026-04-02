@@ -18,6 +18,9 @@ type BaseFilter = {
 type AccommodationFilter = BaseFilter & {
   rating: number;
   amenities: string[];
+  lat?: number;
+  lng?: number;
+  radius?: number;
 };
 
 type DiningFilter = BaseFilter & {

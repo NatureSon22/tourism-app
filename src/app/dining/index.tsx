@@ -9,41 +9,60 @@ import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
+import { QueryParams } from "@/src/types/filter";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
 export default function DiningPage() {
   const { openSheet } = useSingleSheet();
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search);
-  const { currentSort, updateOptions, resetCategory } = useFilterStore(
-    useShallow((state) => ({
-      updateOptions: state.updateOptions,
-      currentSort: state.categories.dining.options.sort,
-      resetCategory: state.resetCategory,
-    })),
-  );
+  const [searchLocal, setSearchLocal] = useState("");
+  const debouncedSearch = useDebounce(searchLocal);
+
+  const { diningState, updateOptions, resetCategory, setSearch } =
+    useFilterStore(
+      useShallow((state) => ({
+        diningState: state.categories.dining,
+        updateOptions: state.updateOptions,
+        resetCategory: state.resetCategory,
+        setSearch: state.setSearch,
+      })),
+    );
 
   useEffect(() => {
     return () => {
       resetCategory("dining");
     };
-  }, []);
+  }, [resetCategory]);
+
+  useEffect(() => {
+    setSearch("dining", debouncedSearch);
+  }, [debouncedSearch, setSearch]);
 
   const handleAreaPress = (area: string) => {
     openSheet(area, {
       options: DINING_SORT,
-      selectedValue: currentSort,
+      selectedValue: diningState.options.sort,
       onSelect: (val: string) => updateOptions("dining", { sort: val }),
     });
+  };
+
+  const params: QueryParams = {
+    search: diningState.search,
+    area: diningState.options.area,
+    sort: diningState.options.sort,
+    rating: diningState.options.rating || undefined,
+    type: diningState.options.type.type || undefined,
+    subtypes: diningState.options.type.subtypes,
+    amenities: diningState.options.amenities,
+    page: 1,
   };
 
   return (
     <SafeArea edges={["bottom", "top"]}>
       <SearchableHeader
-        search={search}
-        setSearch={setSearch}
+        search={searchLocal}
+        setSearch={setSearchLocal}
         title={"Food and Dining"}
       />
 
@@ -54,7 +73,7 @@ export default function DiningPage() {
           containerStyle={styles.filterBarPadding}
         />
 
-        <DiningList filter={debouncedSearch} search={debouncedSearch} />
+        <DiningList diningState={params} />
       </Screen>
     </SafeArea>
   );

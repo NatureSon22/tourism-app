@@ -7,38 +7,47 @@ import { Pressable, Text, View } from "react-native";
 export const CheckboxGroup = ({
   title,
   options,
-  selectedIds,
+  selectedNames, // Renamed for clarity
   onToggle,
 }: {
   title: string;
-  options: any[];
-  selectedIds: number[];
-  onToggle: (id: number) => void;
+  options: { id: number | string; name: string }[];
+  selectedNames: string[]; // Now accepts an array of strings (names)
+  onToggle: (name: string) => void; // Now returns the name string
 }) => (
   <VStack gap={10}>
     <Text style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}>
       {title}
     </Text>
     <View style={{ gap: 10, marginLeft: 10 }}>
-      {options.map((opt) => (
-        <Pressable
-          key={opt.id}
-          onPress={() => onToggle(opt.id)}
-          style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
-        >
-          <Checkbox
-            style={{ borderColor: Colors.border }}
-            value={selectedIds.includes(opt.id)}
-            onValueChange={() => onToggle(opt.id)}
-            color={selectedIds.includes(opt.id) ? Colors.primary : undefined}
-          />
-          <Text
-            style={{ fontFamily: Typography.family.regular, fontSize: 13.5 }}
+      {options.map((opt) => {
+        // Check if the current name is in the selected list
+        const isSelected = selectedNames.includes(opt.name);
+
+        return (
+          <Pressable
+            key={opt.name} // Using name as key since it's now our identifier
+            onPress={() => onToggle(opt.name)}
+            style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
           >
-            {opt.name}
-          </Text>
-        </Pressable>
-      ))}
+            <Checkbox
+              style={{ borderColor: Colors.border, borderRadius: 4 }}
+              value={isSelected}
+              onValueChange={() => onToggle(opt.name)}
+              color={isSelected ? Colors.primary : undefined}
+            />
+            <Text
+              style={{ 
+                fontFamily: Typography.family.regular, 
+                fontSize: 13.5,
+                color: Colors.text 
+              }}
+            >
+              {opt.name}
+            </Text>
+          </Pressable>
+        );
+      })}
     </View>
   </VStack>
 );

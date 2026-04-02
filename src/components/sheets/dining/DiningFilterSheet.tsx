@@ -11,33 +11,31 @@ import ActionSheet, {
 } from "react-native-actions-sheet";
 import { CategoryGroup } from "../../app/filter/CategoryGroup";
 import FilterFooter from "../../app/filter/FilterFooter";
-import { CheckboxGroup } from "../../app/filter/FilterRating";
+import { CheckboxGroup } from "../../app/filter/FilterRating"; // Ensure this uses selectedNames prop
 import { StarRatingGroup } from "../../app/filter/StarRating";
 import HeaderSheet from "../../app/HeaderSheet";
 
 export default function DiningFilterSheet(props: SheetProps) {
   const updateOptions = useFilterStore((state) => state.updateOptions);
 
-  // Local Draft States
+  // Local Draft States switched to Name-based strings
   const [draft, setDraft] = useState({
     rating: 0,
-    categoryId: null as number | null,
-    subtypes: [] as number[],
-    amenities: [] as number[],
-    attributes: {} as Record<number, number[]>,
+    categoryName: null as string | null,
+    subnames: [] as string[],
+    amenities: [] as string[],
+    attributes: {} as Record<string, string[]>, // Key: Attr Name, Value: Option Names
   });
 
   const handleApply = () => {
     updateOptions("dining", {
       rating: draft.rating,
       type: {
-        type: draft.categoryId?.toString() || "",
-        subtypes: draft.subtypes.map(String),
+        type: draft.categoryName || "",
+        subtypes: draft.subnames,
       },
-      amenities: draft.amenities.map(String),
-      attributes: Object.fromEntries(
-        Object.entries(draft.attributes).map(([k, v]) => [k, v.map(String)]),
-      ),
+      amenities: draft.amenities,
+      attributes: draft.attributes,
     });
     SheetManager.hide(props.sheetId);
   };
@@ -45,29 +43,29 @@ export default function DiningFilterSheet(props: SheetProps) {
   const handleClear = () => {
     setDraft({
       rating: 0,
-      categoryId: null,
-      subtypes: [],
+      categoryName: null,
+      subnames: [],
       amenities: [],
       attributes: {},
     });
   };
 
-  const toggleSubtype = (id: number) => {
+  const toggleSubname = (name: string) => {
     setDraft((prev) => ({
       ...prev,
-      subtypes: prev.subtypes.includes(id)
-        ? prev.subtypes.filter((i) => i !== id)
-        : [...prev.subtypes, id],
+      subnames: prev.subnames.includes(name)
+        ? prev.subnames.filter((i) => i !== name)
+        : [...prev.subnames, name],
     }));
   };
 
-  const toggleAttribute = (headerId: number, optionId: number) => {
+  const toggleAttribute = (attrName: string, optionName: string) => {
     setDraft((prev) => {
-      const current = prev.attributes[headerId] || [];
-      const next = current.includes(optionId)
-        ? current.filter((id) => id !== optionId)
-        : [...current, optionId];
-      return { ...prev, attributes: { ...prev.attributes, [headerId]: next } };
+      const current = prev.attributes[attrName] || [];
+      const next = current.includes(optionName)
+        ? current.filter((n) => n !== optionName)
+        : [...current, optionName];
+      return { ...prev, attributes: { ...prev.attributes, [attrName]: next } };
     });
   };
 
@@ -80,6 +78,7 @@ export default function DiningFilterSheet(props: SheetProps) {
       <View style={styles.wrapper}>
         <HeaderSheet title="Filter" handleCloseSheet={handleCloseSheet} />
         <ScrollView contentContainerStyle={{ padding: 20, gap: 24 }}>
+          {/* Star Rating */}
           <VStack gap={8} style={{ width: "100%" }}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
@@ -93,6 +92,7 @@ export default function DiningFilterSheet(props: SheetProps) {
             />
           </VStack>
 
+          {/* Dining Type */}
           <VStack gap={8}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
@@ -101,37 +101,38 @@ export default function DiningFilterSheet(props: SheetProps) {
             </Text>
             <CategoryGroup
               types={CUISINE_FILTERS.types}
-              selectedId={draft.categoryId}
-              selectedSubtypes={draft.subtypes}
-              onCategoryChange={(id) =>
-                setDraft({ ...draft, categoryId: id, subtypes: [] })
+              selectedName={draft.categoryName}
+              selectedSubnames={draft.subnames}
+              onCategoryChange={(name) =>
+                setDraft({ ...draft, categoryName: name, subnames: [] })
               }
-              onSubtypeToggle={toggleSubtype}
+              onSubnameToggle={toggleSubname}
             />
           </VStack>
 
-          {/* Dynamic Attributes */}
+          {/* Dynamic Attributes (e.g., Price Range, Meal Time) */}
           {CUISINE_FILTERS.attributes.map((attr) => (
             <CheckboxGroup
-              key={attr.id}
+              key={attr.name}
               title={attr.name}
               options={attr.options}
-              selectedIds={draft.attributes[attr.id] || []}
-              onToggle={(optId) => toggleAttribute(attr.id, optId)}
+              selectedNames={draft.attributes[attr.name] || []}
+              onToggle={(optName) => toggleAttribute(attr.name, optName)}
             />
           ))}
 
+          {/* Amenities (e.g., Outdoor Seating, WiFi) */}
           <CheckboxGroup
             title="Amenities"
             options={CUISINE_FILTERS.amenities}
-            selectedIds={draft.amenities}
-            onToggle={(id) =>
-              setDraft({
-                ...draft,
-                amenities: draft.amenities.includes(id)
-                  ? draft.amenities.filter((i) => i !== id)
-                  : [...draft.amenities, id],
-              })
+            selectedNames={draft.amenities}
+            onToggle={(name) =>
+              setDraft((prev) => ({
+                ...prev,
+                amenities: prev.amenities.includes(name)
+                  ? prev.amenities.filter((i) => i !== name)
+                  : [...prev.amenities, name],
+              }))
             }
           />
         </ScrollView>
@@ -143,12 +144,7 @@ export default function DiningFilterSheet(props: SheetProps) {
 }
 
 const styles = StyleSheet.create({
-  sheetContainer: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: "white",
-  },
   wrapper: {
-    height: 500,
+    height: 520, // Adjusted for slightly longer text labels in names
   },
 });

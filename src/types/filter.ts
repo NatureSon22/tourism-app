@@ -6,8 +6,11 @@ export type QueryParams = {
   type?: string; // e.g., "Hotels"
   subtypes?: string[]; // Becomes ?subtypes=Beach&subtypes=Luxury
   amenities?: string[]; // Becomes ?amenities=WiFi&amenities=Pool
+  radius?: number; // For distance-based sorting, in meters
+  lat?: number;
+  lng?: number;
   // Pagination
-  page?: number; 
+  page?: number;
   limit?: number;
 };
 

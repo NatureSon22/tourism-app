@@ -3,6 +3,7 @@ import CustomButton from "@/src/components/ui/CustomButton";
 import PREFERENCES from "@/src/constants/preference";
 import React, { useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { Typography } from "../constants/styles";
 
 const options = PREFERENCES.map((item) => ({ label: item, value: item }));
 
@@ -45,13 +46,15 @@ export default function PreferenceForm() {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
     padding: 20,
     gap: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: Typography.family.medium,
   },
   buttonWrapper: {
     width: "100%",

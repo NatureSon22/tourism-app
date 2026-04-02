@@ -3,13 +3,16 @@ import FilterBar from "@/src/components/app/FilterBar";
 import SearchableHeader from "@/src/components/app/SearchableHeader";
 import { ACCOMMODATION_SORT } from "@/src/config/sort";
 import { ACCOMMODATION_FILTERS } from "@/src/constants/filterOptions";
+import { RADIUS } from "@/src/constants/radius";
 import { Typography } from "@/src/constants/styles";
 import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
-import React, { useEffect, useState } from "react";
+import { QueryParams } from "@/src/types/filter";
+import getLocation from "@/src/utils/getLocation";
+import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
@@ -17,32 +20,79 @@ export default function AccommodationPage() {
   const { openSheet } = useSingleSheet();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
-  const { currentSort, updateOptions, resetCategory } = useFilterStore(
-    useShallow((state) => ({
-      updateOptions: state.updateOptions,
-      currentSort: state.categories.accommodation.options.sort,
-      resetCategory: state.resetCategory,
-    })),
-  );
+
+  const { accommodationState, currentSort, updateOptions, resetCategory } =
+    useFilterStore(
+      useShallow((state) => ({
+        accommodationState: state.categories.accommodation,
+        currentSort: state.categories.accommodation.options.sort,
+        updateOptions: state.updateOptions,
+        resetCategory: state.resetCategory,
+      })),
+    );
 
   useEffect(() => {
     return () => {
       resetCategory("accommodation");
     };
-  }, []);
+  }, [resetCategory]);
+
+  const params: QueryParams = useMemo(() => {
+    return {
+      search: debouncedSearch,
+      area: accommodationState.options.area,
+      sort: accommodationState.options.sort,
+      rating: accommodationState.options.rating || undefined,
+      type: accommodationState.options.type.type || undefined,
+      subtypes: accommodationState.options.type.subtypes,
+      amenities: accommodationState.options.amenities,
+      lat: accommodationState.options.lat,
+      lng: accommodationState.options.lng,
+      radius: accommodationState.options.radius,
+      page: 1,
+      limit: 20,
+    };
+  }, [debouncedSearch, accommodationState]);
 
   const handleAreaPress = (sheet: string) => {
-    openSheet(sheet, {
-      options: ACCOMMODATION_SORT,
-      selectedValue: currentSort,
-      onSelect: (val: string) => updateOptions("accommodation", { sort: val }),
-    });
+    const payload =
+      sheet === "sort-sheet"
+        ? {
+            options: ACCOMMODATION_SORT,
+            selectedValue: currentSort,
+            onSelect: async (val: string) => {
+              let userCoords = null;
+
+              // Trigger ONLY for distance sorting
+              if (val === "distance_asc") {
+                const coords = await getLocation();
+
+                if (!coords) {
+                  // Optional: Alert the user that location is required
+                  alert("Location access is required to sort by distance.");
+                  return;
+                }
+                userCoords = coords;
+              }
+
+              // Update store with both the sort method and the coordinates
+              updateOptions("accommodation", {
+                sort: val,
+                lat: userCoords?.latitude,
+                lng: userCoords?.longitude,
+                radius: RADIUS.accommodation,
+              });
+            },
+          }
+        : undefined;
+
+    openSheet(sheet, payload);
   };
 
   return (
     <SafeArea edges={["top", "bottom"]}>
       <SearchableHeader
-        search={debouncedSearch}
+        search={search}
         setSearch={setSearch}
         title="Accommodation"
       />
@@ -54,7 +104,7 @@ export default function AccommodationPage() {
           containerStyle={styles.filterBar}
         />
 
-        <AccommodationList search={debouncedSearch} />
+        <AccommodationList params={params} />
       </Screen>
     </SafeArea>
   );

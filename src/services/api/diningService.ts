@@ -1,50 +1,28 @@
+import { QueryParams } from "@/src/types/filter";
 import { Dining, PHILIPPINE_DINING_DATA } from "../../constants/dining";
+import { AccommodationResponse } from "./accommodationService";
 
-export type GetDiningParams = {
-  filter?: string;
-  search?: string;
-};
+export const diningService = {
+  getDiningData: async (
+    params: QueryParams,
+  ): Promise<AccommodationResponse> => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
-export type DiningResponse = {
-  data: Dining[];
-  total: number;
-};
-
-const diningService = {
-  getDiningData: async ({
-    filter,
-    search,
-  }: GetDiningParams): Promise<DiningResponse> => {
-    await new Promise((r) => setTimeout(r, 1000));
-
-    const list = (PHILIPPINE_DINING_DATA ?? []) as Dining[];
-
-    const text = (search ?? "").trim().toLowerCase();
-    let result = list.filter((item) => {
-      if (!text) return true;
-      return (
-        (item.name || "").toLowerCase().includes(text) ||
-        (item.location || "").toLowerCase().includes(text)
-      );
-    });
-
-    if (filter === "Nearby") {
-      result = [...result].sort(
-        (a, b) =>
-          (a.distanceFromCityCenter ?? 0) - (b.distanceFromCityCenter ?? 0),
-      );
-    } else if (filter === "Recommended") {
-      result = [...result].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-    }
-
-    return {
-      data: result,
-      total: result.length,
+    const mockResponse: AccommodationResponse = {
+      data: { listings: PHILIPPINE_DINING_DATA as unknown as any },
+      total: PHILIPPINE_DINING_DATA.length,
     };
+
+    // const qs = buildQueryString(params);
+    // const response = await api.get(`/consumer/listings?${qs.toString()}`);
+    // console.log("API Response:", response.data);
+    // return response.data;
+
+    return mockResponse;
   },
 
   getDiningById: async (id: string): Promise<Dining | undefined> => {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     return PHILIPPINE_DINING_DATA.find((item) => item.id === id);
   },
 };

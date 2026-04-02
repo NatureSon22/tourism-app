@@ -10,7 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="index"
+      initialRouteName="account"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,

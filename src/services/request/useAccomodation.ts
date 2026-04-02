@@ -1,5 +1,5 @@
 import { QueryParams } from "@/src/types/filter";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { accommodationService } from "../api/accommodationService";
 
 export const accommodationKeys = {
@@ -12,9 +12,23 @@ export const accommodationKeys = {
 };
 
 export const useAccommodations = (params: QueryParams) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: accommodationKeys.list(params),
-    queryFn: () => accommodationService.getAvailableAccommodations(params),
+
+    queryFn: ({ pageParam = 1 }) =>
+      accommodationService.getAvailableAccommodations({
+        ...params,
+        page: pageParam,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { currentPage, limit, count, total } = lastPage.data.pagination;
+      // console.log("Pagination Info:", { currentPage, limit, count });
+      const totalPages = Math.ceil(count / limit);
+
+      // This return value becomes the 'pageParam' for the NEXT call
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
   });
 };
 

@@ -17,6 +17,22 @@ export function buildQueryString(params: QueryParams): string {
     query.append("rating", String(params.rating));
   }
 
+  if (params.radius) {
+    query.append("radius", String(params.radius));
+  }
+
+  if (params.lat) {
+    query.append("lat", String(params.lat));
+  }
+
+  if (params.lng) {
+    query.append("lng", String(params.lng));
+  }
+
+  if (params.page) {
+    query.append("page", String(params.page));
+  }
+
   const appendArray = (key: string, value?: string | string[]) => {
     if (!value) return;
     if (Array.isArray(value)) {

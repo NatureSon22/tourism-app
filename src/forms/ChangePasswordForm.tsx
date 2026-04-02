@@ -1,16 +1,18 @@
 import ControllerTextInput from "@/src/components/ui/ControllerTextInput";
 import CustomButton from "@/src/components/ui/CustomButton";
+import VStack from "@/src/layouts/VStack";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
+import { Typography } from "../constants/styles";
 
 const ChangePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(1, "New password must be at least 1 character"),
+    newPassword: z.string().min(1, "Password must be at least 1 character"),
     confirmPassword: z.string().min(1, "Confirm password is required"),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -72,7 +74,12 @@ export default function ChangePasswordForm() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Change Password</Text>
+      <VStack gap={0}>
+        <Text style={styles.title}>Password</Text>
+        <Text style={styles.description}>
+          Enter your current password and choose a new one
+        </Text>
+      </VStack>
 
       <View style={styles.fieldContainer}>
         <ControllerTextInput
@@ -144,14 +151,22 @@ export default function ChangePasswordForm() {
       </View>
 
       <View style={styles.buttonsRow}>
-        <CustomButton title="Edit" variant="outlined" onPress={handleEdit} />
+        <CustomButton
+          title="Save"
+          onPress={handleSubmit(onSubmit)}
+          disabled={!isValid}
+          style={styles.saveButton}
+          textStyle={styles.buttonStyle}
+        />
+
+        {/* <CustomButton title="Edit" variant="outlined" onPress={handleEdit} />
         {editMode && (
           <CustomButton
             title="Save"
             onPress={handleSubmit(onSubmit)}
             disabled={!isValid}
           />
-        )}
+        )} */}
       </View>
     </View>
   );
@@ -160,13 +175,16 @@ export default function ChangePasswordForm() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    gap: 12,
+    gap: 15,
     padding: 20,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 8,
+    fontSize: 22,
+    fontFamily: Typography.family.semiBold,
+  },
+  description: {
+    fontSize: 12,
+    fontFamily: Typography.family.regular,
   },
   fieldContainer: {
     width: "100%",
@@ -176,13 +194,20 @@ const styles = StyleSheet.create({
     height: 52,
   },
   textInput: {
-    fontSize: 14,
+    fontSize: 12,
   },
   buttonsRow: {
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
     gap: 10,
-    marginTop: 8,
+    marginTop: 15,
+  },
+  saveButton: {
+    width: "100%",
+    paddingVertical: 12,
+  },
+  buttonStyle: {
+    fontSize: 13,
   },
 });

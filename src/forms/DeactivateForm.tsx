@@ -2,13 +2,17 @@ import CustomButton from "@/src/components/ui/CustomButton";
 import { CustomRadioGroup } from "@/src/components/ui/CustomRadioGroup";
 import DEACTIVATION_REASONS from "@/src/constants/deactivateReason";
 import React, { useMemo, useState } from "react";
-import { Text as RNText, StyleSheet, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import ModalConfirmation from "../components/app/account/ModalConfirmation";
+import { Typography } from "../constants/styles";
+import VStack from "../layouts/VStack";
 
 const reasonOptions = DEACTIVATION_REASONS.map((reason) => ({
   label: reason,
   value: reason,
 }));
+
+// TODO: keyboard away view
 
 export default function DeactivateForm() {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
@@ -35,41 +39,49 @@ export default function DeactivateForm() {
 
   return (
     <View style={styles.container}>
-      <RNText style={styles.heading}>
-        Why are you deactivating your account?
-      </RNText>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <VStack gap={0}>
+          <Text style={styles.title}>It&apos;s sad to see you go!</Text>
+          <Text style={styles.description}>
+            You&apos;ll lose access to your profile, saved data, and ongoing
+            activities. You can reactivate anytime by signing in again.
+          </Text>
+        </VStack>
 
-      <View style={styles.radioGroupWrapper}>
-        <CustomRadioGroup
-          options={reasonOptions}
-          selectedValue={selectedReason}
-          onSelect={(val) => {
-            setSelectedReason(val);
-            if (val !== "Other (please specify)") setOtherReasonText("");
-          }}
-        />
-      </View>
-
-      {isOtherSelected && (
-        <View style={styles.otherReasonWrapper}>
-          <RNText style={styles.label}>Please specify</RNText>
-          <TextInput
-            multiline
-            numberOfLines={4}
-            style={styles.textArea}
-            placeholder="Type your reason"
-            value={otherReasonText}
-            onChangeText={setOtherReasonText}
+        <View style={styles.radioGroupWrapper}>
+          <CustomRadioGroup
+            options={reasonOptions}
+            selectedValue={selectedReason}
+            onSelect={(val) => {
+              setSelectedReason(val);
+              if (val !== "Other (please specify)") setOtherReasonText("");
+            }}
+            textStyle={styles.radioText}
           />
         </View>
-      )}
 
-      <CustomButton
-        title="Deactivate"
-        onPress={() => setIsModalOpen(true)}
-        disabled={!isDeactivateEnabled}
-        style={[styles.button, !isDeactivateEnabled && styles.disabledButton]}
-      />
+        {isOtherSelected && (
+          <View style={styles.otherReasonWrapper}>
+            <Text style={styles.label}>Please specify</Text>
+            <TextInput
+              multiline
+              numberOfLines={4}
+              style={styles.textArea}
+              placeholder="Type your reason"
+              value={otherReasonText}
+              onChangeText={setOtherReasonText}
+            />
+          </View>
+        )}
+
+        <CustomButton
+          title="Deactivate"
+          onPress={() => setIsModalOpen(true)}
+          disabled={!isDeactivateEnabled}
+          style={[styles.button, !isDeactivateEnabled && styles.disabledButton]}
+          textStyle={styles.buttonStyle}
+        />
+      </ScrollView>
 
       <ModalConfirmation
         isVisible={isModalOpen}
@@ -85,7 +97,7 @@ export default function DeactivateForm() {
 const styles = StyleSheet.create({
   container: { padding: 20, gap: 16 },
   heading: { fontSize: 16, fontWeight: "600" },
-  radioGroupWrapper: { width: "100%" },
+  radioGroupWrapper: { width: "100%", marginTop: 20 },
   otherReasonWrapper: { width: "100%", gap: 8 },
   label: { fontSize: 12, fontWeight: "500" },
   textArea: {
@@ -98,6 +110,27 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     backgroundColor: "white",
   },
-  button: { width: "100%" },
   disabledButton: { opacity: 0.5 },
+  title: {
+    fontSize: 22,
+    fontFamily: Typography.family.semiBold,
+  },
+  description: {
+    fontSize: 12,
+    fontFamily: Typography.family.regular,
+    lineHeight: 22,
+  },
+  button: {
+    width: "100%",
+    paddingVertical: 12,
+    marginTop: 15,
+  },
+  buttonStyle: {
+    fontSize: 13,
+  },
+  radioContainer: {},
+  radioText: {
+    fontFamily: Typography.family.regular,
+    fontSize: 13,
+  },
 });

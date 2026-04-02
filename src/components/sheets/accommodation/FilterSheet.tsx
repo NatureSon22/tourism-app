@@ -11,33 +11,34 @@ import ActionSheet, {
 } from "react-native-actions-sheet";
 import { CategoryGroup } from "../../app/filter/CategoryGroup";
 import FilterFooter from "../../app/filter/FilterFooter";
-import { CheckboxGroup } from "../../app/filter/FilterRating";
+import { CheckboxGroup } from "../../app/filter/FilterRating"; // Updated to use selectedNames
 import { StarRatingGroup } from "../../app/filter/StarRating";
 import HeaderSheet from "../../app/HeaderSheet";
 
 export default function AccommodationFilterSheet(props: SheetProps) {
+  const state = useFilterStore(
+    (state) => state.categories.accommodation.options,
+  );
   const updateOptions = useFilterStore((state) => state.updateOptions);
 
-  // Local Draft States
+  // Local Draft States - Now using strings for identification
   const [draft, setDraft] = useState({
-    rating: 0,
-    categoryId: null as number | null,
-    subtypes: [] as number[],
-    amenities: [] as number[],
-    attributes: {} as Record<number, number[]>,
+    rating: state.rating || 0,
+    categoryName: state.type.type || (null as string | null),
+    subnames: state.type.subtypes || ([] as string[]),
+    amenities: state.amenities || ([] as string[]),
+    attributes: state.attributes || ({} as Record<string, string[]>), // Keyed by attribute name, values are option names
   });
 
   const handleApply = () => {
     updateOptions("accommodation", {
       rating: draft.rating,
       type: {
-        type: draft.categoryId?.toString() || "",
-        subtypes: draft.subtypes.map(String),
+        type: draft.categoryName || "",
+        subtypes: draft.subnames,
       },
-      amenities: draft.amenities.map(String),
-      attributes: Object.fromEntries(
-        Object.entries(draft.attributes).map(([k, v]) => [k, v.map(String)]),
-      ),
+      amenities: draft.amenities,
+      attributes: draft.attributes,
     });
     SheetManager.hide(props.sheetId);
   };
@@ -45,29 +46,29 @@ export default function AccommodationFilterSheet(props: SheetProps) {
   const handleClear = () => {
     setDraft({
       rating: 0,
-      categoryId: null,
-      subtypes: [],
+      categoryName: null,
+      subnames: [],
       amenities: [],
       attributes: {},
     });
   };
 
-  const toggleSubtype = (id: number) => {
+  const toggleSubname = (name: string) => {
     setDraft((prev) => ({
       ...prev,
-      subtypes: prev.subtypes.includes(id)
-        ? prev.subtypes.filter((i) => i !== id)
-        : [...prev.subtypes, id],
+      subnames: prev.subnames.includes(name)
+        ? prev.subnames.filter((n) => n !== name)
+        : [...prev.subnames, name],
     }));
   };
 
-  const toggleAttribute = (headerId: number, optionId: number) => {
+  const toggleAttribute = (attrName: string, optionName: string) => {
     setDraft((prev) => {
-      const current = prev.attributes[headerId] || [];
-      const next = current.includes(optionId)
-        ? current.filter((id) => id !== optionId)
-        : [...current, optionId];
-      return { ...prev, attributes: { ...prev.attributes, [headerId]: next } };
+      const current = prev.attributes[attrName] || [];
+      const next = current.includes(optionName)
+        ? current.filter((n) => n !== optionName)
+        : [...current, optionName];
+      return { ...prev, attributes: { ...prev.attributes, [attrName]: next } };
     });
   };
 
@@ -80,6 +81,7 @@ export default function AccommodationFilterSheet(props: SheetProps) {
       <View style={styles.wrapper}>
         <HeaderSheet title="Filter" handleCloseSheet={handleCloseSheet} />
         <ScrollView contentContainerStyle={{ padding: 20, gap: 24 }}>
+          {/* Star Rating */}
           <VStack gap={8} style={{ width: "100%" }}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
@@ -93,6 +95,7 @@ export default function AccommodationFilterSheet(props: SheetProps) {
             />
           </VStack>
 
+          {/* Property Type (Categories & Subtypes) */}
           <VStack gap={8}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
@@ -101,36 +104,37 @@ export default function AccommodationFilterSheet(props: SheetProps) {
             </Text>
             <CategoryGroup
               types={ACCOMMODATION_FILTERS.types}
-              selectedId={draft.categoryId}
-              selectedSubtypes={draft.subtypes}
-              onCategoryChange={(id) =>
-                setDraft({ ...draft, categoryId: id, subtypes: [] })
+              selectedName={draft.categoryName}
+              selectedSubnames={draft.subnames}
+              onCategoryChange={(name) =>
+                setDraft({ ...draft, categoryName: name, subnames: [] })
               }
-              onSubtypeToggle={toggleSubtype}
+              onSubnameToggle={toggleSubname}
             />
           </VStack>
 
-          {/* Dynamic Attributes */}
+          {/* Dynamic Attributes (e.g., Duration, Difficulty) */}
           {ACCOMMODATION_FILTERS.attributes.map((attr) => (
             <CheckboxGroup
-              key={attr.id}
+              key={attr.name} // Key by name
               title={attr.name}
               options={attr.options}
-              selectedIds={draft.attributes[attr.id] || []}
-              onToggle={(optId) => toggleAttribute(attr.id, optId)}
+              selectedNames={draft.attributes[attr.name] || []}
+              onToggle={(optName) => toggleAttribute(attr.name, optName)}
             />
           ))}
 
+          {/* Amenities */}
           <CheckboxGroup
             title="Amenities"
             options={ACCOMMODATION_FILTERS.amenities}
-            selectedIds={draft.amenities}
-            onToggle={(id) =>
+            selectedNames={draft.amenities}
+            onToggle={(name) =>
               setDraft({
                 ...draft,
-                amenities: draft.amenities.includes(id)
-                  ? draft.amenities.filter((i) => i !== id)
-                  : [...draft.amenities, id],
+                amenities: draft.amenities.includes(name)
+                  ? draft.amenities.filter((n) => n !== name)
+                  : [...draft.amenities, name],
               })
             }
           />
@@ -143,12 +147,7 @@ export default function AccommodationFilterSheet(props: SheetProps) {
 }
 
 const styles = StyleSheet.create({
-  sheetContainer: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: "white",
-  },
   wrapper: {
-    height: 500,
+    height: 550,
   },
 });

@@ -19,26 +19,24 @@ import HeaderSheet from "../../app/HeaderSheet";
 export default function ActivityFilterSheet(props: SheetProps) {
   const updateOptions = useFilterStore((state) => state.updateOptions);
 
-  // Local Draft States
+  // Local Draft States: Names for filters, but keeping original Duration logic
   const [draft, setDraft] = useState({
     rating: 0,
-    categoryId: null as number | null,
-    subtypes: [] as number[],
-    amenities: [] as number[],
-    attributes: {} as Record<number, number[]>,
-    duration: { min: 0, max: 0 } as { min: number; max: number },
+    categoryName: null as string | null,
+    subnames: [] as string[],
+    amenities: [] as string[],
+    attributes: {} as Record<string, string[]>,
+    duration: { min: 0, max: 0 }, // Kept as numbers per your request
   });
 
   const handleApply = () => {
     updateOptions("activity", {
       type: {
-        type: draft.categoryId?.toString() || "",
-        subtypes: draft.subtypes.map(String),
+        type: draft.categoryName || "",
+        subtypes: draft.subnames,
       },
-      amenities: draft.amenities.map(String),
-      attributes: Object.fromEntries(
-        Object.entries(draft.attributes).map(([k, v]) => [k, v.map(String)]),
-      ),
+      amenities: draft.amenities,
+      attributes: draft.attributes,
       duration: `${draft.duration.min}-${draft.duration.max}`,
     });
     SheetManager.hide(props.sheetId);
@@ -47,30 +45,30 @@ export default function ActivityFilterSheet(props: SheetProps) {
   const handleClear = () => {
     setDraft({
       rating: 0,
-      categoryId: null,
-      subtypes: [],
+      categoryName: null,
+      subnames: [],
       amenities: [],
       attributes: {},
       duration: { min: 0, max: 0 },
     });
   };
 
-  const toggleSubtype = (id: number) => {
+  const toggleSubname = (name: string) => {
     setDraft((prev) => ({
       ...prev,
-      subtypes: prev.subtypes.includes(id)
-        ? prev.subtypes.filter((i) => i !== id)
-        : [...prev.subtypes, id],
+      subnames: prev.subnames.includes(name)
+        ? prev.subnames.filter((n) => n !== name)
+        : [...prev.subnames, name],
     }));
   };
 
-  const toggleAttribute = (headerId: number, optionId: number) => {
+  const toggleAttribute = (attrName: string, optionName: string) => {
     setDraft((prev) => {
-      const current = prev.attributes[headerId] || [];
-      const next = current.includes(optionId)
-        ? current.filter((id) => id !== optionId)
-        : [...current, optionId];
-      return { ...prev, attributes: { ...prev.attributes, [headerId]: next } };
+      const current = prev.attributes[attrName] || [];
+      const next = current.includes(optionName)
+        ? current.filter((n) => n !== optionName)
+        : [...current, optionName];
+      return { ...prev, attributes: { ...prev.attributes, [attrName]: next } };
     });
   };
 
@@ -83,7 +81,7 @@ export default function ActivityFilterSheet(props: SheetProps) {
       <View style={styles.wrapper}>
         <HeaderSheet title="Filter" handleCloseSheet={handleCloseSheet} />
         <ScrollView contentContainerStyle={{ padding: 20, gap: 24 }}>
-          <VStack gap={8} style={{ width: "100%" }}>
+          <VStack gap={8}>
             <Text
               style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
             >
@@ -104,15 +102,16 @@ export default function ActivityFilterSheet(props: SheetProps) {
             </Text>
             <CategoryGroup
               types={ACTIVITY_FILTERS.types}
-              selectedId={draft.categoryId}
-              selectedSubtypes={draft.subtypes}
-              onCategoryChange={(id) =>
-                setDraft({ ...draft, categoryId: id, subtypes: [] })
+              selectedName={draft.categoryName}
+              selectedSubnames={draft.subnames}
+              onCategoryChange={(name) =>
+                setDraft({ ...draft, categoryName: name, subnames: [] })
               }
-              onSubtypeToggle={toggleSubtype}
+              onSubnameToggle={toggleSubname}
             />
           </VStack>
 
+          {/* Duration Filter: Original Props/Logic Maintained */}
           <DurationFilter
             durations={ACTIVITY_FILTERS.duration}
             values={draft.duration}
@@ -120,29 +119,30 @@ export default function ActivityFilterSheet(props: SheetProps) {
               setDraft({ ...draft, duration: { min, max } })
             }
           />
-          
-          {/* Dynamic Attributes */}
+
+          {/* Attributes: Switched to Name mapping */}
           {ACTIVITY_FILTERS.attributes.map((attr) => (
             <CheckboxGroup
-              key={attr.id}
+              key={attr.name}
               title={attr.name}
               options={attr.options}
-              selectedIds={draft.attributes[attr.id] || []}
-              onToggle={(optId) => toggleAttribute(attr.id, optId)}
+              selectedNames={draft.attributes[attr.name] || []}
+              onToggle={(optName) => toggleAttribute(attr.name, optName)}
             />
           ))}
 
+          {/* Amenities: Switched to Name mapping */}
           <CheckboxGroup
             title="Amenities"
             options={ACTIVITY_FILTERS.amenities}
-            selectedIds={draft.amenities}
-            onToggle={(id) =>
-              setDraft({
-                ...draft,
-                amenities: draft.amenities.includes(id)
-                  ? draft.amenities.filter((i) => i !== id)
-                  : [...draft.amenities, id],
-              })
+            selectedNames={draft.amenities}
+            onToggle={(name) =>
+              setDraft((prev) => ({
+                ...prev,
+                amenities: prev.amenities.includes(name)
+                  ? prev.amenities.filter((i) => i !== name)
+                  : [...prev.amenities, name],
+              }))
             }
           />
         </ScrollView>
@@ -154,12 +154,7 @@ export default function ActivityFilterSheet(props: SheetProps) {
 }
 
 const styles = StyleSheet.create({
-  sheetContainer: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: "white",
-  },
   wrapper: {
-    height: 500,
+    height: 600,
   },
 });
