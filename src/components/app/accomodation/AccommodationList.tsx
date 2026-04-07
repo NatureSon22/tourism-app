@@ -5,7 +5,7 @@ import { Accommodation } from "@/src/types/accommodation";
 import { QueryParams } from "@/src/types/filter";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -13,6 +13,7 @@ import {
   Platform,
   RefreshControl,
   StyleSheet,
+  Text,
   View,
 } from "react-native";
 import AccommodationCardSkeleton from "./AccommodationCardSkeleton";
@@ -45,7 +46,6 @@ export default function AccommodationList({ params }: AccommodationListProps) {
         lng: params.lng,
         radius: params.radius,
         page: params.page ?? 1,
-        limit: params.limit ?? 20,
       }),
       [
         params.search,
@@ -59,13 +59,11 @@ export default function AccommodationList({ params }: AccommodationListProps) {
         params.lng,
         params.radius,
         params.page,
-        params.limit,
       ],
     ),
   );
   const { isConnected, isInternetReachable } = useNetInfo();
   const online = isConnected && isInternetReachable;
-  const [isRefetching, setIsRefetching] = useState(false);
 
   const listings = useMemo(() => {
     return data?.pages.flatMap((page) => page.data.listings) ?? [];
@@ -79,13 +77,6 @@ export default function AccommodationList({ params }: AccommodationListProps) {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  };
-
-  const handleRefresh = async () => {
-    setIsRefetching(true);
-    await refetch();
-    console.log("Successful refetch...");
-    setIsRefetching(false);
   };
 
   const renderItem = useCallback<ListRenderItem<Skeleton | Accommodation>>(
@@ -111,7 +102,9 @@ export default function AccommodationList({ params }: AccommodationListProps) {
       ListFooterComponent={() =>
         isFetchingNextPage ? (
           <ActivityIndicator style={{ marginVertical: 20 }} color="#000" />
-        ) : null
+        ) : (
+          <Text>Footer Area</Text>
+        )
       }
       // Optimization Props
       initialNumToRender={5}

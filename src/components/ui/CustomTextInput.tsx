@@ -1,5 +1,5 @@
 import { Colors, Typography } from "@/src/constants/styles";
-import React, { ReactNode, useRef, useState } from "react";
+import React, { forwardRef, ReactNode, useRef, useState } from "react";
 import {
   Pressable,
   StyleProp,
@@ -9,7 +9,6 @@ import {
   TextStyle,
   View,
   ViewStyle,
-  
 } from "react-native";
 
 export interface CustomTextInputProps extends TextInputProps {
@@ -98,6 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     height: 52,
+    overflow: "hidden",
   },
   disabledContainer: {
     backgroundColor: "#F5F5F5",
@@ -125,5 +125,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
 });
+
+CustomTextInput.displayName = "CustomTextInput";
 
 export default CustomTextInput;

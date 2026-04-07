@@ -68,7 +68,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   separator: {
-    height: 20,
+    width: "100%",
+    height: 1,
+    backgroundColor: "#E5E7EB",
   },
   loader: {
     marginVertical: 16,

@@ -190,7 +190,7 @@ export default function ForumReplies() {
               <Text
                 style={{
                   fontFamily: Typography.family.medium,
-                  color: Colors.textMuted
+                  color: Colors.textMuted,
                 }}
               >{`${forum.comments?.length} replies`}</Text>
             }

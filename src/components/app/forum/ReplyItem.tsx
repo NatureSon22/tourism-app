@@ -1,6 +1,10 @@
 import { Colors, Typography } from "@/src/constants/styles";
 import { Reply } from "@/src/types/forum";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -78,6 +82,7 @@ function ReplyItem({
           <Text style={styles.actionText}>Reply</Text>
         </TouchableOpacity>
 
+        {/* button to toggle replies if there are any */}
         {reply.childCount ? (
           <TouchableOpacity
             style={styles.toggleButton}
@@ -96,6 +101,15 @@ function ReplyItem({
           </TouchableOpacity>
         ) : null}
       </View>
+
+      {reply.depth > 0 && (
+        <MaterialCommunityIcons
+          name="arrow-right-bottom"
+          size={24}
+          color="black"
+          style={styles.replyIcon}
+        />
+      )}
     </View>
   );
 }
@@ -104,10 +118,9 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 14,
     marginBottom: 12,
-    borderLeftWidth: 2,
-    borderColor: Colors.border,
+    position: "relative",
+    paddingHorizontal: 12,
   },
   headline: {
     flexDirection: "row",
@@ -179,6 +192,11 @@ const styles = StyleSheet.create({
   },
   activeText: {
     color: Colors.primary,
+  },
+  replyIcon: {
+    position: "absolute",
+    top: -6,
+    left: -20,
   },
 });
 

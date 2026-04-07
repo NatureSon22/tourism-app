@@ -18,15 +18,18 @@ const simulateApiDelay = async (ms = 100) =>
 
 export const forumService = {
   getAllForums: async (type?: string): Promise<ForumResponse> => {
-    try {
-      const response = await axios.get(
-        `/forums?type=${encodeURIComponent(type ?? "")}`,
-      );
-      return response.data;
-    } catch (error) {
-      await simulateApiDelay();
-      return { data: { listings: forumData } };
-    }
+    await simulateApiDelay(1000);
+    return { data: { listings: forumData } };
+
+    // try {
+    //   const response = await axios.get(
+    //     `/forums?type=${encodeURIComponent(type ?? "")}`,
+    //   );
+    //   return response.data;
+    // } catch (error) {
+    //   await simulateApiDelay();
+    //   return { data: { listings: forumData } };
+    // }
   },
 
   getForumDetails: async (
@@ -34,13 +37,18 @@ export const forumService = {
   ): Promise<ForumPost | undefined> => {
     const normalizedId = String(postId);
 
-    try {
-      const response = await axios.get<ForumPost>(`/forums/${normalizedId}`);
-      return response.data;
-    } catch (error) {
-      await simulateApiDelay();
-      return forumData.find((forum) => String(forum.id) === normalizedId);
-    }
+    await simulateApiDelay(1000);
+    return forumData.find((forum) => String(forum.id) === normalizedId);
+
+    // const normalizedId = String(postId);
+
+    // try {
+    //   const response = await axios.get<ForumPost>(`/forums/${normalizedId}`);
+    //   return response.data;
+    // } catch (error) {
+    //   await simulateApiDelay();
+    //   return forumData.find((forum) => String(forum.id) === normalizedId);
+    // }
   },
 
   likePost: async (postId: string | number): Promise<ForumActionResponse> => {
@@ -78,23 +86,30 @@ export const forumService = {
     comment: string,
     parentId?: number | null,
   ): Promise<ForumActionResponse> => {
-    try {
-      const { data } = await axios.post<ForumActionResponse>(
-        `/forums/${String(postId)}/comments`,
-        {
-          comment,
-          parentId,
-        },
-      );
-      return data;
-    } catch (error) {
-      await simulateApiDelay();
-      return {
-        success: true,
-        message: "Comment posted",
-        commentCount: 1,
-      };
-    }
+    await simulateApiDelay();
+    return {
+      success: true,
+      message: "Comment posted",
+      commentCount: 1,
+    };
+
+    // try {
+    //   const { data } = await axios.post<ForumActionResponse>(
+    //     `/forums/${String(postId)}/comments`,
+    //     {
+    //       comment,
+    //       parentId,
+    //     },
+    //   );
+    //   return data;
+    // } catch (error) {
+    //   await simulateApiDelay();
+    //   return {
+    //     success: true,
+    //     message: "Comment posted",
+    //     commentCount: 1,
+    //   };
+    // }
   },
 
   bookmarkPost: async (

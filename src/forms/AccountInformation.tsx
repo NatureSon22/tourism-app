@@ -4,7 +4,7 @@ import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
 import useAuthStore from "@/src/stores/authStore";
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { USER_PROFILE_PLACEHOLDER } from "../constants/assetsPath";
 import { Typography } from "../constants/styles";
@@ -31,27 +31,28 @@ export default function AccountInformation() {
   return (
     <View style={styles.container}>
       <View style={styles.photoSection}>
-        <VStack gap={8}>
-          <HStack justifyContent="space-between" style={styles.fieldRow}>
-            <Text style={styles.fieldLabel}>Photo</Text>
-
-            <CustomButton
-              title="Edit"
-              variant="outlined"
+        <VStack gap={8} style={styles.centeredSelf}>
+          <VStack style={styles.centered} gap={7}>
+            <Pressable
               onPress={() => handleOpenSheet("edit-profile-image-sheet")}
-              style={styles.editBtn}
-              textStyle={styles.editBtnText}
-            />
-          </HStack>
+            >
+              <Image
+                source={
+                  user.profilePictureUrl
+                    ? { uri: user.profilePictureUrl }
+                    : USER_PROFILE_PLACEHOLDER
+                }
+                style={styles.profileImage}
+              />
+            </Pressable>
 
-          <Image
-            source={
-              user.profilePictureUrl
-                ? { uri: user.profilePictureUrl }
-                : USER_PROFILE_PLACEHOLDER
-            }
-            style={styles.profileImage}
-          />
+            <VStack style={styles.centered} gap={0}>
+              <Text
+                style={styles.profileName}
+              >{`${user.firstName} ${user.lastName}`}</Text>
+              <Text style={styles.profileSub}>{`@${user.userName}`}</Text>
+            </VStack>
+          </VStack>
         </VStack>
       </View>
 
@@ -122,27 +123,38 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   profileImage: {
-    width: 60,
-    height: 60,
+    width: 80,
+    height: 80,
     borderRadius: 48,
     backgroundColor: "#E5E7EB",
   },
   profileName: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 14,
+    fontFamily: Typography.family.medium,
   },
   profileSub: {
-    fontSize: 14,
+    fontSize: 10,
+    fontFamily: Typography.family.regular,
     color: "#6B7280",
   },
   photoSection: {
     gap: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
   },
   fieldSection: {
     gap: 10,
   },
   fieldRow: {
     width: "100%",
+  },
+  centered: {
+    alignItems: "center",
+  },
+  centeredSelf: {
+    alignItems: "center",
+    alignSelf: "center",
   },
 
   fieldLabel: {

@@ -3,25 +3,37 @@ import CustomButton from "@/src/components/ui/CustomButton";
 import { Colors, Typography } from "@/src/constants/styles";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { Stack } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
 
 export default function Forum() {
+  const handlePressFilter = () => {
+    SheetManager.show("forum-filter-sheet");
+  };
+
   return (
     <SafeArea edges={["top"]}>
       <Screen style={{ paddingBottom: 0, position: "relative" }}>
-        <Stack.Screen
-          options={{
-            title: "Forum",
-            headerRight: () => (
-              <TouchableOpacity onPress={() => {}} style={styles.headerButton}>
-                <Text style={styles.headerButtonText}>Action</Text>
-              </TouchableOpacity>
-            ),
+        <View
+          style={{
+            alignItems: "flex-end",
+
+            marginBottom: 12,
           }}
-        />
+        >
+          <CustomButton
+            title="Filters"
+            prefixIcon={
+              <MaterialCommunityIcons name="filter" size={10} color="white" />
+            }
+            textStyle={{ fontSize: 10 }}
+            style={{ paddingHorizontal: 12, paddingVertical: 6 }}
+            onPress={handlePressFilter}
+          />
+        </View>
 
         <ForumList />
 

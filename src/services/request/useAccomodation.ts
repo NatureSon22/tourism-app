@@ -22,20 +22,13 @@ export const useAccommodations = (params: QueryParams) => {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const { currentPage, limit, count, total } = lastPage.data.pagination;
-      // console.log("Pagination Info:", { currentPage, limit, count });
-      const totalPages = Math.ceil(count / limit);
+      const { currentPage, limit, total } = lastPage.data.pagination;
 
-      // This return value becomes the 'pageParam' for the NEXT call
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+      // Calculate how many items we have fetched so far
+      const itemsFetched = currentPage * limit;
+
+      // If we haven't reached the total yet, go to the next page
+      return itemsFetched < total ? currentPage + 1 : undefined;
     },
   });
 };
-
-// export const useAccommodationDetails = (id: string) => {
-//   return useQuery({
-//     queryKey: accommodationKeys.detail(id),
-//     queryFn: () => accommodationService.getAccommodationById(id),
-//     enabled: !!id,
-//   });
-// };
