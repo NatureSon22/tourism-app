@@ -12,9 +12,19 @@ type ForumHeaderProps = {
   author: Partial<User>;
   category: string;
   place: string;
+  joined?: boolean;
+  isJoining?: boolean;
+  onJoinPress: () => void;
 };
 
-export const ForumHeader = ({ author, category, place }: ForumHeaderProps) => (
+export const ForumHeader = ({
+  author,
+  category,
+  place,
+  joined,
+  isJoining,
+  onJoinPress,
+}: ForumHeaderProps) => (
   <View style={headerStyles.container}>
     <HStack gap={10}>
       <Image
@@ -34,10 +44,13 @@ export const ForumHeader = ({ author, category, place }: ForumHeaderProps) => (
     </HStack>
 
     <CustomButton
-      style={headerStyles.joinButton}
-      textStyle={headerStyles.joinText}
-      title="Join"
-      onPress={() => {}}
+      style={[headerStyles.joinButton, joined && headerStyles.joinedButton]}
+      textStyle={[headerStyles.joinText, joined && headerStyles.joinedText]}
+      title={joined ? "Joined" : "Join"}
+      onPress={onJoinPress}
+      isLoading={isJoining}
+      removeLabel={isJoining}
+      disabled={isJoining}
     />
   </View>
 );
@@ -60,6 +73,22 @@ const headerStyles = StyleSheet.create({
     fontFamily: Typography.family.bold,
   },
   placeText: { fontSize: 9.5, color: Colors.text, opacity: 0.7 },
-  joinButton: { paddingVertical: 4, paddingHorizontal: 12, borderRadius: 5 },
-  joinText: { fontSize: 10 },
+  joinButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 5,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  joinedButton: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  joinText: {
+    fontSize: 10,
+    color: Colors.surface,
+  },
+  joinedText: {
+    color: "white",
+  },
 });

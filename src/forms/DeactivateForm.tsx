@@ -1,8 +1,8 @@
 import CustomButton from "@/src/components/ui/CustomButton";
 import { CustomRadioGroup } from "@/src/components/ui/CustomRadioGroup";
 import DEACTIVATION_REASONS from "@/src/constants/deactivateReason";
-import React, { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useMemo, useRef, useState } from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import ModalConfirmation from "../components/app/account/ModalConfirmation";
 import { Typography } from "../constants/styles";
 import VStack from "../layouts/VStack";
@@ -12,9 +12,8 @@ const reasonOptions = DEACTIVATION_REASONS.map((reason) => ({
   value: reason,
 }));
 
-// TODO: keyboard away view
-
 export default function DeactivateForm() {
+  const otherInputRef = useRef<TextInput | null>(null);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [otherReasonText, setOtherReasonText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,49 +37,68 @@ export default function DeactivateForm() {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <VStack gap={0}>
-          <Text style={styles.title}>It&apos;s sad to see you go!</Text>
-          <Text style={styles.description}>
-            You&apos;ll lose access to your profile, saved data, and ongoing
-            activities. You can reactivate anytime by signing in again.
-          </Text>
-        </VStack>
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Scrollable content ── */}
+        <View style={styles.body}>
+          <VStack gap={0}>
+            <Text style={styles.title}>It&apos;s sad to see you go!</Text>
+            <Text style={styles.description}>
+              You&apos;ll lose access to your profile, saved data, and ongoing
+              activities. You can reactivate anytime by signing in again.
+            </Text>
+          </VStack>
 
-        <View style={styles.radioGroupWrapper}>
-          <CustomRadioGroup
-            options={reasonOptions}
-            selectedValue={selectedReason}
-            onSelect={(val) => {
-              setSelectedReason(val);
-              if (val !== "Other (please specify)") setOtherReasonText("");
-            }}
-            textStyle={styles.radioText}
-          />
-        </View>
-
-        {isOtherSelected && (
-          <View style={styles.otherReasonWrapper}>
-            <Text style={styles.label}>Please specify</Text>
-            <TextInput
-              multiline
-              numberOfLines={4}
-              style={styles.textArea}
-              placeholder="Type your reason"
-              value={otherReasonText}
-              onChangeText={setOtherReasonText}
+          <View style={styles.radioGroupWrapper}>
+            <CustomRadioGroup
+              options={reasonOptions}
+              selectedValue={selectedReason}
+              onSelect={(val) => {
+                setSelectedReason(val);
+                if (val === "Other (please specify)") {
+                  setTimeout(() => otherInputRef.current?.focus(), 100);
+                } else {
+                  setOtherReasonText("");
+                }
+              }}
+              textStyle={styles.radioText}
             />
           </View>
-        )}
 
-        <CustomButton
-          title="Deactivate"
-          onPress={() => setIsModalOpen(true)}
-          disabled={!isDeactivateEnabled}
-          style={[styles.button, !isDeactivateEnabled && styles.disabledButton]}
-          textStyle={styles.buttonStyle}
-        />
+          {isOtherSelected && (
+            <View style={styles.otherReasonWrapper}>
+              <Text style={styles.label}>Please specify</Text>
+              <TextInput
+                ref={otherInputRef}
+                multiline
+                numberOfLines={4}
+                style={styles.textArea}
+                placeholder="Type your reason"
+                value={otherReasonText}
+                onChangeText={setOtherReasonText}
+              />
+            </View>
+          )}
+        </View>
+
+        {/* ── Button pinned at the bottom of scroll ── */}
+        <View style={styles.footer}>
+          <CustomButton
+            title="Deactivate"
+            onPress={() => setIsModalOpen(true)}
+            disabled={!isDeactivateEnabled}
+            style={[styles.button, !isDeactivateEnabled && styles.disabledButton]}
+            textStyle={styles.buttonStyle}
+          />
+        </View>
       </ScrollView>
 
       <ModalConfirmation
@@ -90,13 +108,27 @@ export default function DeactivateForm() {
         onCancel={() => setIsModalOpen(false)}
         onConfirm={handleConfirm}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, gap: 16 },
-  heading: { fontSize: 16, fontWeight: "600" },
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,           // lets the scroll area grow to fill the screen…
+    justifyContent: "space-between", // …then pushes footer to the bottom
+    padding: 20,
+    gap: 16,
+  },
+  body: {
+    gap: 16,
+  },
+  footer: {
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
   radioGroupWrapper: { width: "100%", marginTop: 20 },
   otherReasonWrapper: { width: "100%", gap: 8 },
   label: { fontSize: 12, fontWeight: "500" },
@@ -123,12 +155,10 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     paddingVertical: 12,
-    marginTop: 15,
   },
   buttonStyle: {
     fontSize: 13,
   },
-  radioContainer: {},
   radioText: {
     fontFamily: Typography.family.regular,
     fontSize: 13,

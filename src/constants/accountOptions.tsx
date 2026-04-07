@@ -1,3 +1,4 @@
+import { Colors } from "@/src/constants/styles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -7,7 +8,8 @@ type AccountOption = {
   title: string;
   description: string;
   icon: React.ReactNode;
-  path: string;
+  path?: string;
+  action?: "logout";
 };
 
 const ACCOUNT_OPTIONS: AccountOption[] = [
@@ -40,6 +42,12 @@ const ACCOUNT_OPTIONS: AccountOption[] = [
       />
     ),
     path: "/account/deactivate",
+  },
+  {
+    title: "Logout account",
+    description: "See you later, traveler! Safe journeys ahead!",
+    icon: <Ionicons name="log-out-outline" size={18} color={Colors.error} />,
+    action: "logout",
   },
 ];
 

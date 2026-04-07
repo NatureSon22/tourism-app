@@ -9,6 +9,7 @@ import {
   TextStyle,
   View,
   ViewStyle,
+  
 } from "react-native";
 
 export interface CustomTextInputProps extends TextInputProps {
@@ -20,72 +21,90 @@ export interface CustomTextInputProps extends TextInputProps {
   editable?: boolean;
 }
 
-const CustomTextInput = ({
-  prefixIcon,
-  suffixIcon,
-  containerStyle,
-  inputStyle,
-  error,
-  editable = true,
-  ...rest
-}: CustomTextInputProps) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const inputRef = useRef<TextInput | null>(null);
+const CustomTextInput = forwardRef<TextInput, CustomTextInputProps>(
+  (
+    {
+      prefixIcon,
+      suffixIcon,
+      containerStyle,
+      inputStyle,
+      error,
+      editable = true,
+      multiline, // Added this to the destructuring
+      ...rest
+    },
+    ref,
+  ) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const inputRef = useRef<TextInput | null>(null);
 
-  return (
-    <Pressable
-      onPress={() => {
-        inputRef.current?.focus();
-      }}
-      style={[
-        styles.container,
-        // Dynamic border color based on Focus or Error state
-        isFocused && styles.focusedBorder,
-        error && styles.errorBorder,
-        containerStyle,
-      ]}
-    >
-      {/* Prefix Icon */}
-      {prefixIcon && (
-        <View style={[styles.iconWrapper, styles.prefixIcon]}>
-          {prefixIcon}
-        </View>
-      )}
+    const handleRef = (instance: TextInput | null) => {
+      inputRef.current = instance;
+      if (typeof ref === "function") {
+        ref(instance);
+      } else if (ref) {
+        (ref as React.MutableRefObject<TextInput | null>).current = instance;
+      }
+    };
 
-      <TextInput
-        ref={inputRef}
-        editable={editable}
-        style={[styles.input, inputStyle]}
-        placeholderTextColor={Colors.neutral}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        {...rest}
-      />
+    return (
+      <Pressable
+        onPress={() => editable && inputRef.current?.focus()}
+        style={[
+          styles.container,
+          !editable && styles.disabledContainer, // Grey out if not editable
+          isFocused && styles.focusedBorder,
+          error && styles.errorBorder,
+          multiline && { height: undefined, minHeight: 52, paddingVertical: 8 },
+          containerStyle,
+        ]}
+      >
+        {prefixIcon && <View style={styles.prefixIcon}>{prefixIcon}</View>}
 
-      {/* Suffix Icon */}
-      {suffixIcon && (
-        <View style={[styles.iconWrapper, styles.suffixIcon]}>
-          {suffixIcon}
-        </View>
-      )}
-    </Pressable>
-  );
-};
+        <TextInput
+          ref={handleRef}
+          editable={editable}
+          multiline={multiline}
+          style={[
+            styles.input,
+            !editable && { color: Colors.neutral }, // Dim text if disabled
+            inputStyle,
+          ]}
+          placeholderTextColor={Colors.neutral}
+          onFocus={(e) => {
+            setIsFocused(true);
+            rest.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            rest.onBlur?.(e);
+          }}
+          {...rest}
+        />
+
+        {suffixIcon && <View style={styles.suffixIcon}>{suffixIcon}</View>}
+      </Pressable>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "white",
-    borderWidth: 2,
+    borderWidth: 1.5, // Changed to match your focusedBorder for smoother transition
     borderColor: Colors.border,
     borderRadius: 12,
     paddingHorizontal: 12,
     height: 52,
   },
+  disabledContainer: {
+    backgroundColor: "#F5F5F5",
+    borderColor: "#E0E0E0",
+  },
   focusedBorder: {
     borderColor: Colors.primary,
-    borderWidth: 1.5,
   },
   errorBorder: {
     borderColor: Colors.error,
@@ -96,21 +115,14 @@ const styles = StyleSheet.create({
     fontFamily: Typography.family.regular,
     fontSize: 16,
     color: Colors.secondary,
-    paddingHorizontal: 8,
-    borderWidth: 0,
-    width: "100%",
-    backgroundColor: "transparent",
-  },
-  iconWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-    minWidth: 24,
+    paddingHorizontal: 4, // Reduced slightly to avoid excessive gap
+    textAlignVertical: "center", // Critical for Android alignment
   },
   prefixIcon: {
-    marginRight: 8,
+    marginRight: 4,
   },
   suffixIcon: {
-    marginLeft: "auto",
+    marginLeft: 4,
   },
 });
 

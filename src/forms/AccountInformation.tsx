@@ -6,6 +6,8 @@ import useAuthStore from "@/src/stores/authStore";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
+import { USER_PROFILE_PLACEHOLDER } from "../constants/assetsPath";
+import { Typography } from "../constants/styles";
 
 export default function AccountInformation() {
   const user = useAuthStore((state) => state.user);
@@ -28,81 +30,81 @@ export default function AccountInformation() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.profileSection}>
-        <Text
-          style={styles.profileName}
-        >{`${user.firstName} ${user.lastName}`}</Text>
-        <Text style={styles.profileSub}>{`@${user.userName}`}</Text>
-        <Text style={styles.profileSub}>{user.email}</Text>
-      </View>
-
-      <Divider />
-
       <View style={styles.photoSection}>
-        <HStack justifyContent="space-between" style={styles.fieldRow}>
-          <VStack gap={8} style={styles.valueGroup}>
+        <VStack gap={8}>
+          <HStack justifyContent="space-between" style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>Photo</Text>
-            <Image
-              source={{ uri: user.profilePictureUrl }}
-              style={styles.profileImage}
+
+            <CustomButton
+              title="Edit"
+              variant="outlined"
+              onPress={() => handleOpenSheet("edit-profile-image-sheet")}
+              style={styles.editBtn}
+              textStyle={styles.editBtnText}
             />
-          </VStack>
-          <CustomButton
-            title="Edit"
-            variant="outlined"
-            onPress={() => handleOpenSheet("edit-profile-image-sheet")}
-            style={styles.editBtn}
+          </HStack>
+
+          <Image
+            source={
+              user.profilePictureUrl
+                ? { uri: user.profilePictureUrl }
+                : USER_PROFILE_PLACEHOLDER
+            }
+            style={styles.profileImage}
           />
-        </HStack>
+        </VStack>
       </View>
 
       <Divider />
 
       <View style={styles.fieldSection}>
-        <HStack justifyContent="space-between" style={styles.fieldRow}>
-          <VStack gap={4} style={styles.valueGroup}>
+        <VStack gap={8}>
+          <HStack justifyContent="space-between" style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>Name</Text>
-            <Text
-              style={styles.fieldValue}
-            >{`${user.firstName} ${user.lastName}`}</Text>
-          </VStack>
-          <CustomButton
-            title="Edit"
-            variant="outlined"
-            onPress={() => handleOpenSheet("edit-name-sheet")}
-            style={styles.editBtn}
-          />
-        </HStack>
+            <CustomButton
+              title="Edit"
+              variant="outlined"
+              onPress={() => handleOpenSheet("edit-name-sheet")}
+              style={styles.editBtn}
+              textStyle={styles.editBtnText}
+            />
+          </HStack>
+          <Text
+            style={styles.fieldValue}
+          >{`${user.firstName} ${user.lastName}`}</Text>
+        </VStack>
 
         <Divider />
 
-        <HStack justifyContent="space-between" style={styles.fieldRow}>
-          <VStack gap={4} style={styles.valueGroup}>
+        <VStack gap={8}>
+          <HStack justifyContent="space-between" style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>Username</Text>
-            <Text style={styles.fieldValue}>{user.userName}</Text>
-          </VStack>
-          <CustomButton
-            title="Edit"
-            variant="outlined"
-            onPress={() => handleOpenSheet("edit-username-sheet")}
-            style={styles.editBtn}
-          />
-        </HStack>
+            <CustomButton
+              title="Edit"
+              variant="outlined"
+              onPress={() => handleOpenSheet("edit-username-sheet")}
+              style={styles.editBtn}
+              textStyle={styles.editBtnText}
+            />
+          </HStack>
+          <Text style={styles.fieldValue}>{user.userName}</Text>
+        </VStack>
 
         <Divider />
 
-        <HStack justifyContent="space-between" style={styles.fieldRow}>
-          <VStack gap={4} style={styles.valueGroup}>
+        <VStack gap={8}>
+          <HStack justifyContent="space-between" style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>Email</Text>
-            <Text style={styles.fieldValue}>{user.email}</Text>
-          </VStack>
-          <CustomButton
-            title="Edit"
-            variant="outlined"
-            onPress={() => handleOpenSheet("edit-email-sheet")}
-            style={styles.editBtn}
-          />
-        </HStack>
+            <CustomButton
+              title="Edit"
+              variant="outlined"
+              onPress={() => handleOpenSheet("edit-email-sheet")}
+              style={styles.editBtn}
+              textStyle={styles.editBtnText}
+            />
+          </HStack>
+          <Text style={styles.fieldValue}>{user.email}</Text>
+        </VStack>
       </View>
     </View>
   );
@@ -120,8 +122,8 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   profileImage: {
-    width: 96,
-    height: 96,
+    width: 60,
+    height: 60,
     borderRadius: 48,
     backgroundColor: "#E5E7EB",
   },
@@ -142,11 +144,10 @@ const styles = StyleSheet.create({
   fieldRow: {
     width: "100%",
   },
-  valueGroup: {
-    flex: 1,
-  },
+
   fieldLabel: {
     fontSize: 12,
+    fontFamily: Typography.family.medium,
     color: "#6B7280",
   },
   fieldValue: {
@@ -154,7 +155,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   editBtn: {
-    minWidth: 80,
+    padding: 0,
+    borderWidth: 0,
+  },
+  editBtnText: {
+    fontSize: 12,
   },
   loadingContainer: {
     padding: 20,

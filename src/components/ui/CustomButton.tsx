@@ -24,6 +24,7 @@ interface ButtonProps {
   rounded?: boolean;
   disabled?: boolean;
   isLoading?: boolean;
+  removeLabel?: boolean;
 }
 
 const CustomButton = ({
@@ -39,6 +40,7 @@ const CustomButton = ({
   rounded = false,
   disabled = false,
   isLoading = false,
+  removeLabel = false,
 }: ButtonProps) => {
   const isSolid = variant === "solid";
   const isIconOnly = !title && (prefixIcon || suffixIcon);
@@ -67,7 +69,7 @@ const CustomButton = ({
           <ActivityIndicator
             size="small"
             color={isSolid ? Colors.surface : Colors.primary}
-            style={{ marginRight: title ? 8 : 0 }}
+            style={{ marginRight: title && !removeLabel ? 8 : 0 }}
           />
         </View>
       ) : (

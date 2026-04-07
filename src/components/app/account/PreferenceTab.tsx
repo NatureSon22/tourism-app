@@ -29,7 +29,7 @@ export default function PreferenceTab({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 28,
     borderWidth: 1,
     borderColor: "#CBD5E1",
     borderRadius: 10,
@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     color: "#1F2937",
+    textAlign: "center",
   },
   selectedLabel: {
     fontWeight: "700",

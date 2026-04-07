@@ -27,7 +27,7 @@ export default function BookmarkForum() {
       keyExtractor={(item) => item.id.toString()}
       contentContainerStyle={{
         flexGrow: 1,
-        paddingHorizontal: 10,
+        paddingHorizontal: 0,
         paddingBottom: 10,
       }}
       // ItemSeparatorComponent={() => <View style={{ height: 20 }} />}

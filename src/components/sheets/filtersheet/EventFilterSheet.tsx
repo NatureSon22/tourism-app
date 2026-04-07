@@ -61,9 +61,9 @@ export default function EventFilterSheet(props: SheetProps) {
       const next = current.includes(optionName)
         ? current.filter((n) => n !== optionName)
         : [...current, optionName];
-      return { 
-        ...prev, 
-        attributes: { ...prev.attributes, [attrName]: next } 
+      return {
+        ...prev,
+        attributes: { ...prev.attributes, [attrName]: next },
       };
     });
   };
@@ -77,10 +77,11 @@ export default function EventFilterSheet(props: SheetProps) {
       <View style={styles.wrapper}>
         <HeaderSheet title="Filter" handleCloseSheet={handleCloseSheet} />
         <ScrollView contentContainerStyle={{ padding: 20, gap: 24 }}>
-          
           {/* Event Type / Category */}
           <VStack gap={8}>
-            <Text style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}>
+            <Text
+              style={{ fontFamily: Typography.family.semiBold, fontSize: 18 }}
+            >
               Event Type
             </Text>
             <CategoryGroup

@@ -1,7 +1,18 @@
 import VStack from "@/src/layouts/VStack";
 import React, { useState } from "react";
-import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import {
+  Dimensions,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from "react-native";
 import CustomPopupMenuItem from "./CustomPopupMenuItem";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const MENU_VERTICAL_OFFSET = 8;
+const OVERLAY_EDGE_BUFFER = Math.max(SCREEN_WIDTH, SCREEN_HEIGHT) * 2;
 
 export type PopupOption = {
   label: string;
@@ -32,22 +43,18 @@ export default function CustomPopupMenu({
   };
 
   return (
-    // zIndex is crucial here so the menu sits on top of following elements
     <View style={{ zIndex: 50 }}>
-      {/* TRIGGER */}
       <Pressable onPress={() => setVisible(!visible)}>
         {triggerButton}
       </Pressable>
 
       {visible && (
         <>
-          {/* THE BACKDROP: Transparent layer to catch taps outside the menu */}
           <Pressable
             style={styles.fullScreenDismiss}
             onPress={() => setVisible(false)}
           />
 
-          {/* THE MENU: Positioned absolutely relative to the parent View */}
           <View style={[styles.menuContainer, menuStyle]}>
             <VStack gap={7}>
               {options.map((option) => (
@@ -70,17 +77,18 @@ export default function CustomPopupMenu({
 const styles = StyleSheet.create({
   fullScreenDismiss: {
     position: "absolute",
-    top: -1000,
-    left: -1000,
-    right: -1000,
-    bottom: -1000,
+    top: -OVERLAY_EDGE_BUFFER,
+    left: -OVERLAY_EDGE_BUFFER,
+    right: -OVERLAY_EDGE_BUFFER,
+    bottom: -OVERLAY_EDGE_BUFFER,
     backgroundColor: "transparent",
     zIndex: 99,
   },
   menuContainer: {
     position: "absolute",
-    top: "110%",
+    top: "100%",
     right: 0,
+    marginTop: MENU_VERTICAL_OFFSET,
     backgroundColor: "white",
     borderRadius: 12,
     padding: 8,

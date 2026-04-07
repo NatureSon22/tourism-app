@@ -20,16 +20,22 @@ import { Sheets } from "../config/sheets";
 import toastConfig from "../config/toastConfig";
 import useAuthStore from "../stores/authStore";
 import { tokenStorage } from "../utils/tokenStorage";
-import authService from "../services/api/authService";
-
-// TODO: - check and handle when the backend is down or unreachable during app initialization, to prevent infinite loading state and provide user feedback
-// TODO: - explore tanstack query retry and delay
-// TODO: - check if stored crsf is being checked and why is it still working without open backend
 
 SplashScreen.preventAutoHideAsync();
 
 function Routes() {
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const { onBoardingCompleted, user, logout, clear } = useAuthStore(
+    useShallow((state) => ({
+      onBoardingCompleted: state.onBoardingCompleted,
+      user: state.user,
+      logout: state.logout,
+      clear: state.clearApp,
+    })),
+  );
+
+  // clear()
+
+  const isAuthChecking = useInitializeAuth(logout);
 
   const [loaded, error] = useFonts({
     "Poppins-Light": Poppins_300Light,
@@ -40,23 +46,41 @@ function Routes() {
     "Poppins-MediumItalic": Poppins_500Medium_Italic,
   });
 
-  const { onBoardingCompleted, user, clear, logout } = useAuthStore(
-    useShallow((state) => ({
-      onBoardingCompleted: state.onBoardingCompleted,
-      user: state.user,
-      clear: state.clearApp,
-      logout: state.logout,
-      rememberMe: state,
-      login: state.login,
-      refreshToken: state.refreshToken,
-    })),
-  );
+  const fontsReady = loaded || error;
+  const appReady = fontsReady && !isAuthChecking;
 
-  // clear()
+  // Hide splash screen only when BOTH fonts and auth check are done
+  useEffect(() => {
+    if (appReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [appReady]);
+
+  // Prevent rendering anything until we are ready
+  if (!appReady) {
+    return null;
+  }
+
+  return (
+    <>
+      <SheetProvider>
+        <Sheets />
+
+        <KeyboardProvider>
+          <AppNavigator user={user} onBoardingCompleted={onBoardingCompleted} />
+        </KeyboardProvider>
+      </SheetProvider>
+      <Toast config={toastConfig} />
+    </>
+  );
+}
+
+function useInitializeAuth(logout: () => Promise<void>) {
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   const initializeAuth = useCallback(async () => {
     try {
-      await authService.requestCrsfToken();
+      // await authService.requestCrsfToken();
 
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {
@@ -84,56 +108,43 @@ function Routes() {
     initializeAuth();
   }, [initializeAuth]);
 
-  const fontsReady = loaded || error;
-  const appReady = fontsReady && !isAuthChecking;
+  return isAuthChecking;
+}
 
-  // Hide splash screen only when BOTH fonts and auth check are done
-  useEffect(() => {
-    if (appReady) {
-      SplashScreen.hideAsync();
-    }
-  }, [appReady]);
-
-  // Prevent rendering anything until we are ready
-  if (!appReady) {
-    return null;
-  }
-
+function AppNavigator({
+  user,
+  onBoardingCompleted,
+}: {
+  user: unknown;
+  onBoardingCompleted: boolean;
+}) {
   return (
-    <>
-      <SheetProvider>
-        <Sheets />
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* Tabs are available to everyone */}
+      <Stack.Screen name="(tabs)" />
 
-        <KeyboardProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            {/* If no user object exists, go to Auth */}
-            <Stack.Protected guard={!user}>
-              <Stack.Screen name="(auth)" />
-            </Stack.Protected>
+      {/* Auth flow is available for unauthenticated users only */}
+      <Stack.Protected guard={!user}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
 
-            {/* User exists but hasn't finished onboarding */}
-            <Stack.Protected guard={!!user && !onBoardingCompleted}>
-              <Stack.Screen name="onboarding" />
-            </Stack.Protected>
+      {/* User exists but hasn't finished onboarding */}
+      <Stack.Protected guard={!!user && !onBoardingCompleted}>
+        <Stack.Screen name="onboarding" />
+      </Stack.Protected>
 
-            {/* User exists and onboarding is done */}
-            <Stack.Protected guard={!!user && onBoardingCompleted}>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="accommodation" />
-              <Stack.Screen name="dining" />
-              <Stack.Screen name="activity" />
-              <Stack.Screen name="event" />
-              <Stack.Screen name="transportation" />
-              <Stack.Screen name="service" />
-              <Stack.Screen name="account" />
-              {/* <Stack.Screen name="(bookmark)" /> */}
-              {/* <Stack.Screen name="(forum)" /> */}
-            </Stack.Protected>
-          </Stack>
-        </KeyboardProvider>
-      </SheetProvider>
-      <Toast config={toastConfig} />
-    </>
+      {/* Protected app sections for completed signed-in users */}
+      <Stack.Protected guard={!!user && onBoardingCompleted}>
+        <Stack.Screen name="accommodation" />
+        <Stack.Screen name="dining" />
+        <Stack.Screen name="activity" />
+        <Stack.Screen name="event" />
+        <Stack.Screen name="transportation" />
+        <Stack.Screen name="service" />
+        <Stack.Screen name="account" />
+        <Stack.Screen name="forum" />
+      </Stack.Protected>
+    </Stack>
   );
 }
 

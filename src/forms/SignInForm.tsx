@@ -7,7 +7,6 @@ import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Toast from "react-native-toast-message";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 import ControllerTextInput from "../components/ui/ControllerTextInput";
@@ -55,10 +54,22 @@ export default function SignInForm() {
 
   const onSubmit = async (data: SignInFormData) => {
     await login(
-      { id: "1", email: "bantajio22@gmail.com" },
+      {
+        id: "1",
+        email: "johndoe@gmail.com",
+        firstName: "John",
+        lastName: "Doe",
+        profilePictureUrl: "",
+        userName: "john_doe",
+      },
       { accessToken: "sampletoken", refreshToken: "samplerefreshtoken" },
       isChecked,
     );
+
+    if (!onBoardingCompleted) {
+      router.replace("/onboarding");
+    }
+
     // mutate(
     //   { email: data.email, password: data.password },
     //   {

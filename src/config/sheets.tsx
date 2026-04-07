@@ -3,14 +3,15 @@ import EditNameSheet from "@/src/components/sheets/account/EditNameSheet";
 import EditProfileImageSheet from "@/src/components/sheets/account/EditProfileImageSheet";
 import EditUsernameSheet from "@/src/components/sheets/account/EditUsernameSheet";
 import { SheetDefinition, SheetRegister } from "react-native-actions-sheet";
-import FilterSheet from "../components/sheets/accommodation/FilterSheet";
-import ActivityFilterSheet from "../components/sheets/activity/ActivityFilterSheet";
 import AreaSheet from "../components/sheets/AreaSheet";
-import DiningFilterSheet from "../components/sheets/dining/DiningFilterSheet";
-import EventFilterSheet from "../components/sheets/event/EventFilterSheet";
+import ActivityFilterSheet from "../components/sheets/filtersheet/ActivityFilterSheet";
+import DiningFilterSheet from "../components/sheets/filtersheet/DiningFilterSheet";
+import EventFilterSheet from "../components/sheets/filtersheet/EventFilterSheet";
+import FilterSheet from "../components/sheets/filtersheet/FilterSheet";
+import ServiceFilterSheet from "../components/sheets/filtersheet/ServiceFilterSheet";
+import TransportationFilterSheet from "../components/sheets/filtersheet/TransportationFilterSheet";
+import ForumFilterSheet from "../components/sheets/ForumFilterSheet";
 import OptionSheet from "../components/sheets/NavigationSheet";
-import ServiceFilterSheet from "../components/sheets/service/ServiceFilterSheet";
-import TransportationFilterSheet from "../components/sheets/transportation/TransportationFilterSheet";
 import SortSheet from "../components/sheets/SortSheet";
 
 declare module "react-native-actions-sheet" {
@@ -31,6 +32,8 @@ declare module "react-native-actions-sheet" {
     "service-filter-sheet": SheetDefinition;
 
     "transportation-filter-sheet": SheetDefinition;
+
+    "forum-filter-sheet": SheetDefinition;
 
     "edit-name-sheet": SheetDefinition;
     "edit-username-sheet": SheetDefinition;
@@ -59,6 +62,8 @@ export const Sheets = () => {
         "service-filter-sheet": ServiceFilterSheet,
 
         "transportation-filter-sheet": TransportationFilterSheet,
+
+        "forum-filter-sheet": ForumFilterSheet,
 
         "edit-name-sheet": EditNameSheet,
         "edit-username-sheet": EditUsernameSheet,

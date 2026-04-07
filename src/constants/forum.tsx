@@ -1,4 +1,5 @@
 import { User } from "../stores/authStore";
+import { ForumType } from "./forumTypes";
 
 type MediaType = "image" | "video";
 
@@ -31,7 +32,7 @@ export type Comment = Reply & {
 };
 
 export type ForumPost = {
-  id: number;
+  id: string;
   title: string;
   content: string;
   category: string;
@@ -44,11 +45,12 @@ export type ForumPost = {
   comments: Comment[];
   commentCount: number;
   media?: Attachment[]; // Media added to the main post
+  type: ForumType;
 };
 
 const forumData: ForumPost[] = [
   {
-    id: 101,
+    id: "101",
     title: "Hidden Gem: The Blue Lagoon in Coron",
     content:
       "Just found this spot that isn't on most maps. The water is crystal clear! Check the video for the exact entry point.",
@@ -64,28 +66,29 @@ const forumData: ForumPost[] = [
     dislikes: 3,
     createdAt: new Date("2026-03-05T08:20:00Z"),
     commentCount: 2,
+    type: "Food & Dining",
     media: [
-      {
-        id: "vid_01",
-        type: "video",
-        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        thumbnailUrl:
-          "https://images.unsplash.com/photo-1544124499-58912cbddaad",
-      },
-      {
-        id: "vid_02",
-        type: "video",
-        url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        thumbnailUrl:
-          "https://images.unsplash.com/photo-1544124499-58912cbddaad",
-      },
-      {
-        id: "vid_03",
-        type: "video",
-        url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-        thumbnailUrl:
-          "https://images.unsplash.com/photo-1544124499-58912cbddaad",
-      },
+      // {
+      //   id: "vid_01",
+      //   type: "video",
+      //   url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      //   thumbnailUrl:
+      //     "https://images.unsplash.com/photo-1544124499-58912cbddaad",
+      // },
+      // {
+      //   id: "vid_02",
+      //   type: "video",
+      //   url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      //   thumbnailUrl:
+      //     "https://images.unsplash.com/photo-1544124499-58912cbddaad",
+      // },
+      // {
+      //   id: "vid_03",
+      //   type: "video",
+      //   url: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+      //   thumbnailUrl:
+      //     "https://images.unsplash.com/photo-1544124499-58912cbddaad",
+      // },
     ],
     comments: [
       {
@@ -121,7 +124,7 @@ const forumData: ForumPost[] = [
     ],
   },
   {
-    id: 102,
+    id: "102",
     title: "Avoid the crowds at Calle Crisologo",
     content:
       "If you want the best photos without 100 people in the background, go at 5:15 AM. Here is the lighting at that hour.",
@@ -137,6 +140,7 @@ const forumData: ForumPost[] = [
     dislikes: 1,
     createdAt: new Date("2026-03-08T14:10:00Z"),
     commentCount: 1,
+    type: "Accommodation & Lodging",
     media: [
       {
         id: "img_01",
@@ -162,7 +166,7 @@ const forumData: ForumPost[] = [
     comments: [],
   },
   {
-    id: 103,
+    id: "103",
     title: "Best Surf Instructor in Cloud 9?",
     content:
       "Hey guys, I'm a total beginner. Looking for someone patient who won't just leave me in the white water.",
@@ -194,9 +198,10 @@ const forumData: ForumPost[] = [
         viewers: 300,
       },
     ],
+    type: "Tourist Spots & Attractions",
   },
   {
-    id: 104,
+    id: "104",
     title: "Current Road Conditions to Sagada",
     content:
       "Thinking of driving up this weekend. Any landslides reported after the rain yesterday?",
@@ -220,9 +225,10 @@ const forumData: ForumPost[] = [
       },
     ],
     comments: [],
+    type: "Transportation & Travel Tips",
   },
   {
-    id: 105,
+    id: "105",
     title: "Expo SDK 54 - Native Menu Performance",
     content:
       "Testing out the new Link.Menu API for my tourism app. The performance on Android is surprisingly snappy.",
@@ -239,6 +245,7 @@ const forumData: ForumPost[] = [
     createdAt: new Date("2026-03-11T16:00:00Z"),
     commentCount: 0,
     comments: [],
+    type: "Food & Dining",
   },
 ];
 

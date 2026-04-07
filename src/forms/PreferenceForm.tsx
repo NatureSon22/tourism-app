@@ -24,7 +24,7 @@ export default function PreferenceForm() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Choose your preference</Text>
+      <Text style={styles.title}>What&apos;s the mood?</Text>
 
       <PreferenceList
         options={options}
@@ -38,6 +38,7 @@ export default function PreferenceForm() {
           onPress={handleContinue}
           disabled={!isContinueEnabled}
           style={[styles.button, !isContinueEnabled && styles.disabledButton]}
+          textStyle={styles.buttonStyle}
         />
       </View>
     </View>
@@ -61,8 +62,16 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
+    paddingVertical: 12,
   },
   disabledButton: {
     opacity: 0.5,
+  },
+  saveButton: {
+    width: "100%",
+    paddingVertical: 12,
+  },
+  buttonStyle: {
+    fontSize: 13,
   },
 });

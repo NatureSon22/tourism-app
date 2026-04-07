@@ -1,5 +1,6 @@
 import BookmarkForum from "@/src/components/app/bookmark/BookmarkForum";
 import BookmarkListing from "@/src/components/app/bookmark/BookmarkListing";
+import ProtectedAccessNotice from "@/src/components/app/ProtectedAccessNotice";
 import CustomPopupMenu from "@/src/components/ui/CustomPopupMenu";
 import FORUMS_OPTIONS, {
   ForumsOptionValue,
@@ -11,6 +12,7 @@ import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import useAuthStore from "@/src/stores/authStore";
 import { FontAwesome5 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -20,6 +22,7 @@ export default function Bookmark() {
   const [selectedFilter, setSelectedFilter] = useState<
     ListingOptionValue | ForumsOptionValue
   >("accommodation");
+  const user = useAuthStore((state) => state.user);
 
   const handleSetSection = (newSection: "listing" | "forum") => {
     setSection(newSection);
@@ -29,6 +32,18 @@ export default function Bookmark() {
         : "tourist_spots_and_attractions",
     );
   };
+
+  if (!user) {
+    return (
+      <SafeArea edges={["top"]}>
+        <ProtectedAccessNotice
+          headline="Account access requires sign-in"
+          description="Sign in to manage your bookmarks of listing and forum."
+          actionLabel="Go to Sign In"
+        />
+      </SafeArea>
+    );
+  }
 
   return (
     <SafeArea edges={["top"]}>

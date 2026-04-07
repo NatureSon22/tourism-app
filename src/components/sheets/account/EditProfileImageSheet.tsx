@@ -20,7 +20,6 @@ export default function EditProfileImageSheet(props: SheetProps) {
   };
 
   const handlePickFromLibrary = async () => {
-    // request permission to access media library
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
@@ -32,17 +31,13 @@ export default function EditProfileImageSheet(props: SheetProps) {
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
-      allowsEditing: true, // Allows user to edit the selected image
+      allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      // result.assets[0].uri contains the local file URI
-      const localUri = result.assets[0].uri;
-      console.log(localUri);
-      // Proceed to upload the image
-      setSelectedImage(localUri);
+      setSelectedImage(result.assets[0].uri);
     }
   };
 
@@ -54,66 +49,58 @@ export default function EditProfileImageSheet(props: SheetProps) {
     }
 
     let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true, // Allows editing/cropping the image after capture
-      quality: 1, // Highest quality
+      allowsEditing: true,
+      quality: 1,
       mediaTypes: ["images"],
       aspect: [4, 3],
     });
 
     if (!result.canceled) {
-      // result.assets[0].uri contains the local file URI
-      const localUri = result.assets[0].uri;
-      console.log(localUri);
-      // Proceed to upload the image
-      setSelectedImage(localUri);
+      setSelectedImage(result.assets[0].uri);
     }
-  };
-
-  const handleRemovePhoto = () => {
-    setSelectedImage(null);
   };
 
   const handleSave = () => {
     if (!selectedImage) return;
-    console.log("Selected profile image:", selectedImage);
     if (updateUser) {
       updateUser({ profilePictureUrl: selectedImage });
     }
     handleClose();
   };
 
+  const imageSource = selectedImage || user?.profilePictureUrl;
+
   return (
     <ActionSheet id={props.sheetId} containerStyle={styles.sheetContainer}>
-      <View style={styles.headerContainer}>
-        <HeaderSheet title="Edit Photo" handleCloseSheet={handleClose} />
-      </View>
+      <HeaderSheet title="Edit Photo" handleCloseSheet={handleClose} />
 
       <View style={styles.content}>
+        {/* Preview */}
+        <View style={styles.previewWrapper}>
+          {imageSource ? (
+            <Image source={{ uri: imageSource }} style={styles.imagePreview} />
+          ) : (
+            <View style={[styles.imagePreview, styles.imagePlaceholder]}>
+              <Text style={styles.placeholderText}>No photo selected</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Pick options */}
         <View style={styles.optionsRow}>
-          <CustomButton title="Take Photo" onPress={handleTakePhoto} />
+          <CustomButton
+            title="Take Photo"
+            onPress={handleTakePhoto}
+            variant="outlined"
+          />
           <CustomButton
             title="Choose from Library"
             onPress={handlePickFromLibrary}
+            variant="outlined"
           />
         </View>
 
-        {user?.profilePictureUrl ? (
-          <Text style={styles.currentLabel}>Current photo</Text>
-        ) : null}
-
-        <Image
-          source={{ uri: selectedImage || user?.profilePictureUrl || "" }}
-          style={styles.imagePreview}
-        />
-
-        {selectedImage && (
-          <CustomButton
-            title="Remove Photo"
-            variant="outlined"
-            onPress={handleRemovePhoto}
-          />
-        )}
-
+        {/* Actions */}
         <View style={styles.actions}>
           <CustomButton
             title="Save"
@@ -136,26 +123,32 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     backgroundColor: "white",
-    padding: 16,
-  },
-  headerContainer: {
-    marginBottom: 12,
   },
   content: {
-    gap: 12,
+    gap: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    paddingTop: 8,
+  },
+  previewWrapper: {
+    alignItems: "center",
+  },
+  imagePreview: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#E5E7EB",
+  },
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderText: {
+    fontSize: 12,
+    color: "#9CA3AF",
   },
   optionsRow: {
     gap: 10,
-  },
-  currentLabel: {
-    fontSize: 12,
-    color: "#6B7280",
-  },
-  imagePreview: {
-    width: "100%",
-    aspectRatio: 1,
-    borderRadius: 12,
-    backgroundColor: "#E5E7EB",
   },
   actions: {
     flexDirection: "row",

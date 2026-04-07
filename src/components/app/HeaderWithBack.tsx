@@ -3,14 +3,26 @@ import HStack from "@/src/layouts/HStack";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from "react-native";
 
 interface HeaderWithBackProps {
   title?: string;
   suffix?: ReactNode;
+  suffixContainerStyle?: StyleProp<ViewStyle>;
 }
 
-export default function HeaderWithBack({ title, suffix }: HeaderWithBackProps) {
+export default function HeaderWithBack({
+  title,
+  suffix,
+  suffixContainerStyle,
+}: HeaderWithBackProps) {
   const router = useRouter();
 
   return (
@@ -37,7 +49,7 @@ export default function HeaderWithBack({ title, suffix }: HeaderWithBackProps) {
         )}
       </View>
 
-      <View style={[styles.sideSlot, styles.alignRight]}>
+      <View style={[styles.sideSlot, styles.alignRight, suffixContainerStyle]}>
         {suffix ? suffix : <View style={styles.spacer} />}
       </View>
     </HStack>

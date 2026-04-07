@@ -1,16 +1,17 @@
-import ForumCard from "@/src/components/app/forum/ForumCard";
-import forumData from "@/src/constants/forum";
+import ForumList from "@/src/components/app/forum/ForumList";
+import CustomButton from "@/src/components/ui/CustomButton";
 import { Colors, Typography } from "@/src/constants/styles";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Stack } from "expo-router";
 import React from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function Forum() {
   return (
     <SafeArea edges={["top"]}>
-      <Screen style={{ paddingBottom: 0 }}>
+      <Screen style={{ paddingBottom: 0, position: "relative" }}>
         <Stack.Screen
           options={{
             title: "Forum",
@@ -22,12 +23,13 @@ export default function Forum() {
           }}
         />
 
-        <FlatList
-          data={forumData}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <ForumCard {...item} />}
-          contentContainerStyle={styles.listContent}
+        <ForumList />
+
+        <CustomButton
+          title=""
+          prefixIcon={<FontAwesome6 name="add" size={18} color="white" />}
+          style={styles.buttonStyle}
+          onPress={() => {}}
         />
       </Screen>
     </SafeArea>
@@ -48,5 +50,13 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 20,
+  },
+  buttonStyle: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 50,
   },
 });

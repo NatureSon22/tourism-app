@@ -18,17 +18,6 @@ export type Accommodation = {
   distanceFromCityCenter?: number;
 };
 
-// export type Accommodation = {
-//   id: string;
-//   name: string;
-//   location: string;
-//   pricePerNight: number;
-//   rating: number;
-//   reviews: number;
-//   imageUrl: string;
-//   distanceFromCityCenter: number; // in kilometers
-// };
-
 export type AccomodationResponse = {
   success: boolean;
   message: string;

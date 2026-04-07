@@ -21,7 +21,7 @@ export default function OnBoarding() {
 
   const handleContinue = () => {
     completeOnBoarding();
-    router.replace("/(main)");
+    router.replace("/(tabs)");
   };
 
   return (

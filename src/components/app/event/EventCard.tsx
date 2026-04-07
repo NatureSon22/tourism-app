@@ -26,7 +26,7 @@ function EventCard({
   );
 
   const handlePress = () => {
-    router.push({ pathname: "/event", params: { id: name } });
+    router.push({ pathname: "/event/[id]", params: { id: name } });
   };
 
   return (
