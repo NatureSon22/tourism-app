@@ -1,4 +1,4 @@
-import { DEFAULT_ACCOMMODATION } from "@/src/constants/accomodations";
+import { mockAccommodation } from "@/src/constants/accomodations";
 import { Colors, Typography } from "@/src/constants/styles";
 import { useSafeNavigation } from "@/src/hooks/useSafeNavigation";
 import HStack from "@/src/layouts/HStack";
@@ -32,26 +32,26 @@ function AccommodationCard({
     <Pressable style={styles.card} onPress={handlePress}>
       <HStack gap={17} alignItems="flex-start">
         <Image
-          source={imageUrl ?? DEFAULT_ACCOMMODATION.imageUrl}
+          source={{ uri: imageUrl ?? mockAccommodation[0].imageUrl }}
           contentFit="cover"
           style={styles.image}
         />
 
         <VStack style={styles.content} gap={5}>
           <Text style={styles.name} numberOfLines={1}>
-            {title ?? DEFAULT_ACCOMMODATION.title}
+            {title ?? mockAccommodation[0].title}
           </Text>
 
           <Text style={styles.location} numberOfLines={1}>
-            {location ?? DEFAULT_ACCOMMODATION.location}
+            {location ?? mockAccommodation[0].location}
           </Text>
 
-          <VStack gap={0} style={{ alignItems: "flex-start" }}>
+          <VStack gap={0} style={styles.flexStart}>
             <HStack gap={5}>
               <Text style={styles.distanceText}>
                 {">"}
                 {distanceFromCityCenter ??
-                  DEFAULT_ACCOMMODATION.distanceFromCityCenter}
+                  mockAccommodation[0].distanceFromCityCenter}
                 km away
               </Text>
             </HStack>
@@ -59,17 +59,17 @@ function AccommodationCard({
             <HStack alignItems="center" gap={5}>
               <FontAwesome6 name="star" size={10} color="#E28F0B" solid />
               <Text style={styles.ratingText}>
-                {rating ?? DEFAULT_ACCOMMODATION.rating}
+                {rating ?? mockAccommodation[0].rating}
               </Text>
               <Text style={styles.reviewText}>
-                ({reviews ?? DEFAULT_ACCOMMODATION.reviews})
+                ({reviews ?? mockAccommodation[0].reviews})
               </Text>
             </HStack>
           </VStack>
 
           <Text style={styles.price}>
             {formatCurrency(
-              pricePerNight ?? DEFAULT_ACCOMMODATION.pricePerNight ?? 0,
+              pricePerNight ?? mockAccommodation[0].pricePerNight ?? 0,
             )}
           </Text>
         </VStack>
@@ -91,6 +91,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  flexStart: {
+    alignItems: "flex-start",
   },
   name: {
     fontSize: 15,

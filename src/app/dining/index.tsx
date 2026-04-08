@@ -10,7 +10,7 @@ import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
 import { QueryParams } from "@/src/types/filter";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
@@ -47,16 +47,19 @@ export default function DiningPage() {
     });
   };
 
-  const params: QueryParams = {
-    search: diningState.search,
-    area: diningState.options.area,
-    sort: diningState.options.sort,
-    rating: diningState.options.rating || undefined,
-    type: diningState.options.type.type || undefined,
-    subtypes: diningState.options.type.subtypes,
-    amenities: diningState.options.amenities,
-    page: 1,
-  };
+  const params = useMemo<QueryParams>(
+    () => ({
+      search: diningState.search,
+      area: diningState.options.area,
+      sort: diningState.options.sort,
+      rating: diningState.options.rating || undefined,
+      type: diningState.options.type.type || undefined,
+      subtypes: diningState.options.type.subtypes,
+      amenities: diningState.options.amenities,
+      page: 1,
+    }),
+    [diningState],
+  );
 
   return (
     <SafeArea edges={["bottom", "top"]}>
@@ -73,7 +76,7 @@ export default function DiningPage() {
           containerStyle={styles.filterBarPadding}
         />
 
-        <DiningList diningState={params} />
+        <DiningList params={params} />
       </Screen>
     </SafeArea>
   );

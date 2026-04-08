@@ -3,13 +3,13 @@ import { Colors, Typography } from "@/src/constants/styles";
 import formatCurrency from "@/src/utils/currency";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ImageGrid from "../ImageGrid";
 
 type Props = Dining;
 
-export default function DiningCard({
+function DiningCard({
   id,
   name,
   location,
@@ -199,3 +199,5 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
 });
+
+export default memo(DiningCard);

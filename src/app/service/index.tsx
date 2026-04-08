@@ -9,7 +9,8 @@ import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
-import { useEffect, useState } from "react";
+import type { QueryParams } from "@/src/types/filter";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
@@ -17,13 +18,15 @@ export default function ServicePage() {
   const { openSheet } = useSingleSheet();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
-  const { currentSort, updateOptions, resetCategory } = useFilterStore(
-    useShallow((state) => ({
-      updateOptions: state.updateOptions,
-      currentSort: state.categories.services.options.sort,
-      resetCategory: state.resetCategory,
-    })),
-  );
+  const { currentSort, currentOptions, updateOptions, resetCategory } =
+    useFilterStore(
+      useShallow((state) => ({
+        updateOptions: state.updateOptions,
+        currentSort: state.categories.services.options.sort,
+        currentOptions: state.categories.services.options,
+        resetCategory: state.resetCategory,
+      })),
+    );
 
   useEffect(() => {
     return () => {
@@ -38,6 +41,20 @@ export default function ServicePage() {
       onSelect: (val: string) => updateOptions("services", { sort: val }),
     });
   };
+
+  const params = useMemo<QueryParams>(
+    () => ({
+      search: debouncedSearch,
+      area: currentOptions.area,
+      sort: currentOptions.sort,
+      type: currentOptions.type.type || undefined,
+      subtypes: currentOptions.type.subtypes,
+      amenities: currentOptions.attributes["amenities"] ?? [],
+      page: 1,
+      limit: 5,
+    }),
+    [currentOptions, debouncedSearch],
+  );
 
   return (
     <SafeArea edges={["bottom", "top"]}>
@@ -54,7 +71,7 @@ export default function ServicePage() {
           containerStyle={styles.filterBarPadding}
         />
 
-        <ServiceList search={debouncedSearch} />
+        <ServiceList params={params} />
       </Screen>
     </SafeArea>
   );

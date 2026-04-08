@@ -1,6 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { QueryParams } from "@/src/types/filter";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Alert } from "react-native";
-import eventService, { EventParams } from "../api/eventService";
+import eventService from "../api/eventService";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
@@ -11,26 +17,40 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 const eventKeys = {
   all: ["events"] as const,
   lists: () => [...eventKeys.all, "list"] as const,
-  list: (params: EventParams) => [...eventKeys.lists(), params] as const,
+  list: (params: QueryParams) => [...eventKeys.lists(), params] as const,
   details: () => [...eventKeys.all, "detail"] as const,
   detail: (id: string) => [...eventKeys.details(), id] as const,
 };
 
-export const useEvents = (params: EventParams) => {
-  return useQuery({
+export const useEvents = (params: QueryParams) => {
+  return useInfiniteQuery({
     queryKey: eventKeys.list(params),
-    queryFn: () => eventService.getEventData(params),
-    placeholderData: (prev) => prev,
-    select: (data) => {
-      return {
-        ...data,
-        data: data.data.map((event) => ({
-          ...event,
-          id: String(event.id),
-          formattedDate: dateFormatter.format(new Date(event.date)),
-        })),
-      };
+    queryFn: ({ pageParam = 1 }) =>
+      eventService.getEventData({
+        ...params,
+        page: pageParam,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { currentPage, limit, total } = lastPage.data.pagination;
+      const itemsFetched = currentPage * limit;
+      return itemsFetched < total ? currentPage + 1 : undefined;
     },
+    placeholderData: (prev) => prev,
+    select: (data) => ({
+      ...data,
+      pages: data.pages.map((page) => ({
+        ...page,
+        data: {
+          ...page.data,
+          listings: page.data.listings.map((event) => ({
+            ...event,
+            id: String(event.id),
+            formattedDate: dateFormatter.format(new Date(event.date)),
+          })),
+        },
+      })),
+    }),
   });
 };
 

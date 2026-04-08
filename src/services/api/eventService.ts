@@ -1,14 +1,16 @@
+import { QueryParams } from "@/src/types/filter";
 import { Event, REALISTIC_EVENTS } from "../../constants/eventListing";
 
-export type EventParams = {
-  search?: string;
-  sort?: string;
-  filters?: any;
-};
-
 export type GetEventResponse = {
-  data: Event[];
-  total: number;
+  data: {
+    listings: Event[];
+    pagination: {
+      count: number;
+      currentPage: number;
+      limit: number;
+      total: number;
+    };
+  };
 };
 
 export type RegistrationResponse = {
@@ -18,12 +20,10 @@ export type RegistrationResponse = {
 };
 
 const eventService = {
-  getEventData: async ({
-    search,
-    filters,
-  }: EventParams): Promise<GetEventResponse> => {
+  getEventData: async (params: QueryParams): Promise<GetEventResponse> => {
     await new Promise((r) => setTimeout(r, 1000));
 
+    const { search, page, limit } = params;
     let result = [...(REALISTIC_EVENTS ?? [])];
 
     if (search) {
@@ -35,9 +35,23 @@ const eventService = {
       );
     }
 
+    const currentPage = Math.max(1, page ?? 1);
+    const limitPerPage = limit ?? 5;
+    const total = result.length;
+    const start = (currentPage - 1) * limitPerPage;
+    const end = start + limitPerPage;
+    const listings = result.slice(start, end);
+
     return {
-      data: result,
-      total: result.length,
+      data: {
+        listings,
+        pagination: {
+          count: listings.length,
+          currentPage,
+          limit: limitPerPage,
+          total,
+        },
+      },
     };
   },
 

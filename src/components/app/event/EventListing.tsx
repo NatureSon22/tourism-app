@@ -1,50 +1,107 @@
 import type { Event } from "@/src/constants/eventListing";
-import { useOnRefresh } from "@/src/hooks/useOnRefresh";
 import { useEvents } from "@/src/services/request/useEvent";
+import type { QueryParams } from "@/src/types/filter";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useCallback } from "react";
-import { FlatList, RefreshControl, StyleSheet, ListRenderItem } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  ListRenderItem,
+  RefreshControl,
+  StyleSheet,
+} from "react-native";
 import ItemSeparator from "../../ui/ItemSeparator";
 import ListEmptyState from "../ListEmptyState";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "./EventCardSkeleton";
 
 type EventListingProps = {
-  search: string;
+  params: QueryParams;
 };
 
-export default function EventListing({ search }: EventListingProps) {
-  const { data, isLoading, isFetched } = useEvents({ search });
-  const { refreshing, onRefresh } = useOnRefresh();
+export default function EventListing({ params }: EventListingProps) {
+  const {
+    data,
+    isLoading,
+    isFetched,
+    isError,
+    refetch,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useEvents(params);
   const { isConnected } = useNetInfo();
-  const isEmpty = isFetched && !isLoading && data?.data.length === 0;
+  const [isRefetching, setIsRefetching] = useState(false);
 
-  const renderItem = useCallback<ListRenderItem<Skeleton | Event>>(({ item }) => {
-    if ("isSkeleton" in item) return <EventCardSkeleton />;
-    return <EventCard {...item} />;
-  }, []);
+  const handleRefresh = useCallback(async () => {
+    setIsRefetching(true);
+    await refetch();
+    setIsRefetching(false);
+  }, [refetch]);
+
+  const listings = useMemo(
+    () => data?.pages.flatMap((page) => page.data.listings) ?? [],
+    [data],
+  );
+
+  const listData = useMemo(
+    () => (isLoading ? createSkeletons(5) : listings),
+    [isLoading, listings],
+  );
+
+  const isEmpty = useMemo(
+    () => isFetched && !isLoading && listings.length === 0,
+    [isFetched, isLoading, listings],
+  );
+
+  const handleEndReached = useCallback(() => {
+    console.log("End reached");
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const listFooterComponent = useMemo(
+    () =>
+      isFetchingNextPage ? (
+        <ActivityIndicator style={styles.footerLoader} color="#000" />
+      ) : null,
+    [isFetchingNextPage],
+  );
+
+  const renderItem = useCallback<ListRenderItem<Skeleton | Event>>(
+    ({ item }) => {
+      if ("isSkeleton" in item) return <EventCardSkeleton />;
+      return <EventCard {...item} />;
+    },
+    [],
+  );
 
   return (
     <FlatList<Skeleton | Event>
-      data={isLoading ? createSkeletons(5) : data?.data || []}
+      data={listData}
       keyExtractor={(item) => item.id.toString()}
       renderItem={renderItem}
+      onEndReached={handleEndReached}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={listFooterComponent}
       initialNumToRender={8}
-      maxToRenderPerBatch={10}
+      maxToRenderPerBatch={5}
       windowSize={11}
       removeClippedSubviews
       contentContainerStyle={styles.listContent}
       ItemSeparatorComponent={ItemSeparator}
       showsVerticalScrollIndicator={false}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
       }
       ListEmptyComponent={
         <ListEmptyState
           isLoading={isLoading}
           isConnected={isConnected}
-          onRetry={onRefresh}
+          isError={isError}
+          onRetry={handleRefresh}
           resourceName="events"
           customNoResultsMessage="No events found."
           isEmpty={isEmpty}
@@ -59,5 +116,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 10,
     paddingBottom: 20,
+  },
+  footerLoader: {
+    marginVertical: 20,
   },
 });

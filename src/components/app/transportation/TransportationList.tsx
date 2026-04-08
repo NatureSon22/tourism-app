@@ -1,39 +1,62 @@
 import { Transportation } from "@/src/constants/transportationList";
 import { useTransportation } from "@/src/services/request/useTransportation";
+import { QueryParams } from "@/src/types/filter";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   ListRenderItem,
+  Platform,
   RefreshControl,
   StyleSheet,
   View,
 } from "react-native";
 import ListEmptyState from "../ListEmptyState";
-import { FilterType } from "../main/PlaceFilterTabs";
 import TransportationCardSkeleton from "./TransportaionCardSkeleton";
 import TransportationCard from "./TransportationCard";
 
 type TransportationListProps = {
-  filter?: string;
-  search: string;
+  params: QueryParams;
 };
 
 export default function TransportationList({
-  search,
+  params,
 }: TransportationListProps) {
-  const { data, isLoading, isFetched, refetch } = useTransportation({ search });
-  const [filter, setFilter] = useState<FilterType>("Recommended");
+  const {
+    data,
+    isLoading,
+    isFetched,
+    isError,
+    refetch,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useTransportation(params);
   const { isConnected } = useNetInfo();
-  const isEmpty = isFetched && !isLoading && data?.data.length === 0;
   const [isRefetching, setIsRefetching] = useState(false);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setIsRefetching(true);
     await refetch();
     setIsRefetching(false);
-  };
+  }, [refetch]);
+
+  const listings = useMemo(
+    () => data?.pages.flatMap((page) => page.data.listings) ?? [],
+    [data],
+  );
+
+  const listData = useMemo(
+    () => (isLoading ? createSkeletons(6) : listings),
+    [isLoading, listings],
+  );
+
+  const isEmpty = useMemo(
+    () => isFetched && !isLoading && listings.length === 0,
+    [isFetched, isLoading, listings],
+  );
 
   const renderItem = useCallback<ListRenderItem<Skeleton | Transportation>>(
     ({ item }) => {
@@ -54,9 +77,45 @@ export default function TransportationList({
     [],
   );
 
+  const handleEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const listFooterComponent = useMemo(
+    () =>
+      isFetchingNextPage ? (
+        <ActivityIndicator style={styles.footerLoader} color="#000" />
+      ) : null,
+    [isFetchingNextPage],
+  );
+
+  const emptyComponent = useMemo(
+    () => (
+      <ListEmptyState
+        isLoading={isLoading}
+        isConnected={isConnected}
+        isError={isError}
+        onRetry={refetch}
+        resourceName="transportation"
+        customNoResultsMessage="Oh no! There's no transportation option that matches the search or filter criteria."
+        isEmpty={isEmpty}
+      />
+    ),
+    [isConnected, isEmpty, isError, isLoading, refetch],
+  );
+
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+    ),
+    [handleRefresh, isRefetching],
+  );
+
   return (
     <FlatList<Skeleton | Transportation>
-      data={isLoading ? createSkeletons(6) : data?.data || []}
+      data={listData}
       keyExtractor={(item) => item.id}
       key="two-column-list"
       numColumns={2}
@@ -64,19 +123,16 @@ export default function TransportationList({
       contentContainerStyle={styles.listContent}
       showsVerticalScrollIndicator={false}
       renderItem={renderItem}
-      refreshControl={
-        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
-      }
-      ListEmptyComponent={
-        <ListEmptyState
-          isLoading={isLoading}
-          isConnected={isConnected}
-          onRetry={refetch}
-          resourceName="dining"
-          customNoResultsMessage="Oh no! There's no dining option that matches the search or filter criteria."
-          isEmpty={isEmpty}
-        />
-      }
+      onEndReached={handleEndReached}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={listFooterComponent}
+      initialNumToRender={6}
+      maxToRenderPerBatch={10}
+      windowSize={5}
+      removeClippedSubviews={Platform.OS === "android"}
+      updateCellsBatchingPeriod={50}
+      refreshControl={refreshControl}
+      ListEmptyComponent={emptyComponent}
     />
   );
 }
@@ -94,5 +150,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 6,
     maxWidth: "50%",
+  },
+  footerLoader: {
+    marginVertical: 20,
   },
 });

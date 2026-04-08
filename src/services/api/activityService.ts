@@ -2,8 +2,15 @@ import { Activity, PHILIPPINE_ACTIVITY_DATA } from "@/src/constants/activity";
 import { QueryParams } from "@/src/types/filter";
 
 export type ActivityResponse = {
-  data: Activity[];
-  total: number;
+  data: {
+    listings: Activity[];
+    pagination: {
+      count: number;
+      currentPage: number;
+      limit: number;
+      total: number;
+    };
+  };
 };
 
 export const activityService = {
@@ -49,9 +56,23 @@ export const activityService = {
     // console.log("API Response:", response.data);
     // return response.data;
 
+    const currentPage = Math.max(1, params.page ?? 1);
+    const limit = params.limit ?? 5;
+    const total = list.length;
+    const start = (currentPage - 1) * limit;
+    const end = start + limit;
+    const listings = list.slice(start, end);
+
     return {
-      data: list,
-      total: list.length,
+      data: {
+        listings,
+        pagination: {
+          count: listings.length,
+          currentPage,
+          limit,
+          total,
+        },
+      },
     };
   },
 

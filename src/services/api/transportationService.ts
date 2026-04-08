@@ -2,21 +2,23 @@ import {
   PHILIPPINE_TRANSPORTATION_DATA,
   Transportation,
 } from "@/src/constants/transportationList";
-
-export type GetTransportationParams = {
-  search?: string;
-  type?: "Ferry" | "Van" | "Flight" | "All";
-  sort?: "price_low" | "rating_high";
-};
+import { QueryParams } from "@/src/types/filter";
 
 export type TransportationResponse = {
-  data: Transportation[];
-  total: number;
+  data: {
+    listings: Transportation[];
+    pagination: {
+      count: number;
+      currentPage: number;
+      limit: number;
+      total: number;
+    };
+  };
 };
 
 const transportationService = {
   getTransportation: async (
-    params: GetTransportationParams,
+    params: QueryParams,
   ): Promise<TransportationResponse> => {
     await new Promise((r) => setTimeout(r, 1000));
 
@@ -39,9 +41,23 @@ const transportationService = {
       list.sort((a, b) => b.rating - a.rating);
     }
 
+    const currentPage = Math.max(1, params.page ?? 1);
+    const limitPerPage = params.limit ?? 6;
+    const total = list.length;
+    const start = (currentPage - 1) * limitPerPage;
+    const end = start + limitPerPage;
+    const listings = list.slice(start, end);
+
     return {
-      data: list,
-      total: list.length,
+      data: {
+        listings,
+        pagination: {
+          count: listings.length,
+          currentPage,
+          limit: limitPerPage,
+          total,
+        },
+      },
     };
   },
 

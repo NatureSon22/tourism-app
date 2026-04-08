@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: "auto",
     alignSelf: "center",
-    paddingBottom: 10, 
+    paddingBottom: 10,
   },
   versionText: {
     fontSize: 12,

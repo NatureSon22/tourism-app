@@ -13,7 +13,6 @@ import {
   Platform,
   RefreshControl,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import AccommodationCardSkeleton from "./AccommodationCardSkeleton";
@@ -32,36 +31,8 @@ export default function AccommodationList({ params }: AccommodationListProps) {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useAccommodations(
-    useMemo(
-      () => ({
-        search: params.search,
-        area: params.area,
-        sort: params.sort,
-        rating: params.rating,
-        type: params.type,
-        amenities: params.amenities,
-        subtypes: params.subtypes,
-        lat: params.lat,
-        lng: params.lng,
-        radius: params.radius,
-        page: params.page ?? 1,
-      }),
-      [
-        params.search,
-        params.area,
-        params.sort,
-        params.rating,
-        params.type,
-        params.amenities,
-        params.subtypes,
-        params.lat,
-        params.lng,
-        params.radius,
-        params.page,
-      ],
-    ),
-  );
+  } = useAccommodations(params);
+
   const { isConnected, isInternetReachable } = useNetInfo();
   const online = isConnected && isInternetReachable;
 
@@ -71,13 +42,16 @@ export default function AccommodationList({ params }: AccommodationListProps) {
 
   const isEmpty = isFetched && !isLoading && listings?.length === 0;
 
-  const handleEndReached = () => {
-    console.log("End reached. Has next page?", hasNextPage);
-    console.log("Is fetching next page?", isFetchingNextPage);
+  const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const listData = useMemo(
+    () => (isLoading ? createSkeletons(6) : listings),
+    [isLoading, listings],
+  );
 
   const renderItem = useCallback<ListRenderItem<Skeleton | Accommodation>>(
     ({ item }) => {
@@ -90,33 +64,37 @@ export default function AccommodationList({ params }: AccommodationListProps) {
     [],
   );
 
+  const refreshControl = useMemo(
+    () => (
+      <RefreshControl refreshing={isLoading && !!data} onRefresh={refetch} />
+    ),
+    [isLoading, data, refetch],
+  );
+
+  const footerComponent = useMemo(
+    () =>
+      isFetchingNextPage ? (
+        <ActivityIndicator style={styles.footerLoader} color="#000" />
+      ) : null,
+    [isFetchingNextPage],
+  );
+
   return (
     <FlatList<Skeleton | Accommodation>
-      // Show skeletons only on first load, otherwise show listings
-      data={isLoading ? createSkeletons(6) : listings}
+      data={listData}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
-      // Infinite Scroll Props
       onEndReached={handleEndReached}
-      onEndReachedThreshold={0.5} // Trigger when 50% from the bottom
-      ListFooterComponent={() =>
-        isFetchingNextPage ? (
-          <ActivityIndicator style={{ marginVertical: 20 }} color="#000" />
-        ) : (
-          <Text>Footer Area</Text>
-        )
-      }
-      // Optimization Props
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={footerComponent}
       initialNumToRender={5}
       maxToRenderPerBatch={10}
       windowSize={5}
       removeClippedSubviews={Platform.OS === "android"}
       contentContainerStyle={styles.content}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      ItemSeparatorComponent={Separator}
       showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={isLoading && !!data} onRefresh={refetch} />
-      }
+      refreshControl={refreshControl}
       ListEmptyComponent={
         <ListEmptyState
           isLoading={isLoading}
@@ -131,6 +109,8 @@ export default function AccommodationList({ params }: AccommodationListProps) {
   );
 }
 
+const Separator = () => <View style={styles.separator} />;
+
 const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
@@ -138,5 +118,8 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 20,
+  },
+  footerLoader: {
+    marginVertical: 20,
   },
 });

@@ -5,6 +5,7 @@ import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
@@ -12,6 +13,11 @@ import { SheetManager } from "react-native-actions-sheet";
 export default function Forum() {
   const handlePressFilter = () => {
     SheetManager.show("forum-filter-sheet");
+  };
+  const router = useRouter();
+
+  const handlePressCreate = () => {
+    router.push("/forum/experience");
   };
 
   return (
@@ -41,7 +47,7 @@ export default function Forum() {
           title=""
           prefixIcon={<FontAwesome6 name="add" size={18} color="white" />}
           style={styles.buttonStyle}
-          onPress={() => {}}
+          onPress={handlePressCreate}
         />
       </Screen>
     </SafeArea>

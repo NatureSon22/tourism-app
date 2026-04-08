@@ -1,5 +1,5 @@
 import { QueryParams } from "@/src/types/filter";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { diningService } from "../api/diningService";
 
 // 1. Dining Key Factory
@@ -13,18 +13,31 @@ export const diningKeys = {
 };
 
 export const useDining = (params: QueryParams) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: diningKeys.list(params),
-    queryFn: () => diningService.getDiningData(params),
+    queryFn: ({ pageParam = 1 }) =>
+      diningService.getDiningData({
+        ...params,
+        page: pageParam,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { currentPage, limit, total } = lastPage.data.pagination;
+      const itemsFetched = currentPage * limit;
+      return itemsFetched < total ? currentPage + 1 : undefined;
+    },
     select: (data) => ({
       ...data,
-      data: {
-        ...data.data,
-        listings: data.data.listings.map((diningItem: any) => ({
-          ...diningItem,
-          id: String(diningItem.id),
-        })),
-      },
+      pages: data.pages.map((page) => ({
+        ...page,
+        data: {
+          ...page.data,
+          listings: page.data.listings.map((diningItem: any) => ({
+            ...diningItem,
+            id: String(diningItem.id),
+          })),
+        },
+      })),
     }),
   });
 };

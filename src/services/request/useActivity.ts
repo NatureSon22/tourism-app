@@ -1,5 +1,10 @@
 import { QueryParams } from "@/src/types/filter";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { activityService } from "../api/activityService";
 
 export const activityKeys = {
@@ -11,15 +16,31 @@ export const activityKeys = {
 };
 
 export const useActivities = (params: QueryParams) => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: activityKeys.list(params),
-    queryFn: () => activityService.getAvailableActivities(params),
+    queryFn: ({ pageParam = 1 }) =>
+      activityService.getAvailableActivities({
+        ...params,
+        page: pageParam,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { currentPage, limit, total } = lastPage.data.pagination;
+      const itemsFetched = currentPage * limit;
+      return itemsFetched < total ? currentPage + 1 : undefined;
+    },
     placeholderData: (prev) => prev,
     select: (data) => ({
       ...data,
-      data: data.data.map((act) => ({
-        ...act,
-        id: String(act.id),
+      pages: data.pages.map((page) => ({
+        ...page,
+        data: {
+          ...page.data,
+          listings: page.data.listings.map((act) => ({
+            ...act,
+            id: String(act.id),
+          })),
+        },
       })),
     }),
   });

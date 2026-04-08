@@ -9,7 +9,8 @@ import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
-import React, { useEffect, useState } from "react";
+import type { QueryParams } from "@/src/types/filter";
+import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
@@ -17,13 +18,15 @@ export default function EventPage() {
   const { openSheet } = useSingleSheet();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
-  const { currentSort, updateOptions, resetCategory } = useFilterStore(
-    useShallow((state) => ({
-      updateOptions: state.updateOptions,
-      currentSort: state.categories.event.options.sort,
-      resetCategory: state.resetCategory,
-    })),
-  );
+  const { currentSort, currentOptions, updateOptions, resetCategory } =
+    useFilterStore(
+      useShallow((state) => ({
+        updateOptions: state.updateOptions,
+        currentSort: state.categories.event.options.sort,
+        currentOptions: state.categories.event.options,
+        resetCategory: state.resetCategory,
+      })),
+    );
 
   useEffect(() => {
     return () => {
@@ -38,6 +41,18 @@ export default function EventPage() {
       onSelect: (val: string) => updateOptions("event", { sort: val }),
     });
   };
+
+  const params = useMemo<QueryParams>(
+    () => ({
+      search: debouncedSearch,
+      area: currentOptions.area,
+      sort: currentSort,
+      type: currentOptions.type.type,
+      subtypes: currentOptions.type.subtypes,
+      amenities: currentOptions.amenities,
+    }),
+    [debouncedSearch, currentOptions, currentSort],
+  );
 
   return (
     <SafeArea edges={["bottom", "top"]}>
@@ -54,7 +69,7 @@ export default function EventPage() {
           containerStyle={styles.filterBarPadding}
         />
 
-        <EventListing search={debouncedSearch} />
+        <EventListing params={params} />
       </Screen>
     </SafeArea>
   );
