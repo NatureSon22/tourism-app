@@ -46,3 +46,19 @@ export type ForumPost = {
   media?: Attachment[]; // Media added to the main post
   type: string;
 };
+
+export type Community = {
+  id: string;
+  name: string;
+};
+
+export type Location = {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+};
+
+// example: My Current Location
+// example: Bonifacio High Street, Central BGC

@@ -53,8 +53,7 @@ export default function Experience() {
       <KeyboardAvoidingView
         style={styles.keyboardAvoiding}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 80}
-        
+        // keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 80}
       >
         <Screen style={styles.screen}>
           <ExperienceHeader
@@ -67,15 +66,6 @@ export default function Experience() {
             keyboardDismissMode="on-drag"
             showsVerticalScrollIndicator={false}
           >
-            {mediaCount > 0 && (
-              <ExperienceMediaPreview
-                selectedImages={selectedImages}
-                currentPage={currentPage}
-                onPageSelected={handlePageSelected}
-                removeImage={removeImage}
-              />
-            )}
-
             <ExperienceContent
               title={title}
               content={content}
@@ -84,6 +74,14 @@ export default function Experience() {
               titleCountLabel={`${title.length} chars`}
               contentCountLabel={contentCountLabel}
             />
+            {mediaCount > 0 && (
+              <ExperienceMediaPreview
+                selectedImages={selectedImages}
+                currentPage={currentPage}
+                onPageSelected={handlePageSelected}
+                removeImage={removeImage}
+              />
+            )}
           </ScrollView>
 
           <ExperienceFooter
@@ -108,6 +106,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 10,
     paddingBottom: 20,
     gap: 24,

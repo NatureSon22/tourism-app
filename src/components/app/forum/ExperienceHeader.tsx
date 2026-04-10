@@ -3,8 +3,9 @@ import { USER_PROFILE_PLACEHOLDER } from "@/src/constants/assetsPath";
 import { Colors, Typography } from "@/src/constants/styles";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type ExperienceHeaderProps = {
   userName?: string;
@@ -15,9 +16,16 @@ export default function ExperienceHeader({
   userName,
   profilePictureUrl,
 }: ExperienceHeaderProps) {
+  const router = useRouter();
+
+  const handleSelectCommunity = () => {
+    router.push("/forum/community");
+  };
+
   return (
     <View style={styles.header}>
       <HeaderWithBack />
+
       <View style={styles.profileRow}>
         <Image
           style={styles.profileImage}
@@ -33,9 +41,12 @@ export default function ExperienceHeader({
           size={16}
           color={Colors.text}
         />
-        <Text numberOfLines={1} style={styles.profileText}>
-          Community
-        </Text>
+
+        <Pressable style={styles.button} onPress={handleSelectCommunity}>
+          <Text numberOfLines={1} style={styles.buttonText}>
+            Select Community
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -43,7 +54,6 @@ export default function ExperienceHeader({
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: 10,
     gap: 16,
   },
   profileRow: {
@@ -51,6 +61,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     flexWrap: "wrap",
+    paddingHorizontal: 10,
   },
   profileImage: {
     width: 40,
@@ -61,5 +72,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.text,
     fontFamily: Typography.family.regular,
+  },
+  button: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#EEEEEE",
+    borderRadius: 14,
+  },
+  buttonText: {
+    fontSize: 10,
+    color: Colors.text,
+    fontFamily: Typography.family.medium,
   },
 });

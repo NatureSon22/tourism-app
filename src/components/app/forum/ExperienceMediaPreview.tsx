@@ -48,7 +48,7 @@ export default function ExperienceMediaPreview({
         ))}
       </PagerView>
       <View style={styles.mediaIndicatorRow}>
-        <Text style={styles.mediaIndicatorText}>Media</Text>
+        <Text style={styles.mediaIndicatorText}>Attachments</Text>
         <Text style={styles.mediaIndicatorCounter}>
           {selectedImages.length > 0
             ? `${currentPage + 1} / ${selectedImages.length}`

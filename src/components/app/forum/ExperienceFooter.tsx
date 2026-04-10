@@ -1,6 +1,7 @@
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
-import { Feather, FontAwesome6 } from "@expo/vector-icons";
+import { Feather, FontAwesome5, FontAwesome6 } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -19,20 +20,29 @@ export default function ExperienceFooter({
   onPost,
   mediaCount,
 }: ExperienceFooterProps) {
+  const router = useRouter();
+
+  const handlePressAction = () => {
+    router.push("/forum/location");
+  };
+
   return (
-    <HStack justifyContent="space-between">
+    <HStack justifyContent="space-between" style={styles.footerContainer}>
       <HStack style={styles.footerActions}>
-        <Pressable onPress={onCapture} style={styles.iconButton}>
-          <Feather name="camera" size={22} color={Colors.text} />
+        <Pressable onPress={() => handlePressAction()}>
+          <FontAwesome5 name="running" size={20} color={Colors.primary} />
         </Pressable>
-        <Pressable onPress={onPickImages} style={styles.iconButton}>
-          <FontAwesome6 name="images" size={22} color={Colors.text} />
+
+        <Pressable onPress={() => handlePressAction()}>
+          <FontAwesome6 name="location-dot" size={20} color={Colors.primary} />
         </Pressable>
-        {mediaCount > 0 && (
-          <Text style={styles.footerMediaCount}>
-            {mediaCount} media selected
-          </Text>
-        )}
+
+        <Pressable onPress={onCapture}>
+          <Feather name="camera" size={20} color={Colors.primary} />
+        </Pressable>
+        <Pressable onPress={onPickImages}>
+          <FontAwesome6 name="images" size={20} color={Colors.primary} />
+        </Pressable>
       </HStack>
 
       <View style={styles.footerActionRow}>
@@ -60,9 +70,15 @@ export default function ExperienceFooter({
 }
 
 const styles = StyleSheet.create({
+  footerContainer: {
+    borderTopWidth: 1,
+    paddingVertical: 3,
+    borderColor: Colors.border,
+  },
   footerActions: {
-    gap: 16,
+    gap: 20,
     alignItems: "center",
+    justifyContent: "center",
   },
   footerMediaCount: {
     marginLeft: 8,
@@ -74,18 +90,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     alignItems: "flex-end",
   },
-  iconButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: Colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   postButton: {
     backgroundColor: Colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderRadius: 14,
   },
   postButtonPressed: {
@@ -95,9 +103,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.border,
   },
   postButtonText: {
-    color: Colors.surface,
     fontFamily: Typography.family.semiBold,
-    fontSize: 14,
+    fontSize: 11,
+    color: Colors.textOnPrimary,
   },
   postButtonTextDisabled: {
     color: Colors.textMuted,

@@ -10,7 +10,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="index"
+      initialRouteName="forum"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
