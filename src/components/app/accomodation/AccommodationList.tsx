@@ -1,8 +1,8 @@
 import AccommodationCard from "@/src/components/app/accomodation/AccommodationCard";
 import ListEmptyState from "@/src/components/app/ListEmptyState";
 import { useAccommodations } from "@/src/services/request/useAccomodation";
-import { Accommodation } from "@/src/types/accommodation";
 import { QueryParams } from "@/src/types/filter";
+import { ACCOMMODATION } from "@/src/types/listingTypes";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useMemo } from "react";
@@ -15,6 +15,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+import ReloadPage from "../ReloadPage";
 import AccommodationCardSkeleton from "./AccommodationCardSkeleton";
 
 type AccommodationListProps = {
@@ -53,7 +54,7 @@ export default function AccommodationList({ params }: AccommodationListProps) {
     [isLoading, listings],
   );
 
-  const renderItem = useCallback<ListRenderItem<Skeleton | Accommodation>>(
+  const renderItem = useCallback<ListRenderItem<Skeleton | ACCOMMODATION>>(
     ({ item }) => {
       if ("isSkeleton" in item) {
         return <AccommodationCardSkeleton />;
@@ -79,10 +80,19 @@ export default function AccommodationList({ params }: AccommodationListProps) {
     [isFetchingNextPage],
   );
 
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
+
   return (
-    <FlatList<Skeleton | Accommodation>
+    <FlatList<Skeleton | ACCOMMODATION>
       data={listData}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={renderItem}
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.5}
@@ -98,11 +108,12 @@ export default function AccommodationList({ params }: AccommodationListProps) {
       ListEmptyComponent={
         <ListEmptyState
           isLoading={isLoading}
-          isConnected={online}
-          isError={isError}
           isEmpty={isEmpty}
           resourceName="accommodations"
           onRetry={refetch}
+          isConnected={online}
+          isError={isError}
+          disableOfflineReload={true}
         />
       }
     />

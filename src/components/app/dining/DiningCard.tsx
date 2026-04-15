@@ -1,27 +1,39 @@
-import { Dining } from "@/src/constants/dining";
 import { Colors, Typography } from "@/src/constants/styles";
+import { DINING } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
+import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ImageGrid from "../ImageGrid";
 
-type Props = Dining;
+type Props = DINING;
 
 function DiningCard({
   id,
-  name,
-  location,
+  title,
+  addresses,
   distanceFromCityCenter,
-  types,
-  images,
-  price,
-  rating,
-  reviews,
-  books,
+  categories,
+  media,
+  base_price,
+  rating = 0,
+  reviews = 0,
+  thumbnail,
+  books = 0,
 }: Props) {
   const router = useRouter();
+  const types =
+    categories && categories.length > 0
+      ? categories.map((c) => c.name)
+      : ["Category not specified"];
+  const images =
+    media && media.length > 0
+      ? media.map((m) => m.src)
+      : thumbnail
+        ? [thumbnail]
+        : [];
 
   const handlePress = () => {
     router.push({ pathname: `/dining/[id]`, params: { id } });
@@ -31,7 +43,7 @@ function DiningCard({
     <Pressable style={styles.card} onPress={handlePress}>
       <View style={styles.nameRow}>
         <Text style={styles.name} numberOfLines={1}>
-          {name}
+          {title}
         </Text>
         <View style={styles.distanceBadge}>
           <Text style={styles.distanceText}>
@@ -67,9 +79,11 @@ function DiningCard({
       {/* Row 5: Location + price */}
       <View style={styles.footer}>
         <Text style={styles.location} numberOfLines={1}>
-          {location}
+          {addresses && addresses.length > 0
+            ? formatListingAddress(addresses[0], "short")
+            : "Location not available"}
         </Text>
-        <Text style={styles.price}>{formatCurrency(price)}</Text>
+        <Text style={styles.price}>{formatCurrency(base_price)}</Text>
       </View>
     </Pressable>
   );

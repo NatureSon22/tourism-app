@@ -21,7 +21,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_BACKEND_URL || "http://localhost:3333",
+  baseURL: process.env.EXPO_PUBLIC_BACKEND_URL || "http://localhost:3000/",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

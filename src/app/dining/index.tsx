@@ -10,6 +10,7 @@ import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
 import { QueryParams } from "@/src/types/filter";
+import { useLocalSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
@@ -18,6 +19,7 @@ export default function DiningPage() {
   const { openSheet } = useSingleSheet();
   const [searchLocal, setSearchLocal] = useState("");
   const debouncedSearch = useDebounce(searchLocal);
+  const { moduleId } = useLocalSearchParams<{ moduleId: string }>();
 
   const { diningState, updateOptions, resetCategory, setSearch } =
     useFilterStore(
@@ -57,8 +59,9 @@ export default function DiningPage() {
       subtypes: diningState.options.type.subtypes,
       amenities: diningState.options.amenities,
       page: 1,
+      moduleId: moduleId,
     }),
-    [diningState],
+    [diningState, moduleId],
   );
 
   return (

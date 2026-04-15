@@ -1,4 +1,5 @@
 import ListEmptyState from "@/src/components/app/ListEmptyState";
+import ReloadPage from "@/src/components/app/ReloadPage";
 import { ForumPost } from "@/src/constants/forum";
 import { ForumType } from "@/src/constants/forumTypes";
 import { useGetAllForums } from "@/src/services/request/useForum";
@@ -38,6 +39,15 @@ export default function ForumList({ type }: ForumListProps) {
     [],
   );
 
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
+
   return (
     <FlatList<Skeleton | ForumPost>
       data={isLoading ? createSkeletons(3) : forums}
@@ -55,6 +65,7 @@ export default function ForumList({ type }: ForumListProps) {
           isEmpty={isEmpty}
           resourceName="forums"
           onRetry={refetch}
+          disableOfflineReload={true}
         />
       }
       contentContainerStyle={styles.content}

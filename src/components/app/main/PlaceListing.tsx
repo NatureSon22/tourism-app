@@ -7,6 +7,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import ListEmptyState from "../ListEmptyState";
+import ReloadPage from "../ReloadPage";
 import PlaceCard from "./PlaceCard";
 import PlaceCardSkeleton from "./PlaceCardSkeleton";
 
@@ -16,15 +17,14 @@ type PlaceListProps = {
 
 type FilterType = "Recommended" | "Nearby";
 
-// TODO: fix when there is only 1 item
-
 export default function PlaceListing({ searchQuery }: PlaceListProps) {
   const [filter, setFilter] = useState<FilterType>("Recommended");
   const { data, isLoading, isFetched, refetch } = useGetPlaces({
     search: searchQuery,
     filter,
   });
-  const { isConnected } = useNetInfo();
+  const { isConnected, isInternetReachable } = useNetInfo();
+  const online = isConnected && isInternetReachable;
   const isEmpty = isFetched && !isLoading && data?.data.length === 0;
   const [isRefetching, setIsRefetching] = useState(false);
 
@@ -33,6 +33,15 @@ export default function PlaceListing({ searchQuery }: PlaceListProps) {
     await refetch();
     setIsRefetching(false);
   };
+
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -66,11 +75,12 @@ export default function PlaceListing({ searchQuery }: PlaceListProps) {
         ListEmptyComponent={
           <ListEmptyState
             isLoading={isLoading}
-            isConnected={isConnected}
+            isConnected={online}
             onRetry={refetch}
             resourceName="events"
             customNoResultsMessage="No events found."
             isEmpty={isEmpty}
+            disableOfflineReload={true}
           />
         }
       />

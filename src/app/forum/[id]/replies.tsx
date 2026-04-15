@@ -7,6 +7,17 @@ import {
   useCommentForum,
   useGetForumDetails,
 } from "@/src/services/request/useForum";
+import {
+  connectForumSocket,
+  disconnectForumSocket,
+  emitForumReply,
+  emitForumReplyTyping,
+  joinForumRoom,
+  leaveForumRoom,
+  onForumReply,
+  onForumReplyTyping,
+  type ForumReplyTypingPayload,
+} from "@/src/services/socket/forumSocket";
 import useAuthStore from "@/src/stores/authStore";
 import {
   buildThreadedReplies,
@@ -16,7 +27,13 @@ import {
   ThreadReply,
 } from "@/src/utils/forumReplies";
 import { Stack, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -45,12 +62,124 @@ export default function ForumReplies() {
   );
   const currentUser = useAuthStore((state) => state.user);
   const replyMutation = useCommentForum();
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const typingTimeouts = useRef<Record<string, ReturnType<typeof setTimeout>>>(
+    {},
+  );
+  const typingDebounceTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
     if (forum) {
       setReplies(buildThreadedReplies(forum.comments || []));
     }
   }, [forum]);
+
+  const handleSocketReply = useCallback((incomingReply: ThreadReply) => {
+    setReplies((current) => {
+      if (current.some((reply) => reply.id === incomingReply.id)) {
+        return current;
+      }
+
+      const parentDepth = incomingReply.parentId
+        ? (current.find((reply) => reply.id === incomingReply.parentId)
+            ?.depth ?? 0)
+        : 0;
+
+      return insertThreadReply(
+        {
+          ...incomingReply,
+          depth: incomingReply.parentId ? parentDepth + 1 : 0,
+        },
+        incomingReply.parentId ?? null,
+        current,
+      );
+    });
+  }, []);
+
+  const handleRemoteTyping = useCallback(
+    (payload: ForumReplyTypingPayload) => {
+      if (payload.userId === currentUser?.id) return;
+
+      setTypingUsers((current) => {
+        if (current.includes(payload.userName)) return current;
+        return [...current, payload.userName];
+      });
+
+      const timeoutKey = String(payload.userId);
+      if (typingTimeouts.current[timeoutKey]) {
+        clearTimeout(typingTimeouts.current[timeoutKey]);
+      }
+
+      typingTimeouts.current[timeoutKey] = setTimeout(() => {
+        setTypingUsers((current) =>
+          current.filter((name) => name !== payload.userName),
+        );
+        delete typingTimeouts.current[timeoutKey];
+      }, 3000);
+    },
+    [currentUser?.id],
+  );
+
+  const handleTyping = useCallback(() => {
+    if (!forum || !currentUser) return;
+
+    if (typingDebounceTimer.current) {
+      clearTimeout(typingDebounceTimer.current);
+    }
+
+    typingDebounceTimer.current = setTimeout(() => {
+      emitForumReplyTyping({
+        postId: forum.id,
+        userId: currentUser.id,
+        userName: currentUser.userName,
+        clientId: Date.now(),
+      }).catch((error: unknown) => {
+        console.warn("Failed to emit typing event", error);
+      });
+      typingDebounceTimer.current = null;
+    }, 300);
+  }, [currentUser, forum]);
+
+  useEffect(() => {
+    if (!idParam) {
+      return;
+    }
+
+    const timeouts = typingTimeouts.current;
+    let unsubscribe: (() => void) | undefined;
+    let typingUnsubscribe: (() => void) | undefined;
+    const roomId = String(idParam);
+
+    const setupSocket = async () => {
+      try {
+        await connectForumSocket();
+        await joinForumRoom(roomId);
+        unsubscribe = await onForumReply(roomId, handleSocketReply);
+        typingUnsubscribe = await onForumReplyTyping(
+          roomId,
+          handleRemoteTyping,
+        );
+      } catch (error) {
+        console.warn("Forum socket setup failed", error);
+      }
+    };
+
+    setupSocket();
+
+    return () => {
+      unsubscribe?.();
+      typingUnsubscribe?.();
+      Object.values(timeouts).forEach(clearTimeout);
+      if (typingDebounceTimer.current) {
+        clearTimeout(typingDebounceTimer.current);
+        typingDebounceTimer.current = null;
+      }
+      leaveForumRoom(roomId);
+      disconnectForumSocket();
+    };
+  }, [handleRemoteTyping, handleSocketReply, idParam]);
 
   const replyChildrenMap = useMemo(
     () => groupRepliesByParent(replies),
@@ -145,6 +274,15 @@ export default function ForumReplies() {
         },
       },
     );
+
+    emitForumReply({
+      postId: forum.id,
+      comment: trimmed,
+      parentId: activeReplyParentId,
+      clientId: newReply.id,
+    }).catch((error) => {
+      console.warn("Failed to emit forum reply", error);
+    });
   }, [
     activeReplyParentId,
     activeReplyTarget,
@@ -196,6 +334,13 @@ export default function ForumReplies() {
             }
             suffixContainerStyle={{ flex: 0.4 }}
           />
+          {typingUsers.length > 0 ? (
+            <Text style={styles.typingIndicator}>
+              {typingUsers.length === 1
+                ? `${typingUsers[0]} is replying...`
+                : `${typingUsers.join(", ")} are replying...`}
+            </Text>
+          ) : null}
           <FlatList
             data={renderedReplies}
             keyExtractor={(item) => item.id.toString()}
@@ -220,6 +365,7 @@ export default function ForumReplies() {
         <ReplyComposer
           value={inputValue}
           onChangeText={setInputValue}
+          onTyping={handleTyping}
           onSubmit={handleSubmitReply}
           placeholder={
             activeReplyTarget
@@ -291,6 +437,12 @@ const styles = StyleSheet.create({
     fontFamily: Typography.family.medium,
     color: Colors.textMuted,
     marginTop: 12,
+  },
+  typingIndicator: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontFamily: Typography.family.medium,
+    marginBottom: 12,
   },
   footer: {
     width: "100%",

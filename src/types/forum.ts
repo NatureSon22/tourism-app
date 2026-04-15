@@ -1,55 +1,17 @@
-import { User } from "../stores/authStore";
 type MediaType = "image" | "video";
 
-export type Attachment = {
+export type Media = {
   id: string;
   type: MediaType;
-  url: string;
-  thumbnailUrl?: string; // Essential for video previews
+  src: string;
+  alt?: string;
 };
 
 export type Author = {
-  id: number;
-  name: string;
-  avatarUrl: string;
-};
-
-export type Reply = {
-  id: number;
-  content: string;
-  author: Partial<User>;
-  createdAt: Date;
-  likes: number;
-  dislikes: number;
-  viewers: number;
-  parentId?: number | null;
-  media?: Attachment[];
-};
-
-export type Comment = Reply & {
-  replies?: Reply[];
-};
-
-export type ForumPost = {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-  place: string;
-  author: Partial<User>;
-  viewers: number;
-  likes: number;
-  dislikes: number;
-  createdAt: Date;
-  comments: Comment[];
-  commentCount: number;
-  media?: Attachment[]; // Media added to the main post
-  type: string;
-};
-
-export type Community = {
   id: string;
   name: string;
+  avatar?: string;
+  isVerified?: boolean;
 };
 
 export type Location = {
@@ -60,5 +22,53 @@ export type Location = {
   lng: number;
 };
 
-// example: My Current Location
-// example: Bonifacio High Street, Central BGC
+export type ForumComment = {
+  id: string;
+  parentId: string | null;
+  content: string;
+  author: Author;
+  media?: Media[];
+  stats: {
+    likes: number;
+    dislikes: number;
+  };
+  userInteractions: {
+    hasLiked: boolean;
+    hasDisliked: boolean;
+  };
+  replies?: ForumComment[];
+  createdAt: string;
+};
+
+export type ForumPost = {
+  id: string;
+  title: string;
+  content: string;
+
+  // Link to your taxonomies table (e.g., 'Safety Tips', 'Review')
+  category: string;
+
+  // Link to the specific module (e.g., 'Accommodation')
+  moduleId: string;
+
+  author: Author;
+  location?: Location;
+  media?: Media[];
+
+  stats: {
+    viewers: number;
+    likes: number;
+    dislikes: number;
+    commentCount: number;
+  };
+
+  userInteractions: {
+    hasLiked: boolean;
+    hasDisliked: boolean;
+    hasBookmarked: boolean; // Managed by your polymorphic 'bookmarks' table
+  };
+
+  comments: ForumComment[]; // Initial set of top-level comments
+  createdAt: string;
+  updatedAt: string;
+};

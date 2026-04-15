@@ -1,9 +1,12 @@
+import api from "@/src/config/axios";
 import { Activity, PHILIPPINE_ACTIVITY_DATA } from "@/src/constants/activity";
 import { QueryParams } from "@/src/types/filter";
+import { ACTIVITY } from "@/src/types/listingTypes";
+import { buildQueryString } from "@/src/utils/buildQueryString";
 
 export type ActivityResponse = {
   data: {
-    listings: Activity[];
+    listings: ACTIVITY[];
     pagination: {
       count: number;
       currentPage: number;
@@ -21,59 +24,10 @@ export const activityService = {
   getAvailableActivities: async (
     params: QueryParams,
   ): Promise<ActivityResponse> => {
-    const search = (params.search ?? "").trim().toLowerCase();
+    const qs = buildQueryString(params);
 
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 800));
-
-    let list = [...(PHILIPPINE_ACTIVITY_DATA ?? [])];
-
-    // 1. Filter by Search
-    if (search) {
-      list = list.filter((a) => {
-        const name = (a.name ?? "").toLowerCase();
-        const location = (a.location ?? "").toLowerCase();
-        return name.includes(search) || location.includes(search);
-      });
-    }
-
-    // 2. Filter by Area
-    if (params.area && params.area.length > 0) {
-      list = list.filter((a) =>
-        params.area!.some((area) =>
-          a.location.toLowerCase().includes(area.toLowerCase()),
-        ),
-      );
-    }
-
-    // 3. Apply Sorting
-    if (params.sort === "rating") {
-      list.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-    }
-
-    // const qs = buildQueryString(params);
-    // const response = await api.get(`/consumer/listings?${qs.toString()}`);
-    // console.log("API Response:", response.data);
-    // return response.data;
-
-    const currentPage = Math.max(1, params.page ?? 1);
-    const limit = params.limit ?? 5;
-    const total = list.length;
-    const start = (currentPage - 1) * limit;
-    const end = start + limit;
-    const listings = list.slice(start, end);
-
-    return {
-      data: {
-        listings,
-        pagination: {
-          count: listings.length,
-          currentPage,
-          limit,
-          total,
-        },
-      },
-    };
+    const response = await api.get(`/consumer/listings?${qs.toString()}`);
+    return response.data;
   },
 
   /**

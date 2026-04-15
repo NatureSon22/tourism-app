@@ -3,24 +3,24 @@ import { Colors, Typography } from "@/src/constants/styles";
 import { useSafeNavigation } from "@/src/hooks/useSafeNavigation";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
-import type { Accommodation } from "@/src/types/accommodation";
+import { ACCOMMODATION } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-type Props = Accommodation;
+type Props = ACCOMMODATION;
 
 function AccommodationCard({
   id,
-  imageUrl,
+  base_price,
+  thumbnail,
   title,
-  location,
-  pricePerNight,
+  addresses,
+  distanceFromCityCenter,
   rating,
   reviews,
-  distanceFromCityCenter,
 }: Props) {
   const router = useSafeNavigation();
 
@@ -32,7 +32,7 @@ function AccommodationCard({
     <Pressable style={styles.card} onPress={handlePress}>
       <HStack gap={17} alignItems="flex-start">
         <Image
-          source={{ uri: imageUrl ?? mockAccommodation[0].imageUrl }}
+          source={{ uri: thumbnail ?? mockAccommodation[0].imageUrl }}
           contentFit="cover"
           style={styles.image}
         />
@@ -43,7 +43,7 @@ function AccommodationCard({
           </Text>
 
           <Text style={styles.location} numberOfLines={1}>
-            {location ?? mockAccommodation[0].location}
+            {"Location not available"}
           </Text>
 
           <VStack gap={0} style={styles.flexStart}>
@@ -69,8 +69,9 @@ function AccommodationCard({
 
           <Text style={styles.price}>
             {formatCurrency(
-              pricePerNight ?? mockAccommodation[0].pricePerNight ?? 0,
+              base_price ?? mockAccommodation[0].pricePerNight ?? 0,
             )}
+            {/* basePrice */}
           </Text>
         </VStack>
       </HStack>

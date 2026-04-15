@@ -1,5 +1,5 @@
-import { QueryParams } from "@/src/types/filter";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { QueryByIdParams, QueryParams } from "@/src/types/filter";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { accommodationService } from "../api/accommodationService";
 
 export const accommodationKeys = {
@@ -30,5 +30,14 @@ export const useAccommodations = (params: QueryParams) => {
       // If we haven't reached the total yet, go to the next page
       return itemsFetched < total ? currentPage + 1 : undefined;
     },
+  });
+};
+
+export const useAccommodationDetails = (id: QueryByIdParams) => {
+  return useQuery({
+    queryKey: accommodationKeys.detail(id.id),
+    queryFn: () => accommodationService.getAccommodationDetails(id),
+    enabled: !!id.id,
+    staleTime: 1000 * 60 * 5,
   });
 };

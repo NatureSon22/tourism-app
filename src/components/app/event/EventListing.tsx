@@ -1,6 +1,6 @@
-import type { Event } from "@/src/constants/eventListing";
 import { useEvents } from "@/src/services/request/useEvent";
 import type { QueryParams } from "@/src/types/filter";
+import { EVENT } from "@/src/types/listingTypes";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useMemo, useState } from "react";
@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import ItemSeparator from "../../ui/ItemSeparator";
 import ListEmptyState from "../ListEmptyState";
+import ReloadPage from "../ReloadPage";
 import EventCard from "./EventCard";
 import EventCardSkeleton from "./EventCardSkeleton";
 
@@ -31,7 +32,8 @@ export default function EventListing({ params }: EventListingProps) {
     isFetchingNextPage,
     fetchNextPage,
   } = useEvents(params);
-  const { isConnected } = useNetInfo();
+  const { isConnected, isInternetReachable } = useNetInfo();
+  const online = isConnected && isInternetReachable;
   const [isRefetching, setIsRefetching] = useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -70,16 +72,26 @@ export default function EventListing({ params }: EventListingProps) {
     [isFetchingNextPage],
   );
 
-  const renderItem = useCallback<ListRenderItem<Skeleton | Event>>(
+  const renderItem = useCallback<ListRenderItem<Skeleton | EVENT>>(
     ({ item }) => {
       if ("isSkeleton" in item) return <EventCardSkeleton />;
+
       return <EventCard {...item} />;
     },
     [],
   );
 
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
+
   return (
-    <FlatList<Skeleton | Event>
+    <FlatList<Skeleton | EVENT>
       data={listData}
       keyExtractor={(item) => item.id.toString()}
       renderItem={renderItem}
@@ -99,12 +111,13 @@ export default function EventListing({ params }: EventListingProps) {
       ListEmptyComponent={
         <ListEmptyState
           isLoading={isLoading}
-          isConnected={isConnected}
+          isConnected={online}
           isError={isError}
           onRetry={handleRefresh}
           resourceName="events"
           customNoResultsMessage="No events found."
           isEmpty={isEmpty}
+          disableOfflineReload={true}
         />
       }
     />

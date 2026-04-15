@@ -28,6 +28,8 @@ type ReplyComposerProps = {
   disabled?: boolean;
   activeReplyTarget?: string | null;
   onCancelReply: () => void;
+  onTyping?: () => void;
+  onStopTyping?: () => void;
 };
 
 export default function ReplyComposer({
@@ -39,6 +41,8 @@ export default function ReplyComposer({
   disabled = false,
   activeReplyTarget,
   onCancelReply,
+  onTyping,
+  onStopTyping,
 }: ReplyComposerProps) {
   const author = useAuthStore((state) => state.user);
   const [isFocused, setIsFocused] = useState(false);
@@ -84,6 +88,7 @@ export default function ReplyComposer({
     if (value.length === 0 && selectedImages.length === 0) {
       setIsFocused(false);
     }
+    onStopTyping?.();
   };
 
   const handleSend = () => {
@@ -92,6 +97,7 @@ export default function ReplyComposer({
       imageUris: selectedImages.length > 0 ? selectedImages : undefined,
     });
     setSelectedImages([]);
+    onStopTyping?.();
   };
 
   return (
@@ -146,7 +152,10 @@ export default function ReplyComposer({
             placeholder={placeholder}
             placeholderTextColor={Colors.textMuted}
             value={value}
-            onChangeText={onChangeText}
+            onChangeText={(text) => {
+              onChangeText(text);
+              onTyping?.();
+            }}
             onFocus={handleFocus}
             onBlur={handleBlur}
             multiline

@@ -10,6 +10,7 @@ type ListEmptyStateProps = {
   resourceName?: string;
   customNoResultsMessage?: string;
   isEmpty: boolean;
+  disableOfflineReload?: boolean;
 };
 
 export default function ListEmptyState({
@@ -19,14 +20,14 @@ export default function ListEmptyState({
   onRetry,
   resourceName = "results",
   customNoResultsMessage,
-
+  disableOfflineReload = false,
   isEmpty,
 }: ListEmptyStateProps) {
   if (isLoading) {
     return null;
   }
 
-  if (isConnected === false || isError) {
+  if ((isConnected === false && !disableOfflineReload) || isError) {
     return (
       <ReloadPage
         refetch={onRetry}

@@ -1,43 +1,57 @@
-import { Event } from "@/src/constants/eventListing";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import { EVENT } from "@/src/types/listingTypes";
+import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { memo, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-type EventCardProps = Event & { formattedDate?: string };
+type EventCardProps = EVENT & { formattedDate?: string };
 
 function EventCard({
-  name,
-  location,
-  date,
-  imageUrl,
-  types,
+  id,
+  title,
+  thumbnail,
+  addresses,
+  categories,
   formattedDate,
 }: EventCardProps) {
   const router = useRouter();
   const [showAllTypes, setShowAllTypes] = useState(false);
+  const types = useMemo(
+    () =>
+      categories && categories.length > 0
+        ? categories.map((category) => category.name)
+        : [],
+    [categories],
+  );
   const hasMoreTypes = types.length > 2;
   const visibleTypes = useMemo(
     () => (showAllTypes ? types : types.slice(0, 2)),
     [showAllTypes, types],
   );
 
+  const location = addresses?.length
+    ? formatListingAddress(addresses[0], "short")
+    : "Location not available";
+
   const handlePress = () => {
-    router.push({ pathname: "/event/[id]", params: { id: name } });
+    router.push({ pathname: "/event/[id]", params: { id: String(id) } });
   };
 
   return (
-    <Pressable style={styles.card} onPress={handlePress}>
+    <View style={styles.card}>
       <HStack gap={16} alignItems="center">
         {/* Event Image */}
-        <Image source={imageUrl} style={styles.image} contentFit="cover" />
+        <Pressable style={styles.image} onPress={handlePress}>
+          <Image source={{ uri: thumbnail }} contentFit="cover" />
+        </Pressable>
 
         <VStack style={styles.content} gap={4}>
           <Text style={styles.title} numberOfLines={1}>
-            {name}
+            {title}
           </Text>
           <Text style={styles.location} numberOfLines={1}>
             {location}
@@ -45,7 +59,15 @@ function EventCard({
           <Text style={styles.date}>{formattedDate}</Text>
 
           {/* Tags Section */}
-          <View style={styles.tagRow}>
+          <ScrollView
+            horizontal
+            // This is the secret: give the ScrollView vertical padding
+            // so the touchable area is larger (around 40-44px)
+
+            showsHorizontalScrollIndicator={false}
+            // Disable the parent Pressable when touching the tags
+            onTouchStart={(e) => e.stopPropagation()}
+          >
             {visibleTypes.map((type, idx) => (
               <View
                 key={`${type}-${idx}`}
@@ -69,10 +91,10 @@ function EventCard({
                 </Text>
               </Pressable>
             )}
-          </View>
+          </ScrollView>
         </VStack>
       </HStack>
-    </Pressable>
+    </View>
   );
 }
 

@@ -8,12 +8,6 @@ import {
 import { Alert } from "react-native";
 import eventService from "../api/eventService";
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "long",
-  day: "numeric",
-  year: "numeric",
-});
-
 const eventKeys = {
   all: ["events"] as const,
   lists: () => [...eventKeys.all, "list"] as const,
@@ -45,8 +39,7 @@ export const useEvents = (params: QueryParams) => {
           ...page.data,
           listings: page.data.listings.map((event) => ({
             ...event,
-            id: String(event.id),
-            formattedDate: dateFormatter.format(new Date(event.date)),
+            formattedDate: (event as { formattedDate?: string }).formattedDate,
           })),
         },
       })),

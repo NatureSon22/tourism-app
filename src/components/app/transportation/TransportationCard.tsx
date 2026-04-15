@@ -1,26 +1,29 @@
 import { Colors, Typography } from "@/src/constants/styles";
-import { Transportation } from "@/src/constants/transportationList";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import { TRANSPORTATION } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
+import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type Props = Transportation;
-
+type Props = TRANSPORTATION;
 export default function TransportationCard({
   id,
-  name,
-  location,
-  price,
+  title,
+  thumbnail,
+  addresses,
+  base_price,
   rating,
   reviews,
-  imageUrl,
 }: Props) {
   const router = useRouter();
+  const location = addresses?.length
+    ? formatListingAddress(addresses[0], "short")
+    : "Location not available";
 
   const handlePress = () => {
     router.push({ pathname: "/transportation/[id]", params: { id } });
@@ -31,7 +34,7 @@ export default function TransportationCard({
       {/* 1. Image Container with Bookmark */}
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: imageUrl }}
+          source={{ uri: thumbnail }}
           style={styles.image}
           contentFit="cover"
         />
@@ -44,9 +47,9 @@ export default function TransportationCard({
         {/* 2. Location (Subtle/Muted) */}
         <Text style={styles.location}>{location}</Text>
 
-        {/* 3. Name (Large/Bold) */}
+        {/* 3. Title (Large/Bold) */}
         <Text style={styles.name} numberOfLines={1}>
-          {name}
+          {title}
         </Text>
 
         {/* 4. Rating Row */}
@@ -57,7 +60,7 @@ export default function TransportationCard({
         </HStack>
 
         {/* 5. Price */}
-        <Text style={styles.price}>{formatCurrency(price)}</Text>
+        <Text style={styles.price}>{formatCurrency(base_price)}</Text>
       </VStack>
     </Pressable>
   );

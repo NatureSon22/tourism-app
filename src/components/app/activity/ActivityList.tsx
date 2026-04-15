@@ -1,18 +1,20 @@
 import ActivityCard from "@/src/components/app/activity/ActivityCard";
 import ListEmptyState from "@/src/components/app/ListEmptyState";
-import { Activity } from "@/src/constants/activity";
 import { useActivities } from "@/src/services/request/useActivity";
 import { QueryParams } from "@/src/types/filter";
+import { ACTIVITY } from "@/src/types/listingTypes";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { memo, useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  ListRenderItem,
   RefreshControl,
   StyleSheet,
   View,
 } from "react-native";
+import ReloadPage from "../ReloadPage";
 import ActivityCardSkeleton from "./ActivityCardSkeleton";
 
 type Props = {
@@ -30,7 +32,8 @@ function ActivityList({ params }: Props) {
     isFetchingNextPage,
     fetchNextPage,
   } = useActivities(params);
-  const { isConnected } = useNetInfo();
+  const { isConnected, isInternetReachable } = useNetInfo();
+  const online = isConnected && isInternetReachable;
   const [isRefetching, setIsRefetching] = useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -68,8 +71,8 @@ function ActivityList({ params }: Props) {
     [isFetchingNextPage],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: Skeleton | Activity }) =>
+  const renderItem = useCallback<ListRenderItem<Skeleton | ACTIVITY>>(
+    ({ item }) =>
       "isSkeleton" in item ? (
         <ActivityCardSkeleton />
       ) : (
@@ -79,12 +82,20 @@ function ActivityList({ params }: Props) {
   );
 
   const keyExtractor = useCallback(
-    (item: Skeleton | Activity) => item.id.toString(),
+    (item: Skeleton | ACTIVITY) => item.id.toString(),
     [],
   );
 
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
   return (
-    <FlatList<Skeleton | Activity>
+    <FlatList<Skeleton | ACTIVITY>
       data={listData}
       keyExtractor={keyExtractor}
       renderItem={renderItem}
@@ -100,12 +111,13 @@ function ActivityList({ params }: Props) {
       ListEmptyComponent={
         <ListEmptyState
           isLoading={isLoading}
-          isConnected={isConnected}
+          isConnected={online}
           isError={isError}
           onRetry={refetch}
           resourceName="activities"
           customNoResultsMessage="Oh no! There's no activity that matches the search or filter criteria."
           isEmpty={isEmpty}
+          disableOfflineReload={true}
         />
       }
     />

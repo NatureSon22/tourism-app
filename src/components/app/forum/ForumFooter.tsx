@@ -7,8 +7,13 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import CustomButton from "../../ui/CustomButton";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type ForumFooterProps = {
   viewers?: number;
@@ -136,18 +141,40 @@ const ActionButton = ({
   isLoading = false,
   disabled = false,
   active = false,
-}: ActionButtonProps) => (
-  <CustomButton
-    prefixIcon={icon}
-    title={title}
-    gap={title ? 4 : 0}
-    textStyle={[footerStyles.btnText, active && footerStyles.activeText]}
-    style={[footerStyles.btn, active && footerStyles.activeBtn]}
-    onPress={onPress}
-    disabled={disabled || isLoading}
-    isLoading={isLoading}
-  />
-);
+}: ActionButtonProps) => {
+  const isDisabled = disabled || isLoading;
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={isDisabled}
+      activeOpacity={0.7}
+      style={[
+        footerStyles.btn,
+        active && footerStyles.activeBtn,
+        isDisabled && footerStyles.disabledBtn,
+      ]}
+    >
+      {isLoading ? (
+        <ActivityIndicator
+          size="small"
+          color={active ? Colors.primary : Colors.textMuted}
+        />
+      ) : (
+        <View style={footerStyles.buttonContent}>
+          {icon}
+          {title ? (
+            <Text
+              style={[footerStyles.btnText, active && footerStyles.activeText]}
+            >
+              {title}
+            </Text>
+          ) : null}
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 const footerStyles = StyleSheet.create({
   container: {
@@ -165,6 +192,15 @@ const footerStyles = StyleSheet.create({
   activeBtn: {
     backgroundColor: "#eef3ff",
     borderColor: Colors.primary,
+  },
+  disabledBtn: {
+    opacity: 0.5,
+  },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
   },
   btnText: { fontSize: 10, color: Colors.textMuted },
   activeText: {

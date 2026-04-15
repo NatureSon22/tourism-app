@@ -12,8 +12,10 @@ import FooterSheet from "../app/FooterSheet";
 import HeaderSheet from "../app/HeaderSheet";
 import RegionTab from "../app/LocationSheet";
 
+const allRegions = getAllRegions();
+
 export default function AreaSheet(props: SheetProps) {
-  const regions = useMemo(() => getAllRegions(), []);
+  const regions = useMemo(() => allRegions, []);
 
   const handleCloseSheet = () => {
     SheetManager.hide(props.sheetId);

@@ -53,7 +53,7 @@ export default function Experience() {
       <KeyboardAvoidingView
         style={styles.keyboardAvoiding}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        // keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 80}
+        keyboardVerticalOffset={0}
       >
         <Screen style={styles.screen}>
           <ExperienceHeader
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   scrollContent: {
-    flexGrow: 1,
+    flex: 1,
     paddingHorizontal: 10,
     paddingBottom: 20,
     gap: 24,

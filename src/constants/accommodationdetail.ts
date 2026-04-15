@@ -24,7 +24,7 @@ export type Expectation = {
   image: string;
 };
 
-type AccommodationListing = {
+export type AccommodationListing = {
   id: string;
   images: string[];
   name: string;

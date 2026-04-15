@@ -7,6 +7,7 @@ import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 import ControllerTextInput from "../components/ui/ControllerTextInput";
@@ -53,47 +54,47 @@ export default function SignInForm() {
   const togglePasswordVisibility = () => setShowPassword((p) => !p);
 
   const onSubmit = async (data: SignInFormData) => {
-    await login(
-      {
-        id: "1",
-        email: "johndoe@gmail.com",
-        firstName: "John",
-        lastName: "Doe",
-        profilePictureUrl: "",
-        userName: "john_doe",
-      },
-      { accessToken: "sampletoken", refreshToken: "samplerefreshtoken" },
-      isChecked,
-    );
+    // await login(
+    //   {
+    //     id: "1",
+    //     email: "johndoe@gmail.com",
+    //     firstName: "John",
+    //     lastName: "Doe",
+    //     profilePictureUrl: "",
+    //     userName: "john_doe",
+    //   },
+    //   { accessToken: "sampletoken", refreshToken: "samplerefreshtoken" },
+    //   isChecked,
+    // );
 
     if (!onBoardingCompleted) {
       router.replace("/onboarding");
     }
 
-    // mutate(
-    //   { email: data.email, password: data.password },
-    //   {
-    //     onSuccess: async (res) => {
-    //       const { user, accessToken, refreshToken } = res.data;
-    //       console.log("Login successful:", res.data);
-    //       const token = { accessToken, refreshToken };
+    mutate(
+      { email: data.email, password: data.password },
+      {
+        onSuccess: async (res) => {
+          const { user, accessToken, refreshToken } = res.data;
+          console.log("Login successful:", res.data);
+          const token = { accessToken, refreshToken };
 
-    //       await login({ id: user.id, email: user.email }, token, isChecked);
+          await login(user, token, isChecked);
 
-    //       if (!onBoardingCompleted) {
-    //         router.replace("/onboarding");
-    //       }
-    //     },
-    //     onError: (error: any) => {
-    //       const errorMessage = error.response?.data?.message || error.message;
-    //       Toast.show({
-    //         type: "error",
-    //         text1: errorMessage,
-    //         text2: error.message,
-    //       });
-    //     },
-    //   },
-    // );
+          if (!onBoardingCompleted) {
+            router.replace("/onboarding");
+          }
+        },
+        onError: (error: any) => {
+          const errorMessage = error.response?.data?.message || error.message;
+          Toast.show({
+            type: "error",
+            text1: errorMessage,
+            text2: error.message,
+          });
+        },
+      },
+    );
   };
 
   return (

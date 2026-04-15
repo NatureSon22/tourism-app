@@ -12,6 +12,11 @@ export type QueryParams = {
   // Pagination
   page?: number;
   limit?: number;
+  moduleId?: string;
+};
+
+export type QueryByIdParams = {
+  id: string;
 };
 
 export interface FilterState {

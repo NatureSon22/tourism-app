@@ -1,5 +1,10 @@
-export type Accommodation = {
+import { BaseListing } from "./baseListing";
+
+export type AccommodationBase = Omit<BaseListing, "id"> & {
   id: string;
+};
+
+export type Accommodation = AccommodationBase & {
   creator_id: string;
   title: string;
   description: string;
@@ -11,11 +16,11 @@ export type Accommodation = {
   category_names: string[];
   category_types: ("PRIMARY" | "SECONDARY")[];
   imageUrl?: string;
-  location?: string;
   pricePerNight?: number;
   rating?: number;
   reviews: number;
   distanceFromCityCenter?: number;
+  locationLabel?: string;
 };
 
 export type AccomodationResponse = {

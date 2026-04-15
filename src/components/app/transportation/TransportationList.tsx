@@ -1,6 +1,6 @@
-import { Transportation } from "@/src/constants/transportationList";
 import { useTransportation } from "@/src/services/request/useTransportation";
 import { QueryParams } from "@/src/types/filter";
+import { TRANSPORTATION } from "@/src/types/listingTypes";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useMemo, useState } from "react";
@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import ListEmptyState from "../ListEmptyState";
+import ReloadPage from "../ReloadPage";
 import TransportationCardSkeleton from "./TransportaionCardSkeleton";
 import TransportationCard from "./TransportationCard";
 
@@ -34,7 +35,8 @@ export default function TransportationList({
     isFetchingNextPage,
     fetchNextPage,
   } = useTransportation(params);
-  const { isConnected } = useNetInfo();
+  const { isConnected, isInternetReachable } = useNetInfo();
+  const online = isConnected && isInternetReachable;
   const [isRefetching, setIsRefetching] = useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -58,7 +60,7 @@ export default function TransportationList({
     [isFetched, isLoading, listings],
   );
 
-  const renderItem = useCallback<ListRenderItem<Skeleton | Transportation>>(
+  const renderItem = useCallback<ListRenderItem<Skeleton | TRANSPORTATION>>(
     ({ item }) => {
       if ("isSkeleton" in item) {
         return (
@@ -95,15 +97,16 @@ export default function TransportationList({
     () => (
       <ListEmptyState
         isLoading={isLoading}
-        isConnected={isConnected}
+        isConnected={online}
         isError={isError}
         onRetry={refetch}
         resourceName="transportation"
         customNoResultsMessage="Oh no! There's no transportation option that matches the search or filter criteria."
         isEmpty={isEmpty}
+        disableOfflineReload={true}
       />
     ),
-    [isConnected, isEmpty, isError, isLoading, refetch],
+    [isEmpty, isError, isLoading, online, refetch],
   );
 
   const refreshControl = useMemo(
@@ -113,10 +116,19 @@ export default function TransportationList({
     [handleRefresh, isRefetching],
   );
 
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
+
   return (
-    <FlatList<Skeleton | Transportation>
+    <FlatList<Skeleton | TRANSPORTATION>
       data={listData}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}
       key="two-column-list"
       numColumns={2}
       columnWrapperStyle={styles.columnWrapper}

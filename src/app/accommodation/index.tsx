@@ -12,6 +12,7 @@ import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
 import { QueryParams } from "@/src/types/filter";
 import getLocation from "@/src/utils/getLocation";
+import { useLocalSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
@@ -20,6 +21,7 @@ export default function AccommodationPage() {
   const { openSheet } = useSingleSheet();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
+  const { moduleId } = useLocalSearchParams<{ moduleId: string }>();
 
   const { accommodationState, currentSort, updateOptions, resetCategory } =
     useFilterStore(
@@ -51,8 +53,9 @@ export default function AccommodationPage() {
       radius: accommodationState.options.radius,
       page: 1,
       limit: 20,
+      moduleId: moduleId,
     };
-  }, [debouncedSearch, accommodationState]);
+  }, [debouncedSearch, accommodationState, moduleId]);
 
   const handleAreaPress = (sheet: string) => {
     const payload =

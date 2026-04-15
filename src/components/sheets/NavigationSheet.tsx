@@ -14,14 +14,20 @@ import ActionSheet, {
 export default function OptionSheet(props: SheetProps) {
   const router = useRouter();
 
-  const handleTabPress = (path: string) => {
+  const handleTabPress = (path: string, moduleId?: string) => {
     // close the sheet first
     SheetManager.hide(props.sheetId);
 
     // then navigate if a path was provided
     if (path) {
       setTimeout(() => {
-        router.push(path as Parameters<typeof router.push>[0]);
+        const route = moduleId
+          ? ({ pathname: path, params: { moduleId } } as Parameters<
+              typeof router.push
+            >[0])
+          : (path as Parameters<typeof router.push>[0]);
+
+        router.push(route);
       }, 200);
     }
   };
@@ -50,7 +56,7 @@ export default function OptionSheet(props: SheetProps) {
           {ALLTABNAVIGATION.map((item) => (
             <Pressable
               key={item.name}
-              onPress={() => handleTabPress(item.path)}
+              onPress={() => handleTabPress(item.path, item.moduleId)}
             >
               <HStack justifyContent="flex-start" gap={15}>
                 <View style={{ width: 30, height: 30 }}>

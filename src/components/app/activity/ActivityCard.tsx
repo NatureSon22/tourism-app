@@ -1,31 +1,37 @@
-import { Activity } from "@/src/constants/activity";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
+import { ACTIVITY } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
+import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type Props = Activity;
+type Props = ACTIVITY;
 
 function ActivityCard({
-  name,
-  location,
+  id,
+  title,
+  addresses,
   distanceFromCityCenter,
-  rating,
-  reviews,
-  books,
-  price,
+  rating = 0,
+  reviews = 0,
+  books = 0,
+  base_price,
   prevPrice,
-  types,
-  image,
+  thumbnail,
+  categories,
 }: Props) {
   const router = useRouter();
+  const types =
+    categories && categories.length > 0
+      ? categories.map((c) => c.name)
+      : ["Category not specified"];
 
   const handlePress = () => {
-    router.push({ pathname: "/activity/[id]", params: { id: name } });
+    router.push({ pathname: "/activity/[id]", params: { id: id } });
   };
 
   return (
@@ -33,7 +39,7 @@ function ActivityCard({
       {/* Hero image */}
       <View style={styles.imageWrapper}>
         <Image
-          source={{ uri: image }}
+          source={{ uri: thumbnail }}
           style={styles.image}
           contentFit="cover"
         />
@@ -46,9 +52,9 @@ function ActivityCard({
       {/* Content */}
       <View style={styles.content}>
         {/* Title + distance badge */}
-        <HStack justifyContent="flex-start" alignItems="center" gap={8}>
+        <HStack justifyContent="space-between" alignItems="center" gap={8}>
           <Text style={styles.title} numberOfLines={1}>
-            {name}
+            {title}
           </Text>
           <View style={styles.distanceBadge}>
             <Text style={styles.distanceText}>
@@ -70,7 +76,9 @@ function ActivityCard({
 
         {/* Location */}
         <Text style={styles.location} numberOfLines={2}>
-          {location}
+          {addresses && addresses.length > 0
+            ? formatListingAddress(addresses[0], "short")
+            : "Location not available"}
         </Text>
 
         {/* Rating + reviews + booked */}
@@ -85,7 +93,7 @@ function ActivityCard({
         {/* Price row */}
         <HStack justifyContent="flex-start" alignItems="center" gap={6}>
           <Text style={styles.fromLabel}>From </Text>
-          <Text style={styles.price}>{formatCurrency(price)}</Text>
+          <Text style={styles.price}>{formatCurrency(base_price)}</Text>
           {prevPrice != null && (
             <Text style={styles.prevPrice}>{formatCurrency(prevPrice)}</Text>
           )}

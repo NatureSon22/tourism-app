@@ -18,6 +18,7 @@ import { useShallow } from "zustand/react/shallow";
 import queryClient from "../config/queryClient";
 import { Sheets } from "../config/sheets";
 import toastConfig from "../config/toastConfig";
+import authService from "../services/api/authService";
 import useAuthStore from "../stores/authStore";
 import { tokenStorage } from "../utils/tokenStorage";
 
@@ -80,7 +81,7 @@ function useInitializeAuth(logout: () => Promise<void>) {
 
   const initializeAuth = useCallback(async () => {
     try {
-      // await authService.requestCrsfToken();
+      await authService.requestCrsfToken();
 
       const currentUser = useAuthStore.getState().user;
       if (currentUser) {

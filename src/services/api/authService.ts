@@ -1,3 +1,4 @@
+import { User } from "@/src/stores/authStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api, { ApiResponse } from "../../config/axios";
 import { SignUpFormData } from "../../forms/SignUpForm";
@@ -6,12 +7,7 @@ import { tokenStorage } from "../../utils/tokenStorage";
 export type AuthResponse = {
   accessToken: string;
   refreshToken: string;
-  user: {
-    id: string;
-    email: string;
-    firstName?: string;
-    lastName?: string;
-  };
+  user: User;
 };
 
 export type SignUpResponse = ApiResponse<AuthResponse>;
@@ -20,13 +16,13 @@ export type LoginResponse = ApiResponse<AuthResponse>;
 const authService = {
   requestCrsfToken: async (): Promise<string> => {
     try {
-      const response = await fetch(
-        "https://t3w5zwg6-3000.asse.devtunnels.ms/api/csrf-token",
-        {
-          method: "GET",
-          credentials: "include",
-        },
-      );
+      const response = await fetch("https://5mftvr7z-3000.asse.devtunnels.ms/api/csrf-token", {
+        method: "GET",
+        credentials: "include",
+        headers: {
+    "Content-Type": "application/json",
+  },
+      });
 
       if (!response.ok) {
         const errorBody = await response.text();

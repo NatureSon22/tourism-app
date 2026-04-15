@@ -1,9 +1,10 @@
 import { QueryParams } from "@/src/types/filter";
-import { Event, REALISTIC_EVENTS } from "../../constants/eventListing";
+import { REALISTIC_EVENTS } from "../../constants/eventListing";
+import { EVENT } from "../../types/listingTypes";
 
 export type GetEventResponse = {
   data: {
-    listings: Event[];
+    listings: EVENT[];
     pagination: {
       count: number;
       currentPage: number;
@@ -30,8 +31,13 @@ const eventService = {
       const query = search.toLowerCase().trim();
       result = result.filter(
         (e) =>
-          e.name.toLowerCase().includes(query) ||
-          e.location.toLowerCase().includes(query),
+          e.title.toLowerCase().includes(query) ||
+          e.addresses?.some((address) =>
+            address.formatted.toLowerCase().includes(query),
+          ) ||
+          e.categories?.some((category) =>
+            category.name.toLowerCase().includes(query),
+          ),
       );
     }
 
@@ -55,9 +61,9 @@ const eventService = {
     };
   },
 
-  getEventById: async (id: string): Promise<Event | undefined> => {
+  getEventById: async (id: string): Promise<EVENT | undefined> => {
     await new Promise((r) => setTimeout(r, 500));
-    return REALISTIC_EVENTS.find((event) => event.id === id);
+    return REALISTIC_EVENTS.find((event) => String(event.id) === id);
   },
 
   registerForEvent: async (

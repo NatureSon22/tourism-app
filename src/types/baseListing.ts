@@ -1,71 +1,138 @@
-export type ListingImage = {
-  id: string;
+export type Media = {
+  id: number;
   src: string;
   alt: string;
-  caption?: string;
+  type: string;
 };
 
-export type ListingAddress = {
+export type Address = {
+  id: number;
+  listing_id: number;
+  lat: number;
+  lng: number;
+  formatted: string;
   region: string;
-  regionCode: string;
+  region_code: string;
   province: string;
-  provinceCode: string;
+  province_code: string;
   city: string;
-  cityCode: string;
+  city_code: string;
   barangay: string;
   street: string;
-  postalCode: string;
+  postal_code: string;
+  is_primary: boolean;
 };
 
-export type InfoBlock = {
-  id: string;
-  type: "subheading" | "text" | "image";
-  content: {
-    text?: string;
-    html?: string;
-    src?: string;
-    alt?: string;
-  };
+export type Contact = {
+  id: number;
+  listing_id: number;
+  type: string;
+  label: string;
+  number: string;
 };
 
-export type AdditionalInfoSection = {
+export type BlockMedia = {
+  id: number;
+  content_block_id: number;
+  media_id: number;
+  media?: Media; // Joined from media table
+};
+
+export type ContentBlock = {
+  id: number;
+  listing_info_id: number;
+  type: string;
+  body_text: string | null;
+  body_html: string | null;
+  order: number;
+  media?: BlockMedia[]; // Joined via block_media
+};
+
+export type ListingInfo = {
+  id: number;
+  listing_id: number;
   key: string;
   title: string;
-  children: InfoBlock[];
+  content_blocks: ContentBlock[];
 };
 
-export type BaseListing = {
+export type Category = {
   id: number;
   name: string;
-  thumbnail: {
-    data: string;
-  };
-  images: ListingImage[];
-  basePrice: number;
-  type: string;
-  status: "Active" | "Inactive" | "Pending";
+  type: string; // e.g., "PRIMARY" | "SECONDARY"
+};
 
-  // Merchant/Owner Info
-  merchantId: number;
-  merchantName: string;
-
-  // Categorization & Filtering
-  mainCategoryId: number;
-  subCategoryIds: number[];
-  amenities: number[];
-
-  // Contact & Content
+export type Listing = {
+  id: number;
+  title: string;
+  thumbnail: string;
+  base_price: number;
+  merchant_id: number;
+  module_id: number;
+  main_category_id: number;
+  status: string; // e.g., "Active" | "Inactive"
   highlights: string;
-  phone: string;
+  email: string;
+  media?: Media[]; // Joined from media table (if you want to include all media directly)
+
+  // Related Data (Omitted from base table but part of the listing object)
+  addresses?: Address[];
+  contacts?: Contact[];
+  listing_info?: ListingInfo[];
+  categories?: Category[];
+};
+
+export type ListingDetailed = {
+  id: number;
+  title: string;
+  thumbnail: string;
+  base_price: number;
+  module_id: number;
+  main_category_id: number;
+  status: string;
+  highlights: string;
   email: string;
 
-  // Geographic Data
-  location: {
-    lat: number;
-    lng: number;
+  // From 'categories' table (Primary)
+  main_category?: {
+    id: number;
+    name: string;
+    type: string;
   };
-  address: ListingAddress;
 
-  // Dynamic Content (CMS-style)
-  additional_information: AdditionalInfoSection[];
+  // From 'listing_categories' junction
+  // Allows the listing to have multiple secondary categories
+  categories?: {
+    id: number;
+    name: string;
+    type: string;
+  }[];
+
+  // From 'addresses' table
+  addresses: Address[];
+
+  // From 'contacts' table
+  contacts: Contact[];
+
+  // From 'listing_info' -> 'content_blocks' -> 'block_media'
+  // This represents the CMS/Dynamic content sections
+  additional_info: (ListingInfo & {
+    content_blocks: (ContentBlock & {
+      media?: Media[];
+    })[];
+  })[];
+
+  // From 'bookings' table
+  bookings?: Booking[];
+
+  // From 'bookmarks' table
+  // (Assuming you'd want to know if the current user has bookmarked it)
+  is_bookmarked?: boolean;
+};
+
+export type Booking = {
+  id: number;
+  listing_id: number;
+  user_id: number;
+  booked_price: number;
 };

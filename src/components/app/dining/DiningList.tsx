@@ -1,18 +1,20 @@
-import { Dining } from "@/src/constants/dining";
 import { useDining } from "@/src/services/request/useDining";
 import { QueryParams } from "@/src/types/filter";
+import { DINING } from "@/src/types/listingTypes";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  ListRenderItem,
   Platform,
   RefreshControl,
   StyleSheet,
   View,
 } from "react-native";
 import ListEmptyState from "../ListEmptyState";
+import ReloadPage from "../ReloadPage";
 import DiningCard from "./DiningCard";
 import DiningCardSkeleton from "./DiningCardSkeleton";
 
@@ -20,10 +22,7 @@ type DiningListProps = {
   params: QueryParams;
 };
 
-const renderDiningItem = ({ item }: { item: Skeleton | Dining }) =>
-  "isSkeleton" in item ? <DiningCardSkeleton /> : <DiningCard {...item} />;
-
-const diningKeyExtractor = (item: Skeleton | Dining) => item.id;
+const diningKeyExtractor = (item: Skeleton | DINING) => item.id.toString();
 
 const DiningList = ({ params }: DiningListProps) => {
   const {
@@ -36,7 +35,8 @@ const DiningList = ({ params }: DiningListProps) => {
     isFetchingNextPage,
     fetchNextPage,
   } = useDining(params);
-  const { isConnected } = useNetInfo();
+  const { isConnected, isInternetReachable } = useNetInfo();
+  const online = isConnected && isInternetReachable;
   const [isRefetching, setIsRefetching] = useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -60,19 +60,26 @@ const DiningList = ({ params }: DiningListProps) => {
     [isFetched, isLoading, listings],
   );
 
+  const renderItem = useCallback<ListRenderItem<Skeleton | DINING>>(
+    ({ item }) =>
+      "isSkeleton" in item ? <DiningCardSkeleton /> : <DiningCard {...item} />,
+    [],
+  );
+
   const emptyComponent = useMemo(
     () => (
       <ListEmptyState
         isLoading={isLoading}
-        isConnected={isConnected}
+        isConnected={online}
         isError={isError}
         onRetry={refetch}
         resourceName="dining"
         customNoResultsMessage="Oh no! There's no dining option that matches the search or filter criteria."
         isEmpty={isEmpty}
+        disableOfflineReload={true}
       />
     ),
-    [isConnected, isEmpty, isError, isLoading, refetch],
+    [online, isEmpty, isError, isLoading, refetch],
   );
 
   const refreshControl = useMemo(
@@ -96,11 +103,20 @@ const DiningList = ({ params }: DiningListProps) => {
     [isFetchingNextPage],
   );
 
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
+
   return (
-    <FlatList<Skeleton | Dining>
+    <FlatList<Skeleton | DINING>
       data={listData}
       keyExtractor={diningKeyExtractor}
-      renderItem={renderDiningItem}
+      renderItem={renderItem}
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.5}
       ListFooterComponent={listFooterComponent}

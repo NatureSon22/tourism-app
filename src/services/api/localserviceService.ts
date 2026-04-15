@@ -1,10 +1,12 @@
-import PHILIPPINE_LOCAL_SERVICE from "@/src/constants/localServiceList";
+import PHILIPPINE_LOCAL_SERVICE, {
+  LocalServiceList,
+} from "@/src/constants/localServiceList";
 import { QueryParams } from "@/src/types/filter";
-import { Service } from "@/src/types/service";
+import { SERVICE } from "@/src/types/listingTypes";
 
 export type ServiceResponse = {
   data: {
-    listings: Service[];
+    listings: SERVICE[];
     pagination: {
       count: number;
       currentPage: number;
@@ -13,6 +15,46 @@ export type ServiceResponse = {
     };
   };
 };
+
+const mapLocalService = (item: LocalServiceList): SERVICE => ({
+  id: item.id,
+  title: item.name,
+  thumbnail: item.imageUrl,
+  base_price: 0,
+  merchant_id: 0,
+  module_id: 0,
+  main_category_id: 0,
+  status: "Active",
+  highlights: item.location,
+  email: "service@tourism.local",
+  addresses: [
+    {
+      id: Number(item.id) || 0,
+      listing_id: Number(item.id) || 0,
+      lat: 0,
+      lng: 0,
+      formatted: item.location,
+      region: "",
+      region_code: "",
+      province: item.province,
+      province_code: "",
+      city: item.location,
+      city_code: "",
+      barangay: "",
+      street: "",
+      postal_code: "",
+      is_primary: true,
+    },
+  ],
+  categories: [
+    {
+      id: Number(item.id) * 10 + 1,
+      name: "Service",
+      type: "PRIMARY",
+    },
+  ],
+  distanceFromCityCenter: item.distanceFromCityCenter,
+});
 
 export const localserviceService = {
   getAvailableServices: async (
@@ -37,7 +79,7 @@ export const localserviceService = {
     const total = list.length;
     const start = (currentPage - 1) * limitPerPage;
     const end = start + limitPerPage;
-    const listings = list.slice(start, end);
+    const listings = list.slice(start, end).map(mapLocalService);
 
     return {
       data: {

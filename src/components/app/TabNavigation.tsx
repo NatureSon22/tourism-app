@@ -4,24 +4,28 @@ import HStack from "@/src/layouts/HStack";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 
 export default function TabNavigation() {
   const router = useRouter();
   const isBusy = useRef(false);
 
-  const handleTabPress = (path: string) => {
+  const handleTabPress = (path: string, moduleId?: string) => {
     if (isBusy.current) return;
 
     isBusy.current = true;
 
     if (path !== "/more") {
-      router.push(path as any);
+      const route = moduleId
+        ? { pathname: path as any, params: { moduleId } }
+        : (path as Parameters<typeof router.push>[0]);
+
+      router.push(route);
       // Reset lock after a short delay to prevent double-pushing the same route
       setTimeout(() => {
         isBusy.current = false;
-      }, 500); 
+      }, 500);
     } else {
       SheetManager.show("options-sheet", {
         onClose() {
@@ -37,7 +41,7 @@ export default function TabNavigation() {
         {TABNAVIGATION.map((item) => (
           <Pressable
             key={item.name}
-            onPress={() => handleTabPress(item.path)}
+            onPress={() => handleTabPress(item.path, item.moduleId)}
             style={styles.tabPressable}
           >
             <View style={styles.tabContent}>

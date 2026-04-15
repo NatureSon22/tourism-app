@@ -1,6 +1,6 @@
 import { useGetServices } from "@/src/services/request/useService";
 import { QueryParams } from "@/src/types/filter";
-import { Service } from "@/src/types/service";
+import { SERVICE } from "@/src/types/listingTypes";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useMemo, useState } from "react";
@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import ListEmptyState from "../ListEmptyState";
+import ReloadPage from "../ReloadPage";
 import ServiceCard from "./ServiceCard";
 import ServiceCardSkeleton from "./ServiceCardSkeleton";
 
@@ -32,7 +33,8 @@ export default function ServiceList({ params }: ServiceListProps) {
     isFetchingNextPage,
     fetchNextPage,
   } = useGetServices(params);
-  const { isConnected } = useNetInfo();
+  const { isConnected, isInternetReachable } = useNetInfo();
+  const online = isConnected && isInternetReachable;
   const [isRefetching, setIsRefetching] = useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -56,7 +58,7 @@ export default function ServiceList({ params }: ServiceListProps) {
     [isFetched, isLoading, listings],
   );
 
-  const renderItem = useCallback<ListRenderItem<Skeleton | Service>>(
+  const renderItem = useCallback<ListRenderItem<Skeleton | SERVICE>>(
     ({ item }) => {
       if ("isSkeleton" in item) {
         return <ServiceCardSkeleton />;
@@ -85,15 +87,16 @@ export default function ServiceList({ params }: ServiceListProps) {
     () => (
       <ListEmptyState
         isLoading={isLoading}
-        isConnected={isConnected}
+        isConnected={online}
         isError={isError}
         isEmpty={isEmpty}
         resourceName="service"
         customNoResultsMessage="Oh no! There's no service option that matches the search or filter criteria."
         onRetry={refetch}
+        disableOfflineReload={true}
       />
     ),
-    [isConnected, isEmpty, isError, isLoading, refetch],
+    [online, isEmpty, isError, isLoading, refetch],
   );
 
   const refreshControl = useMemo(
@@ -103,10 +106,19 @@ export default function ServiceList({ params }: ServiceListProps) {
     [handleRefresh, isRefetching],
   );
 
+  if (!online && !isLoading) {
+    return (
+      <ReloadPage
+        refetch={refetch}
+        message="It looks like you're offline. Please check your connection and try again."
+      />
+    );
+  }
+
   return (
-    <FlatList<Skeleton | Service>
+    <FlatList<Skeleton | SERVICE>
       data={listData}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={renderItem}
       onEndReached={handleEndReached}
       onEndReachedThreshold={0.5}

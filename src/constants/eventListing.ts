@@ -1,91 +1,200 @@
-export type Event = {
-  id: string;
-  name: string;
+import type { Address } from "../types/baseListing";
+import type { EVENT } from "../types/listingTypes";
+
+type EventFixture = {
+  id: number;
+  title: string;
   location: string;
-  date: Date;
   imageUrl: string;
-  types: string[];
+  categories: string[];
+  formattedDate: string;
+  distanceFromCityCenter?: number;
+  rating?: number;
+  reviews?: number;
+  books?: number;
+  base_price?: number;
+  prevPrice?: number;
 };
 
-export const REALISTIC_EVENTS: Event[] = [
+const createAddress = (id: number, location: string): Address => ({
+  id,
+  listing_id: id,
+  lat: 0,
+  lng: 0,
+  formatted: location,
+  region: "",
+  region_code: "",
+  province: "",
+  province_code: "",
+  city: location,
+  city_code: "",
+  barangay: "",
+  street: "",
+  postal_code: "",
+  is_primary: true,
+});
+
+const createEvent = (
+  fixture: EventFixture,
+): EVENT & { formattedDate: string } => ({
+  id: fixture.id,
+  title: fixture.title,
+  thumbnail: fixture.imageUrl,
+  base_price: fixture.base_price ?? 0,
+  merchant_id: 0,
+  module_id: 0,
+  main_category_id: 0,
+  status: "Active",
+  highlights: fixture.categories.join(", "),
+  email: "events@tourism.local",
+  addresses: [createAddress(fixture.id, fixture.location)],
+  categories: fixture.categories.map((name, index) => ({
+    id: fixture.id * 10 + index,
+    name,
+    type: index === 0 ? "PRIMARY" : "SECONDARY",
+  })),
+  distanceFromCityCenter: fixture.distanceFromCityCenter,
+  rating: fixture.rating,
+  reviews: fixture.reviews,
+  books: fixture.books,
+  prevPrice: fixture.prevPrice,
+  formattedDate: fixture.formattedDate,
+});
+
+const EVENT_FIXTURES: EventFixture[] = [
   {
-    id: "1",
-    name: "Panagbenga Flower Festival",
+    id: 1,
+    title: "Panagbenga Flower Festival",
     location: "Burnham Park, Baguio City",
-    date: new Date("2026-02-24T08:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1597211833712-46637372338c",
-    types: ["Festival", "Culture", "Outdoor", "Parade", "Flowers"], // 5 Types
+    categories: ["Festival", "Culture", "Outdoor", "Parade", "Flowers"],
+    formattedDate: "February 24, 2026",
+    distanceFromCityCenter: 2.1,
+    rating: 4.8,
+    reviews: 241,
+    books: 12,
+    base_price: 0,
   },
   {
-    id: "2",
-    name: "Tech Summit Philippines 2026",
+    id: 2,
+    title: "Tech Summit Philippines 2026",
     location: "SMX Convention Center, Manila",
-    date: new Date("2026-05-15T09:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678",
-    types: ["Conference", "Technology", "Networking", "AI", "Business"], // 5 Types
+    categories: ["Conference", "Technology", "Networking", "AI", "Business"],
+    formattedDate: "May 15, 2026",
+    distanceFromCityCenter: 1.4,
+    rating: 4.6,
+    reviews: 188,
+    books: 19,
+    base_price: 1499,
+    prevPrice: 1999,
   },
   {
-    id: "3",
-    name: "Sinulog Grand Parade",
+    id: 3,
+    title: "Sinulog Grand Parade",
     location: "Cebu City Sports Complex",
-    date: new Date("2026-01-18T07:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7",
-    types: ["Festival", "Religious", "Tradition", "Dance", "Tourism"], // 5 Types
+    categories: ["Festival", "Religious", "Tradition", "Dance", "Tourism"],
+    formattedDate: "January 18, 2026",
+    distanceFromCityCenter: 3.2,
+    rating: 4.9,
+    reviews: 320,
+    books: 25,
+    base_price: 0,
   },
   {
-    id: "4",
-    name: "Acoustic Night: OPM Classics",
+    id: 4,
+    title: "Acoustic Night: OPM Classics",
     location: "Social House, Makati",
-    date: new Date("2026-04-12T20:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4",
-    types: ["Music", "Nightlife", "Acoustic", "Social"], // 4 Types
+    categories: ["Music", "Nightlife", "Acoustic", "Social"],
+    formattedDate: "April 12, 2026",
+    distanceFromCityCenter: 0.8,
+    rating: 4.4,
+    reviews: 92,
+    books: 7,
+    base_price: 699,
+    prevPrice: 899,
   },
   {
-    id: "5",
-    name: "Mt. Pulag Sunrise Hike",
+    id: 5,
+    title: "Mt. Pulag Sunrise Hike",
     location: "Kabayan, Benguet",
-    date: new Date("2026-03-20T02:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
-    types: ["Adventure", "Hiking", "Nature", "Photography", "Eco-Tourism"], // 5 Types
+    categories: ["Adventure", "Hiking", "Nature", "Photography", "Eco-Tourism"],
+    formattedDate: "March 20, 2026",
+    distanceFromCityCenter: 5.6,
+    rating: 4.7,
+    reviews: 156,
+    books: 31,
+    base_price: 1299,
   },
   {
-    id: "6",
-    name: "Manila Food & Wine Expo",
+    id: 6,
+    title: "Manila Food & Wine Expo",
     location: "World Trade Center, Pasay",
-    date: new Date("2026-07-08T11:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1",
-    types: ["Food", "Exhibition", "Lifestyle", "Wine", "Networking"], // 5 Types
+    categories: ["Food", "Exhibition", "Lifestyle", "Wine", "Networking"],
+    formattedDate: "July 8, 2026",
+    distanceFromCityCenter: 1.9,
+    rating: 4.5,
+    reviews: 143,
+    books: 14,
+    base_price: 899,
   },
   {
-    id: "7",
-    name: "Cebu Startup Weekend",
+    id: 7,
+    title: "Cebu Startup Weekend",
     location: "IT Park, Cebu City",
-    date: new Date("2026-08-14T18:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1515187029135-18ee286d815b",
-    types: ["Workshop", "Business", "Tech", "Education", "Competition"], // 5 Types
+    categories: ["Workshop", "Business", "Tech", "Education", "Competition"],
+    formattedDate: "August 14, 2026",
+    distanceFromCityCenter: 2.7,
+    rating: 4.3,
+    reviews: 76,
+    books: 11,
+    base_price: 499,
+    prevPrice: 699,
   },
   {
-    id: "8",
-    name: "Art in the Park",
+    id: 8,
+    title: "Art in the Park",
     location: "Salcedo Village, Makati",
-    date: new Date("2026-03-15T10:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4ce186860d",
-    types: ["Art", "Family", "Community", "Outdoor", "Market"], // 5 Types
+    categories: ["Art", "Family", "Community", "Outdoor", "Market"],
+    formattedDate: "March 15, 2026",
+    distanceFromCityCenter: 0.6,
+    rating: 4.2,
+    reviews: 67,
+    books: 5,
+    base_price: 0,
   },
   {
-    id: "9",
-    name: "Siargao International Surfing Cup",
+    id: 9,
+    title: "Siargao International Surfing Cup",
     location: "Cloud 9, Siargao Island",
-    date: new Date("2026-10-05T06:00:00"),
     imageUrl: "https://images.unsplash.com/photo-1502680399488-2a65838d981a",
-    types: ["Sports", "Beach", "Competition", "Extreme", "Travel"], // 5 Types
+    categories: ["Sports", "Beach", "Competition", "Extreme", "Travel"],
+    formattedDate: "October 5, 2026",
+    distanceFromCityCenter: 8.9,
+    rating: 4.9,
+    reviews: 204,
+    books: 22,
+    base_price: 0,
   },
   {
-    id: "10",
-    name: "Indie Film Night",
+    id: 10,
+    title: "Indie Film Night",
     location: "Cinematheque Centre Manila",
-    date: new Date("2026-06-21T19:30:00"),
     imageUrl: "https://images.unsplash.com/photo-1485846234645-a62644f84728",
-    types: ["Movie", "Culture", "Indie", "Education"], // 4 Types
+    categories: ["Movie", "Culture", "Indie", "Education"],
+    formattedDate: "June 21, 2026",
+    distanceFromCityCenter: 1.1,
+    rating: 4.1,
+    reviews: 54,
+    books: 4,
+    base_price: 350,
   },
 ];
+
+export const REALISTIC_EVENTS: EVENT[] = EVENT_FIXTURES.map(createEvent);

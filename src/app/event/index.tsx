@@ -10,6 +10,7 @@ import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useFilterStore } from "@/src/stores/filterStore";
 import type { QueryParams } from "@/src/types/filter";
+import { useLocalSearchParams } from "expo-router/build/hooks";
 import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
@@ -18,6 +19,7 @@ export default function EventPage() {
   const { openSheet } = useSingleSheet();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
+  const { moduleId } = useLocalSearchParams<{ moduleId: string }>();
   const { currentSort, currentOptions, updateOptions, resetCategory } =
     useFilterStore(
       useShallow((state) => ({
@@ -50,8 +52,9 @@ export default function EventPage() {
       type: currentOptions.type.type,
       subtypes: currentOptions.type.subtypes,
       amenities: currentOptions.amenities,
+      moduleId: moduleId,
     }),
-    [debouncedSearch, currentOptions, currentSort],
+    [debouncedSearch, currentOptions, currentSort, moduleId],
   );
 
   return (

@@ -1,22 +1,22 @@
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
-import { Service } from "@/src/types/service";
+import { SERVICE } from "@/src/types/listingTypes";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type ServiceCardProps = Service;
+type ServiceCardProps = SERVICE;
 
 export default function ServiceCard({
   id,
-  imageUrl,
-  location,
+  thumbnail,
+  title,
+  addresses,
+  highlights,
   distanceFromCityCenter,
-  name,
-  province,
 }: ServiceCardProps) {
   const router = useRouter();
 
@@ -24,11 +24,21 @@ export default function ServiceCard({
     router.push({ pathname: "/service/[id]", params: { id } });
   };
 
+  const listingLocation =
+    addresses?.[0]?.formatted ?? highlights ?? "Location not available";
+  const listingProvince =
+    addresses?.[0]?.province ?? addresses?.[0]?.city ?? "Province not available";
+
+  const distanceText =
+    distanceFromCityCenter !== undefined && distanceFromCityCenter !== null
+      ? `>${distanceFromCityCenter}km away`
+      : "Distance unknown";
+
   return (
     <Pressable style={styles.card} onPress={handlePress}>
       <HStack gap={17} alignItems="flex-start">
         <View style={styles.imageWrapper}>
-          <Image source={imageUrl} contentFit="cover" style={styles.image} />
+          <Image source={{ uri: thumbnail }} contentFit="cover" style={styles.image} />
           <View style={styles.bookmarkIcon}>
             <Ionicons name="bookmark-outline" size={20} color={Colors.rating} />
           </View>
@@ -36,21 +46,19 @@ export default function ServiceCard({
 
         <VStack style={styles.content} gap={5}>
           <Text style={styles.name} numberOfLines={2}>
-            {name}
+            {title}
           </Text>
 
           <Text style={styles.location} numberOfLines={1}>
-            {location}
+            {listingLocation}
           </Text>
 
           <Text style={styles.location} numberOfLines={2}>
-            {province}
+            {listingProvince}
           </Text>
 
           <VStack gap={0} style={{ alignItems: "flex-start" }}>
-            <Text
-              style={styles.distanceText}
-            >{`>${distanceFromCityCenter}km away`}</Text>
+            <Text style={styles.distanceText}>{distanceText}</Text>
           </VStack>
         </VStack>
       </HStack>
