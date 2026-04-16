@@ -1,4 +1,4 @@
-import { QueryParams } from "@/src/types/filter";
+import { QueryByIdParams, QueryParams } from "@/src/types/filter";
 import {
   useInfiniteQuery,
   useMutation,
@@ -26,7 +26,12 @@ export const useEvents = (params: QueryParams) => {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const { currentPage, limit, total } = lastPage.data.pagination;
+      const pagination = lastPage.data.pagination;
+      if (!pagination) {
+        return undefined;
+      }
+
+      const { currentPage, limit, total } = pagination;
       const itemsFetched = currentPage * limit;
       return itemsFetched < total ? currentPage + 1 : undefined;
     },
@@ -47,10 +52,10 @@ export const useEvents = (params: QueryParams) => {
   });
 };
 
-export const useEventDetails = (id: string) => {
+export const useEventDetails = (id: QueryByIdParams) => {
   return useQuery({
-    queryKey: eventKeys.detail(id),
-    queryFn: () => eventService.getEventById(id),
+    queryKey: eventKeys.detail(id.id),
+    queryFn: () => eventService.getEventById(id.id),
     enabled: !!id, // Prevent running if ID is missing
     staleTime: 1000 * 60 * 5, // Keep detail fresh for 5 mins
   });

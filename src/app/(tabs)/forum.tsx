@@ -1,11 +1,11 @@
 import ForumList from "@/src/components/app/forum/ForumList";
+import ShareExperienceHeader from "@/src/components/app/forum/ShareExperienceHeader";
 import CustomButton from "@/src/components/ui/CustomButton";
 import { Colors, Typography } from "@/src/constants/styles";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { useRouter } from "expo-router";
+import { Tabs } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
@@ -14,47 +14,73 @@ export default function Forum() {
   const handlePressFilter = () => {
     SheetManager.show("forum-filter-sheet");
   };
-  const router = useRouter();
-
-  const handlePressCreate = () => {
-    router.push("/forum/experience");
-  };
 
   return (
     <SafeArea edges={["top"]}>
-      <Screen style={{ paddingBottom: 0, position: "relative" }}>
-        <View
-          style={{
-            alignItems: "flex-end",
+      <Tabs.Screen
+        options={{
+          sceneStyle: styles.sceneStyle,
+        }}
+      />
 
-            marginBottom: 12,
-          }}
-        >
+      <Screen style={styles.screen}>
+        <ShareExperienceHeader />
+
+        <View style={styles.contentWrapper}>
           <CustomButton
             title="Filters"
+            variant="outlined"
             prefixIcon={
-              <MaterialCommunityIcons name="filter" size={10} color="white" />
+              <MaterialCommunityIcons
+                name="filter"
+                size={10}
+                color={Colors.primary}
+              />
             }
-            textStyle={{ fontSize: 10 }}
-            style={{ paddingHorizontal: 12, paddingVertical: 6 }}
+            textStyle={styles.filterButtonText}
+            style={styles.filterButton}
             onPress={handlePressFilter}
           />
+
+          <ForumList />
         </View>
 
-        <ForumList />
-
-        <CustomButton
+        {/* <CustomButton
           title=""
           prefixIcon={<FontAwesome6 name="add" size={18} color="white" />}
           style={styles.buttonStyle}
           onPress={handlePressCreate}
-        />
+        /> */}
       </Screen>
     </SafeArea>
   );
 }
 
 const styles = StyleSheet.create({
+  sceneStyle: {
+    backgroundColor: Colors.background,
+  },
+  screen: {
+    padding: 0,
+    position: "relative",
+  },
+  contentWrapper: {
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    flex: 1,
+    gap: 6,
+  },
+  filterButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    alignSelf: "flex-end",
+    borderRadius: 5,
+    borderWidth: 0,
+    backgroundColor: "#e0e7ff",
+  },
+  filterButtonText: {
+    fontSize: 10,
+  },
   headerButton: {
     backgroundColor: "#e0e7ff",
     paddingHorizontal: 12,

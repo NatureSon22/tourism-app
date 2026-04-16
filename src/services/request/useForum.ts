@@ -1,20 +1,8 @@
-import { ForumPost } from "@/src/constants/forum";
 import { ForumType } from "@/src/constants/forumTypes";
+import type { ForumPost } from "@/src/types/forum";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert } from "react-native";
 import { forumService } from "../api/forumService";
-
-export type ForumResponse = {
-  data: {
-    listings: ForumPost[];
-    pagination?: {
-      count: number;
-      currentPage: number;
-      limit: number;
-      total: number;
-    };
-  };
-};
 
 export const forumKeys = {
   all: () => ["forum"] as const,
@@ -126,8 +114,6 @@ export const useBookmarkForum = () => {
 };
 
 export const useShareForum = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ postId }: PostIdPayload) => forumService.sharePost(postId),
     onSuccess: () => {

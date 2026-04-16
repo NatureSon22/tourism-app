@@ -7,68 +7,83 @@ import ActivityReviews from "@/src/components/app/activity/ActivityReviews";
 import NavigationRow from "@/src/components/app/NavigationRow";
 import StickyFooter from "@/src/components/app/StickyFooter";
 import Divider from "@/src/components/ui/Divider";
+import Loading from "@/src/components/ui/Loading";
 import { ACTIVITY_DETAIL } from "@/src/constants/activitydetail";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
-import { useRouter } from "expo-router";
+import { useActivityDetails } from "@/src/services/request/useActivity";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function ActivityDetailsPage() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ id: string }>();
+  const idParam = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { data: activity, isLoading } = useActivityDetails({
+    id: idParam ?? "",
+  });
 
   return (
     <SafeArea edges={["top", "bottom"]}>
       <Screen style={styles.screenContainer}>
-        <ScrollView
-          style={styles.scrollView}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
-        >
-          <ActivityImages images={ACTIVITY_DETAIL.images} />
-
-          <View style={styles.contentContainer}>
-            <ActivityHeader
-              name={ACTIVITY_DETAIL.name}
-              rating={ACTIVITY_DETAIL.rating}
-              reviews={ACTIVITY_DETAIL.reviews}
-              location={ACTIVITY_DETAIL.location}
-              description={ACTIVITY_DETAIL.description}
-              books={ACTIVITY_DETAIL.books}
-              tags={ACTIVITY_DETAIL.tags}
-            />
-
-            <ActivityHotlines hotlines={ACTIVITY_DETAIL.hotlines} />
-
-            <ActivityPackages packages={ACTIVITY_DETAIL.packages} />
-
-            <Divider />
-
-            <NavigationRow
-              label="General Information"
-              onPress={() => {
-                router.push("/accommodation/about");
-              }}
-            />
-
-            <Divider />
-
-            <NavigationRow
-              label="Terms & Conditions"
-              onPress={() => {
-                router.push("/accommodation/about");
-              }}
-            />
-
-            <Divider />
-
-            <ActivityForums forums={ACTIVITY_DETAIL.forums} />
-
-            <ActivityReviews reviews={ACTIVITY_DETAIL.reviewsData} />
+        {isLoading || !activity ? (
+          <View style={styles.loadingContainer}>
+            <Loading />
           </View>
-        </ScrollView>
+        ) : (
+          <>
+            <ScrollView
+              style={styles.scrollView}
+              scrollEventThrottle={16}
+              showsVerticalScrollIndicator={false}
+            >
+              <ActivityImages images={ACTIVITY_DETAIL.images} />
 
-        <StickyFooter price={ACTIVITY_DETAIL.price} />
+              <View style={styles.contentContainer}>
+                <ActivityHeader
+                  name={ACTIVITY_DETAIL.name}
+                  rating={ACTIVITY_DETAIL.rating}
+                  reviews={ACTIVITY_DETAIL.reviews}
+                  location={ACTIVITY_DETAIL.location}
+                  description={ACTIVITY_DETAIL.description}
+                  books={ACTIVITY_DETAIL.books}
+                  tags={ACTIVITY_DETAIL.tags}
+                />
+
+                <ActivityHotlines hotlines={ACTIVITY_DETAIL.hotlines} />
+
+                <ActivityPackages packages={ACTIVITY_DETAIL.packages} />
+
+                <Divider />
+
+                <NavigationRow
+                  label="General Information"
+                  onPress={() => {
+                    router.push("/accommodation/about");
+                  }}
+                />
+
+                <Divider />
+
+                <NavigationRow
+                  label="Terms & Conditions"
+                  onPress={() => {
+                    router.push("/accommodation/about");
+                  }}
+                />
+
+                <Divider />
+
+                <ActivityForums forums={ACTIVITY_DETAIL.forums} />
+
+                <ActivityReviews reviews={ACTIVITY_DETAIL.reviewsData} />
+              </View>
+            </ScrollView>
+
+            <StickyFooter price={ACTIVITY_DETAIL.price} />
+          </>
+        )}
       </Screen>
     </SafeArea>
   );
@@ -96,5 +111,10 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#E5E7EB",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

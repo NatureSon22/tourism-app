@@ -16,7 +16,7 @@ function DiningCard({
   addresses,
   distanceFromCityCenter,
   categories,
-  media,
+  images,
   base_price,
   rating = 0,
   reviews = 0,
@@ -28,9 +28,9 @@ function DiningCard({
     categories && categories.length > 0
       ? categories.map((c) => c.name)
       : ["Category not specified"];
-  const images =
-    media && media.length > 0
-      ? media.map((m) => m.src)
+  const media =
+    images && images.length > 0
+      ? images.map((m) => m.src)
       : thumbnail
         ? [thumbnail]
         : [];
@@ -74,13 +74,13 @@ function DiningCard({
       </View>
 
       {/* Row 4: Thumbnails */}
-      <ImageGrid images={images} />
+      <ImageGrid images={media} />
 
       {/* Row 5: Location + price */}
       <View style={styles.footer}>
         <Text style={styles.location} numberOfLines={1}>
-          {addresses && addresses.length > 0
-            ? formatListingAddress(addresses[0], "short")
+          {addresses
+            ? formatListingAddress(addresses, "short")
             : "Location not available"}
         </Text>
         <Text style={styles.price}>{formatCurrency(base_price)}</Text>

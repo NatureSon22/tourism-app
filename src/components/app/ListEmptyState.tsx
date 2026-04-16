@@ -27,21 +27,21 @@ export default function ListEmptyState({
     return null;
   }
 
-  if ((isConnected === false && !disableOfflineReload) || isError) {
-    return (
-      <ReloadPage
-        refetch={onRetry}
-        message="It looks like you're offline. Please check your connection and try again."
-      />
-    );
-  }
-
   if (isEmpty) {
     const defaultMessage = `We couldn't find any ${resourceName} matching your request.`;
     return (
       <NoResourceFound
         message={customNoResultsMessage || defaultMessage}
         onRetry={onRetry}
+      />
+    );
+  }
+
+  if ((isConnected === false && !disableOfflineReload) || isError) {
+    return (
+      <ReloadPage
+        refetch={onRetry}
+        message="It looks like you're offline. Please check your connection and try again."
       />
     );
   }

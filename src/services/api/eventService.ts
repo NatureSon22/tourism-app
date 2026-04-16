@@ -1,11 +1,12 @@
+import api from "@/src/config/axios";
 import { QueryParams } from "@/src/types/filter";
-import { REALISTIC_EVENTS } from "../../constants/eventListing";
+import { buildQueryString } from "@/src/utils/buildQueryString";
 import { EVENT } from "../../types/listingTypes";
 
 export type GetEventResponse = {
   data: {
     listings: EVENT[];
-    pagination: {
+    pagination?: {
       count: number;
       currentPage: number;
       limit: number;
@@ -22,48 +23,41 @@ export type RegistrationResponse = {
 
 const eventService = {
   getEventData: async (params: QueryParams): Promise<GetEventResponse> => {
-    await new Promise((r) => setTimeout(r, 1000));
+    // await new Promise((r) => setTimeout(r, 1000));
 
-    const { search, page, limit } = params;
-    let result = [...(REALISTIC_EVENTS ?? [])];
+    // const { search, page, limit } = params;
+    // let result = [...(REALISTIC_EVENTS ?? [])];
 
-    if (search) {
-      const query = search.toLowerCase().trim();
-      result = result.filter(
-        (e) =>
-          e.title.toLowerCase().includes(query) ||
-          e.addresses?.some((address) =>
-            address.formatted.toLowerCase().includes(query),
-          ) ||
-          e.categories?.some((category) =>
-            category.name.toLowerCase().includes(query),
-          ),
-      );
-    }
+    // if (search) {
+    //   const query = search.toLowerCase().trim();
+    //   result = result.filter(
+    //     (e) =>
+    //       e.title.toLowerCase().includes(query) ||
+    //       e.addresses?.some((address) =>
+    //         address.formatted.toLowerCase().includes(query),
+    //       ) ||
+    //       e.categories?.some((category) =>
+    //         category.name.toLowerCase().includes(query),
+    //       ),
+    //   );
+    // }
 
-    const currentPage = Math.max(1, page ?? 1);
-    const limitPerPage = limit ?? 5;
-    const total = result.length;
-    const start = (currentPage - 1) * limitPerPage;
-    const end = start + limitPerPage;
-    const listings = result.slice(start, end);
+    // const currentPage = Math.max(1, page ?? 1);
+    // const limitPerPage = limit ?? 5;
+    // const total = result.length;
+    // const start = (currentPage - 1) * limitPerPage;
+    // const end = start + limitPerPage;
+    // const listings = result.slice(start, end);
 
-    return {
-      data: {
-        listings,
-        pagination: {
-          count: listings.length,
-          currentPage,
-          limit: limitPerPage,
-          total,
-        },
-      },
-    };
+    const qs = buildQueryString(params);
+
+    const response = await api.get(`/consumer/listings?${qs.toString()}`);
+    return response.data;
   },
 
-  getEventById: async (id: string): Promise<EVENT | undefined> => {
+  getEventById: async (id: string): Promise<EVENT> => {
     await new Promise((r) => setTimeout(r, 500));
-    return REALISTIC_EVENTS.find((event) => String(event.id) === id);
+    return [] as unknown as EVENT;
   },
 
   registerForEvent: async (

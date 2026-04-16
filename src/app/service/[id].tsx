@@ -4,45 +4,60 @@ import ServiceHeader from "@/src/components/app/service/ServiceHeader";
 import ServiceHotlines from "@/src/components/app/service/ServiceHotlines";
 import ServiceImages from "@/src/components/app/service/ServiceImages";
 import ServiceTeam from "@/src/components/app/service/ServiceTeam";
+import Loading from "@/src/components/ui/Loading";
 import { LOCALSERVICE_DETAIL } from "@/src/constants/localservicedetails";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import { useLocalServiceDetails } from "@/src/services/request/useService";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function ServiceDetailsPage() {
+  const params = useLocalSearchParams<{ id: string }>();
+  const idParam = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { data: service, isLoading } = useLocalServiceDetails({
+    id: idParam ?? "",
+  });
+
   return (
     <SafeArea edges={["top", "bottom"]}>
       <Screen style={styles.screenContainer}>
-        <ScrollView
-          style={styles.scrollView}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
-        >
-          <ServiceImages images={LOCALSERVICE_DETAIL.images} />
-
-          <View style={styles.contentContainer}>
-            <ServiceHeader
-              title={LOCALSERVICE_DETAIL.title}
-              tags={LOCALSERVICE_DETAIL.tags}
-              location={LOCALSERVICE_DETAIL.location}
-            />
-
-            <ServiceHotlines hotlines={LOCALSERVICE_DETAIL.hotlines} />
-
-            <View style={styles.divider} />
-
-            <ServiceGeneralInformation />
-
-            <View style={styles.divider} />
-
-            <ServiceTeam team={LOCALSERVICE_DETAIL.team} />
-
-            <View style={styles.divider} />
-
-            <ServiceForum forums={LOCALSERVICE_DETAIL.forums} />
+        {isLoading || !service ? (
+          <View style={styles.loadingContainer}>
+            <Loading />
           </View>
-        </ScrollView>
+        ) : (
+          <ScrollView
+            style={styles.scrollView}
+            scrollEventThrottle={16}
+            showsVerticalScrollIndicator={false}
+          >
+            <ServiceImages images={LOCALSERVICE_DETAIL.images} />
+
+            <View style={styles.contentContainer}>
+              <ServiceHeader
+                title={LOCALSERVICE_DETAIL.title}
+                tags={LOCALSERVICE_DETAIL.tags}
+                location={LOCALSERVICE_DETAIL.location}
+              />
+
+              <ServiceHotlines hotlines={LOCALSERVICE_DETAIL.hotlines} />
+
+              <View style={styles.divider} />
+
+              <ServiceGeneralInformation />
+
+              <View style={styles.divider} />
+
+              <ServiceTeam team={LOCALSERVICE_DETAIL.team} />
+
+              <View style={styles.divider} />
+
+              <ServiceForum forums={LOCALSERVICE_DETAIL.forums} />
+            </View>
+          </ScrollView>
+        )}
       </Screen>
     </SafeArea>
   );
@@ -70,5 +85,10 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#E5E7EB",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

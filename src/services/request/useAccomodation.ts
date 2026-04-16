@@ -22,7 +22,12 @@ export const useAccommodations = (params: QueryParams) => {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const { currentPage, limit, total } = lastPage.data.pagination;
+      const pagination = lastPage.data.pagination;
+      if (!pagination) {
+        return undefined;
+      }
+
+      const { currentPage, limit, total } = pagination;
 
       // Calculate how many items we have fetched so far
       const itemsFetched = currentPage * limit;

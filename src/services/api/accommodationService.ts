@@ -1,8 +1,6 @@
 import api from "@/src/config/axios";
-import {
-  AccommodationListing,
-  LISTING_INFO,
-} from "@/src/constants/accommodationdetail";
+import { SAMPLE_ACCOMMODATION_DETAIL } from "@/src/constants/data";
+import { ListingDetailed } from "@/src/types/baseListing";
 import { QueryByIdParams, QueryParams } from "@/src/types/filter";
 import { ACCOMMODATION } from "@/src/types/listingTypes";
 import { buildQueryString } from "@/src/utils/buildQueryString";
@@ -10,7 +8,7 @@ import { buildQueryString } from "@/src/utils/buildQueryString";
 export type AccommodationResponse = {
   data: {
     listings: ACCOMMODATION[];
-    pagination: {
+    pagination?: {
       count: number;
       currentPage: number;
       limit: number;
@@ -57,10 +55,8 @@ export const accommodationService = {
 
   getAccommodationDetails: async (
     id: QueryByIdParams,
-  ): Promise<AccommodationListing | undefined> => {
-    //   await new Promise((resolve) => setTimeout(resolve, 1000));
-    // return {} as ACCOMMODATION; // Replace with actual API call when endpoint is readys
+  ): Promise<ListingDetailed> => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    return "listing-en-001" === LISTING_INFO.id ? LISTING_INFO : undefined;
+    return SAMPLE_ACCOMMODATION_DETAIL;
   },
 };

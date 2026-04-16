@@ -1,14 +1,12 @@
 import api from "@/src/config/axios";
-import { Dining } from "@/src/types/dining";
-import { QueryParams } from "@/src/types/filter";
+import { QueryByIdParams, QueryParams } from "@/src/types/filter";
 import { DINING } from "@/src/types/listingTypes";
 import { buildQueryString } from "@/src/utils/buildQueryString";
-import { PHILIPPINE_DINING_DATA } from "../../constants/dining";
 
 export type DiningResponse = {
   data: {
     listings: DINING[];
-    pagination: {
+    pagination?: {
       count: number;
       currentPage: number;
       limit: number;
@@ -50,9 +48,9 @@ export const diningService = {
     return response.data;
   },
 
-  getDiningById: async (id: string): Promise<Dining | undefined> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    return PHILIPPINE_DINING_DATA.find((item) => item.id === id);
+  getDiningById: async (id: QueryByIdParams): Promise<DINING | undefined> => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return [] as unknown as DINING;
   },
 };
 

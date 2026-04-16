@@ -19,13 +19,13 @@ type FilterType = "Recommended" | "Nearby";
 
 export default function PlaceListing({ searchQuery }: PlaceListProps) {
   const [filter, setFilter] = useState<FilterType>("Recommended");
-  const { data, isLoading, isFetched, refetch } = useGetPlaces({
+  const { data, isLoading, isSuccess, refetch } = useGetPlaces({
     search: searchQuery,
     filter,
   });
   const { isConnected, isInternetReachable } = useNetInfo();
   const online = isConnected && isInternetReachable;
-  const isEmpty = isFetched && !isLoading && data?.data.length === 0;
+  const isEmpty = isSuccess && !isLoading && data?.data.length === 0;
   const [isRefetching, setIsRefetching] = useState(false);
 
   const handleRefresh = async () => {

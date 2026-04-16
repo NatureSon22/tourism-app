@@ -1,5 +1,4 @@
 import api from "@/src/config/axios";
-import { Activity, PHILIPPINE_ACTIVITY_DATA } from "@/src/constants/activity";
 import { QueryParams } from "@/src/types/filter";
 import { ACTIVITY } from "@/src/types/listingTypes";
 import { buildQueryString } from "@/src/utils/buildQueryString";
@@ -7,7 +6,7 @@ import { buildQueryString } from "@/src/utils/buildQueryString";
 export type ActivityResponse = {
   data: {
     listings: ACTIVITY[];
-    pagination: {
+    pagination?: {
       count: number;
       currentPage: number;
       limit: number;
@@ -17,10 +16,6 @@ export type ActivityResponse = {
 };
 
 export const activityService = {
-  /**
-   * FETCH ALL ACTIVITIES
-   * Handles Search and Sorting (Rating, etc.)
-   */
   getAvailableActivities: async (
     params: QueryParams,
   ): Promise<ActivityResponse> => {
@@ -30,11 +25,8 @@ export const activityService = {
     return response.data;
   },
 
-  /**
-   * FETCH SINGLE ACTIVITY DETAIL
-   */
-  getActivityById: async (id: string): Promise<Activity | undefined> => {
-    await new Promise((r) => setTimeout(r, 400));
-    return PHILIPPINE_ACTIVITY_DATA.find((a) => a.id === id);
+  getActivityById: async (id: string): Promise<ACTIVITY> => {
+    await new Promise((r) => setTimeout(r, 1000));
+    return [] as unknown as ACTIVITY;
   },
 };

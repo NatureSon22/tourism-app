@@ -1,5 +1,6 @@
 import { Colors, Typography } from "@/src/constants/styles";
-import { Reply } from "@/src/types/forum";
+import { ForumComment } from "@/src/types/forum";
+
 import {
   AntDesign,
   MaterialCommunityIcons,
@@ -9,7 +10,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type ThreadReply = Reply & {
+type ThreadReply = ForumComment & {
   depth: number;
   replyTo?: string;
   childCount?: number;
@@ -19,7 +20,7 @@ type ThreadReply = Reply & {
 type ReplyItemProps = {
   reply: ThreadReply;
   isLiked?: boolean;
-  onToggleLike: (replyId: number) => void;
+  onToggleLike: (replyId: string) => void;
   onReplyPress: (reply: ThreadReply) => void;
   onToggleReplies: (reply: ThreadReply) => void;
 };
@@ -31,19 +32,14 @@ function ReplyItem({
   onReplyPress,
   onToggleReplies,
 }: ReplyItemProps) {
-  const likedCount = reply.likes + (isLiked ? 1 : 0);
+  const likedCount = reply.stats.likes + (isLiked ? 1 : 0);
 
   return (
     <View style={[styles.card, { marginLeft: reply.depth * 14 }]}>
       <View style={styles.headline}>
-        <Image
-          source={{ uri: reply.author?.profilePictureUrl }}
-          style={styles.avatar}
-        />
+        <Image source={{ uri: reply.author?.avatar }} style={styles.avatar} />
         <View style={styles.meta}>
-          <Text style={styles.author}>
-            {reply.author?.userName ?? "Anonymous"}
-          </Text>
+          <Text style={styles.author}>{reply.author?.name ?? "Anonymous"}</Text>
           <Text style={styles.timestamp}>
             {new Date(reply.createdAt).toLocaleDateString(undefined, {
               month: "short",

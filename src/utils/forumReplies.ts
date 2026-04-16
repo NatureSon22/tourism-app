@@ -1,63 +1,104 @@
-import { Comment, Reply } from "@/src/types/forum";
+import { ForumComment } from "@/src/types/forum";
 
-export type ThreadReply = Reply & {
+export type ThreadReply = ForumComment & {
   depth: number;
   replyTo?: string;
-  parentId?: number | null;
+  parentId?: string | null;
 };
 
 export const buildThreadedReplies = (
-  comments: Comment[] = [],
+  comments: {
+    id: string | number;
+    content: string;
+    author?: {
+      id?: string | number;
+      name?: string;
+      userName?: string;
+      avatarUrl?: string;
+      profilePictureUrl?: string;
+    };
+    createdAt: string | Date;
+    likes: number;
+    dislikes: number;
+    viewers?: number;
+    media?: any[];
+    replies?: any[];
+  }[] = [],
 ): ThreadReply[] => {
   const result: ThreadReply[] = [];
 
+  const normalizeReply = (
+    item: any,
+    parentId: string | null,
+    depth: number,
+    replyTo?: string,
+  ): ThreadReply => ({
+    id: String(item.id),
+    content: item.content,
+    author: {
+      id: String(item.author?.id ?? "0"),
+      name: item.author?.name || item.author?.userName || "Anonymous",
+      avatar: item.author?.avatarUrl || item.author?.profilePictureUrl,
+    },
+    createdAt:
+      typeof item.createdAt === "string"
+        ? item.createdAt
+        : (item.createdAt?.toISOString?.() ?? String(item.createdAt)),
+    stats: {
+      likes: item.likes ?? 0,
+      dislikes: item.dislikes ?? 0,
+    },
+    userInteractions: {
+      hasLiked: false,
+      hasDisliked: false,
+    },
+    replies: [],
+    media: item.media,
+    parentId,
+    depth,
+    replyTo,
+  });
+
   const walkReplies = (
-    item: Reply & { replies?: Reply[] },
-    parentId: number | null,
+    item: any,
+    parentId: string | null,
     depth: number,
     replyTo?: string,
   ) => {
-    result.push({
-      ...item,
-      parentId,
-      depth,
-      replyTo,
-    });
+    result.push(normalizeReply(item, parentId, depth, replyTo));
 
     if (item.replies && item.replies.length > 0) {
-      item.replies.forEach((child) =>
+      item.replies.forEach((child: any) =>
         walkReplies(
-          child as Reply & { replies?: Reply[] },
-          item.id,
+          child,
+          String(item.id),
           depth + 1,
-          item.author?.userName,
+          item.author?.name || item.author?.userName,
         ),
       );
     }
   };
 
-  comments.forEach((comment) =>
-    walkReplies(comment as Reply & { replies?: Reply[] }, null, 0),
-  );
+  comments.forEach((comment) => walkReplies(comment, null, 0));
 
   return result;
 };
 
 export const groupRepliesByParent = (
   replies: ThreadReply[],
-): Map<number, ThreadReply[]> => {
+): Map<string, ThreadReply[]> => {
   return replies.reduce((map, reply) => {
     if (reply.parentId != null) {
       const children = map.get(reply.parentId) ?? [];
       map.set(reply.parentId, [...children, reply]);
     }
     return map;
-  }, new Map<number, ThreadReply[]>());
+  }, new Map<string, ThreadReply[]>());
 };
 
 export const getVisibleReplies = (
   replies: ThreadReply[],
-  expandedReplies: Set<number>,
+  expandedReplies: Set<string>,
 ): ThreadReply[] => {
   if (expandedReplies.size === 0) {
     return replies.filter((reply) => reply.parentId == null);
@@ -68,7 +109,7 @@ export const getVisibleReplies = (
       return true;
     }
 
-    let currentParent: number | null = reply.parentId;
+    let currentParent: string | null = reply.parentId;
     while (currentParent != null) {
       if (!expandedReplies.has(currentParent)) {
         return false;
@@ -83,7 +124,7 @@ export const getVisibleReplies = (
 
 export const insertReply = (
   reply: ThreadReply,
-  parentId: number | null,
+  parentId: string | null,
   currentReplies: ThreadReply[],
 ) => {
   if (!parentId) {

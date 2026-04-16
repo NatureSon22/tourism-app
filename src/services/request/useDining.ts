@@ -1,4 +1,4 @@
-import { QueryParams } from "@/src/types/filter";
+import { QueryByIdParams, QueryParams } from "@/src/types/filter";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { diningService } from "../api/diningService";
 
@@ -6,7 +6,7 @@ import { diningService } from "../api/diningService";
 export const diningKeys = {
   all: ["dining"] as const,
   lists: () => [...diningKeys.all, "list"] as const,
-  // Use a stable, primitive tuple for the list key to avoid cache churn
+  // Use a stable, primitive tuple for the list key to avoid cache churns
   list: (params: QueryParams) => [...diningKeys.lists(), params] as const,
   details: () => [...diningKeys.all, "detail"] as const,
   detail: (id: string) => [...diningKeys.details(), id] as const,
@@ -22,7 +22,12 @@ export const useDining = (params: QueryParams) => {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const { currentPage, limit, total } = lastPage.data.pagination;
+      const pagination = lastPage.data.pagination;
+      if (!pagination) {
+        return undefined;
+      }
+
+      const { currentPage, limit, total } = pagination;
       const itemsFetched = currentPage * limit;
       return itemsFetched < total ? currentPage + 1 : undefined;
     },
@@ -42,9 +47,9 @@ export const useDining = (params: QueryParams) => {
   });
 };
 
-export const useDiningDetails = (id: string) => {
+export const useDiningDetails = (id: QueryByIdParams) => {
   return useQuery({
-    queryKey: diningKeys.detail(id),
+    queryKey: diningKeys.detail(id.id),
     queryFn: () => diningService.getDiningById(id),
     enabled: !!id,
     staleTime: 1000 * 60 * 5, // Keep fresh for 5 minutes

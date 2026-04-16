@@ -50,14 +50,14 @@ export default function ForumReplies() {
   const { data: forum, isLoading } = useGetForumDetails(idParam ?? "");
   const [replies, setReplies] = useState<ThreadReply[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [activeReplyParentId, setActiveReplyParentId] = useState<number | null>(
+  const [activeReplyParentId, setActiveReplyParentId] = useState<string | null>(
     null,
   );
   const [activeReplyTarget, setActiveReplyTarget] = useState<string | null>(
     null,
   );
-  const [likedReplies, setLikedReplies] = useState<Record<number, boolean>>({});
-  const [expandedReplies, setExpandedReplies] = useState<Set<number>>(
+  const [likedReplies, setLikedReplies] = useState<Record<string, boolean>>({});
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(
     new Set(),
   );
   const currentUser = useAuthStore((state) => state.user);
@@ -192,14 +192,14 @@ export default function ForumReplies() {
   );
 
   const replyChildCountMap = useMemo(() => {
-    const map = new Map<number, number>();
+    const map = new Map<string, number>();
     replyChildrenMap.forEach((children, parentId) => {
       map.set(parentId, children.length);
     });
     return map;
   }, [replyChildrenMap]);
 
-  const handleToggleLike = useCallback((replyId: number) => {
+  const handleToggleLike = useCallback((replyId: string) => {
     setLikedReplies((prev) => ({
       ...prev,
       [replyId]: !prev[replyId],
@@ -208,7 +208,7 @@ export default function ForumReplies() {
 
   const handleReplyPress = useCallback((reply: ThreadReply) => {
     setActiveReplyParentId(reply.id);
-    setActiveReplyTarget(reply.author?.userName ?? "user");
+    setActiveReplyTarget(reply.author?.name ?? "user");
   }, []);
 
   const handleClearReplyTarget = useCallback(() => {
@@ -237,20 +237,28 @@ export default function ForumReplies() {
       : undefined;
 
     const newReply: ThreadReply = {
-      id: Date.now(),
+      id: String(Date.now()),
       content: trimmed,
-      author: currentUser ?? {
-        id: "0",
-        userName: "You",
-        profilePictureUrl: "",
-        email: "",
-        firstName: "",
-        lastName: "",
+      author: currentUser
+        ? {
+            id: currentUser.id,
+            name: currentUser.userName,
+            avatar: currentUser.profilePictureUrl,
+          }
+        : {
+            id: "0",
+            name: "You",
+          },
+      createdAt: new Date().toISOString(),
+      stats: {
+        likes: 0,
+        dislikes: 0,
       },
-      createdAt: new Date(),
-      likes: 0,
-      dislikes: 0,
-      viewers: 0,
+      userInteractions: {
+        hasLiked: false,
+        hasDisliked: false,
+      },
+      replies: [],
       parentId: activeReplyParentId,
       depth: parentReply ? parentReply.depth + 1 : 0,
       replyTo: activeReplyTarget || undefined,
@@ -266,7 +274,7 @@ export default function ForumReplies() {
       {
         postId: forum.id,
         comment: trimmed,
-        parentId: activeReplyParentId,
+        parentId: activeReplyParentId ? Number(activeReplyParentId) : undefined,
       },
       {
         onError: () => {
@@ -278,7 +286,7 @@ export default function ForumReplies() {
     emitForumReply({
       postId: forum.id,
       comment: trimmed,
-      parentId: activeReplyParentId,
+      parentId: activeReplyParentId ? Number(activeReplyParentId) : undefined,
       clientId: newReply.id,
     }).catch((error) => {
       console.warn("Failed to emit forum reply", error);
@@ -330,9 +338,11 @@ export default function ForumReplies() {
                   fontFamily: Typography.family.medium,
                   color: Colors.textMuted,
                 }}
-              >{`${forum.comments?.length} replies`}</Text>
+              >{`${forum.comments?.length} comments`}</Text>
             }
-            suffixContainerStyle={{ flex: 0.4 }}
+            suffixContainerStyle={{
+              flex: 1,
+            }}
           />
           {typingUsers.length > 0 ? (
             <Text style={styles.typingIndicator}>
@@ -362,21 +372,36 @@ export default function ForumReplies() {
           />
         </View>
 
-        <ReplyComposer
-          value={inputValue}
-          onChangeText={setInputValue}
-          onTyping={handleTyping}
-          onSubmit={handleSubmitReply}
-          placeholder={
-            activeReplyTarget
-              ? `Replying to @${activeReplyTarget}`
-              : "Write a reply..."
-          }
-          isLoading={replyMutation.isPending}
-          disabled={!inputValue.trim() || replyMutation.isPending}
-          activeReplyTarget={activeReplyTarget}
-          onCancelReply={handleClearReplyTarget}
-        />
+        {currentUser ? (
+          <ReplyComposer
+            value={inputValue}
+            onChangeText={setInputValue}
+            onTyping={handleTyping}
+            onSubmit={handleSubmitReply}
+            placeholder={
+              activeReplyTarget
+                ? `Replying to @${activeReplyTarget}`
+                : "Write a reply..."
+            }
+            isLoading={replyMutation.isPending}
+            disabled={!inputValue.trim() || replyMutation.isPending}
+            activeReplyTarget={activeReplyTarget}
+            onCancelReply={handleClearReplyTarget}
+          />
+        ) : (
+          <View style={styles.footer}>
+            <Text
+              style={{
+                fontFamily: Typography.family.medium,
+                textAlign: "center",
+                color: Colors.textMuted,
+                fontSize: 12,
+              }}
+            >
+              Sign in or create an account to comment
+            </Text>
+          </View>
+        )}
       </KeyboardAvoidingView>
     </SafeArea>
   );
@@ -487,4 +512,9 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 14,
   },
+  // footer: {
+  //   width: "100%",
+  //   borderTopWidth: 1,
+
+  // },
 });

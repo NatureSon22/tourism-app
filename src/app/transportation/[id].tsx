@@ -3,13 +3,16 @@ import TransportationHotlines from "@/src/components/app/transportation/Transpor
 import TransportationImages from "@/src/components/app/transportation/TransportationImages";
 import TransportationRoutes from "@/src/components/app/transportation/TransportationRoutes";
 import TransportationSchedule from "@/src/components/app/transportation/TransportationSchedule";
+import Loading from "@/src/components/ui/Loading";
 import { Colors, Typography } from "@/src/constants/styles";
 import { TRANSPORTATION_DETAIL } from "@/src/constants/transportationdetail";
 import HStack from "@/src/layouts/HStack";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import VStack from "@/src/layouts/VStack";
+import { useTransportationDetails } from "@/src/services/request/useTransportation";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
   FlatList,
@@ -21,86 +24,99 @@ import {
 } from "react-native";
 
 export default function TransportationDetailsPage() {
+  const router = useRouter();
+  const params = useLocalSearchParams<{ id: string }>();
+  const idParam = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { data: accommodation, isLoading } = useTransportationDetails({
+    id: idParam ?? "",
+  });
+
   return (
     <SafeArea edges={["top", "bottom"]}>
       <Screen style={styles.screenContainer}>
-        <ScrollView
-          style={styles.scrollView}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Image carousel — no sticky, sits at top */}
-          <TransportationImages images={TRANSPORTATION_DETAIL.images} />
+        {isLoading || !accommodation ? (
+          <View style={styles.loadingContainer}>
+            <Loading />
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.scrollView}
+            scrollEventThrottle={16}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Image carousel — no sticky, sits at top */}
+            <TransportationImages images={TRANSPORTATION_DETAIL.images} />
 
-          {/* Content card overlaps the image by pulling it up */}
-          <View style={styles.contentContainer}>
-            <VStack gap={8} style={{ alignItems: "flex-start" }}>
-              <Text style={styles.title} numberOfLines={2}>
-                {TRANSPORTATION_DETAIL.title}
-              </Text>
+            {/* Content card overlaps the image by pulling it up */}
+            <View style={styles.contentContainer}>
+              <VStack gap={8} style={{ alignItems: "flex-start" }}>
+                <Text style={styles.title} numberOfLines={2}>
+                  {TRANSPORTATION_DETAIL.title}
+                </Text>
 
-              {/* Tags */}
-              <View style={styles.tagsWrapper}>
-                <FlatList
-                  data={TRANSPORTATION_DETAIL.tags}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(item) => item}
-                  contentContainerStyle={styles.tagsContainer}
-                  renderItem={({ item: tag }) => (
-                    <View style={styles.tagBadge}>
-                      <Text style={styles.tagText}>{tag}</Text>
-                    </View>
-                  )}
-                />
-              </View>
-            </VStack>
+                {/* Tags */}
+                <View style={styles.tagsWrapper}>
+                  <FlatList
+                    data={TRANSPORTATION_DETAIL.tags}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={(item) => item}
+                    contentContainerStyle={styles.tagsContainer}
+                    renderItem={({ item: tag }) => (
+                      <View style={styles.tagBadge}>
+                        <Text style={styles.tagText}>{tag}</Text>
+                      </View>
+                    )}
+                  />
+                </View>
+              </VStack>
 
-            {/* Location */}
-            <HStack
-              gap={8}
-              alignItems="center"
-              justifyContent="space-between"
-              style={{ width: "100%" }}
-            >
-              <HStack gap={4}>
+              {/* Location */}
+              <HStack
+                gap={8}
+                alignItems="center"
+                justifyContent="space-between"
+                style={{ width: "100%" }}
+              >
+                <HStack gap={4}>
+                  <Ionicons
+                    name="location-outline"
+                    size={18}
+                    color={Colors.textMuted}
+                  />
+                  <Pressable onPress={() => {}}>
+                    <Text style={styles.locationText} numberOfLines={1}>
+                      {TRANSPORTATION_DETAIL.location}
+                    </Text>
+                  </Pressable>
+                </HStack>
+
                 <Ionicons
-                  name="location-outline"
+                  name="chevron-forward"
                   size={18}
                   color={Colors.textMuted}
                 />
-                <Pressable onPress={() => {}}>
-                  <Text style={styles.locationText} numberOfLines={1}>
-                    {TRANSPORTATION_DETAIL.location}
-                  </Text>
-                </Pressable>
               </HStack>
 
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={Colors.textMuted}
-              />
-            </HStack>
+              {/* Hotlines */}
+              <TransportationHotlines />
 
-            {/* Hotlines */}
-            <TransportationHotlines />
+              <View style={styles.divider} />
 
-            <View style={styles.divider} />
+              {/* routes */}
+              <TransportationRoutes />
 
-            {/* routes */}
-            <TransportationRoutes />
+              <View style={styles.divider} />
 
-            <View style={styles.divider} />
+              {/* schedule */}
+              <TransportationSchedule />
 
-            {/* schedule */}
-            <TransportationSchedule />
+              <View style={styles.divider} />
 
-            <View style={styles.divider} />
-
-            <TranportationForum forums={TRANSPORTATION_DETAIL.forums} />
-          </View>
-        </ScrollView>
+              <TranportationForum forums={TRANSPORTATION_DETAIL.forums} />
+            </View>
+          </ScrollView>
+        )}
       </Screen>
     </SafeArea>
   );
@@ -165,5 +181,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: Typography.family.semiBold,
     color: Colors.text,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

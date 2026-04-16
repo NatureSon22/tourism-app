@@ -1,5 +1,5 @@
-import { QueryParams } from "@/src/types/filter";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { QueryByIdParams, QueryParams } from "@/src/types/filter";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { localserviceService } from "../api/localserviceService";
 
 export const serviceKeys = {
@@ -20,9 +20,22 @@ export const useGetServices = (params: QueryParams) => {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const { currentPage, limit, total } = lastPage.data.pagination;
+      const pagination = lastPage.data.pagination;
+      if (!pagination) {
+        return undefined;
+      }
+      const { currentPage, limit, total } = pagination;
       const itemsFetched = currentPage * limit;
       return itemsFetched < total ? currentPage + 1 : undefined;
     },
+  });
+};
+
+export const useLocalServiceDetails = (id: QueryByIdParams) => {
+  return useQuery({
+    queryKey: serviceKeys.detail(id.id),
+    queryFn: () => localserviceService.getLocalServiceDetails(id.id),
+    enabled: !!id.id,
+    staleTime: 1000 * 60 * 5,
   });
 };

@@ -8,13 +8,22 @@ import EventPackages from "@/src/components/app/event/EventPackages";
 import EventReviews from "@/src/components/app/event/EventReviews";
 import StickyFooter from "@/src/components/app/StickyFooter";
 import Divider from "@/src/components/ui/Divider";
+import Loading from "@/src/components/ui/Loading";
 import { EVENT_DETAIL } from "@/src/constants/eventdetail";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import { useEventDetails } from "@/src/services/request/useEvent";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function EventDetailsPage() {
+  const params = useLocalSearchParams<{ id: string }>();
+  const idParam = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { data: dining, isLoading } = useEventDetails({
+    id: idParam ?? "",
+  });
+
   return (
     <SafeArea edges={["top", "bottom"]}>
       <Screen style={styles.screenContainer}>
@@ -23,37 +32,45 @@ export default function EventDetailsPage() {
           scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
         >
-          <EventImages images={EVENT_DETAIL.images} />
+          {isLoading || !dining ? (
+            <View style={styles.loadingContainer}>
+              <Loading />
+            </View>
+          ) : (
+            <>
+              <EventImages images={EVENT_DETAIL.images} />
 
-          <View style={styles.contentContainer}>
-            <EventHeader
-              name={EVENT_DETAIL.name}
-              rating={EVENT_DETAIL.rating}
-              reviews={EVENT_DETAIL.reviews}
-              books={EVENT_DETAIL.books}
-              tags={EVENT_DETAIL.tags}
-              location={EVENT_DETAIL.location}
-              description={EVENT_DETAIL.description}
-            />
+              <View style={styles.contentContainer}>
+                <EventHeader
+                  name={EVENT_DETAIL.name}
+                  rating={EVENT_DETAIL.rating}
+                  reviews={EVENT_DETAIL.reviews}
+                  books={EVENT_DETAIL.books}
+                  tags={EVENT_DETAIL.tags}
+                  location={EVENT_DETAIL.location}
+                  description={EVENT_DETAIL.description}
+                />
 
-            <EventHotlines hotlines={EVENT_DETAIL.hotlines} />
+                <EventHotlines hotlines={EVENT_DETAIL.hotlines} />
 
-            <EventPackages packages={EVENT_DETAIL.packages} />
+                <EventPackages packages={EVENT_DETAIL.packages} />
 
-            <Divider />
+                <Divider />
 
-            <EventGeneralInformation />
+                <EventGeneralInformation />
 
-            <Divider />
+                <Divider />
 
-            <EventConditions />
+                <EventConditions />
 
-            <Divider />
+                <Divider />
 
-            <EventForums forums={EVENT_DETAIL.forums} />
+                <EventForums forums={EVENT_DETAIL.forums} />
 
-            <EventReviews reviews={EVENT_DETAIL.reviewsData} />
-          </View>
+                <EventReviews reviews={EVENT_DETAIL.reviewsData} />
+              </View>
+            </>
+          )}
         </ScrollView>
 
         <StickyFooter price={EVENT_DETAIL.price} />
@@ -80,5 +97,10 @@ const styles = StyleSheet.create({
     gap: 12,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

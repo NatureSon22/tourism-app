@@ -1,13 +1,13 @@
 export type Media = {
-  id: number;
+  id: string;
   src: string;
   alt: string;
-  type: string;
+  type: "image" | "video";
 };
 
 export type Address = {
-  id: number;
-  listing_id: number;
+  id: string;
+  listing_id: string;
   lat: number;
   lng: number;
   formatted: string;
@@ -24,24 +24,23 @@ export type Address = {
 };
 
 export type Contact = {
-  id: number;
-  listing_id: number;
-  type: string;
-  label: string;
+  id: string;
+  listing_id: string;
+  type: "phone" | "landline";
+  label?: string;
   number: string;
 };
 
 export type BlockMedia = {
-  id: number;
-  content_block_id: number;
-  media_id: number;
-  media?: Media; // Joined from media table
+  id: string;
+  content_block_id: string;
+  media: Media;
 };
 
 export type ContentBlock = {
-  id: number;
-  listing_info_id: number;
-  type: string;
+  id: string;
+  listing_info_id: string;
+  type: "subheading" | "paragraph" | "list" | "table"; // Example types
   body_text: string | null;
   body_html: string | null;
   order: number;
@@ -49,8 +48,8 @@ export type ContentBlock = {
 };
 
 export type ListingInfo = {
-  id: number;
-  listing_id: number;
+  id: string;
+  listing_id: string;
   key: string;
   title: string;
   content_blocks: ContentBlock[];
@@ -62,40 +61,49 @@ export type Category = {
   type: string; // e.g., "PRIMARY" | "SECONDARY"
 };
 
+// FOR LISTING PREVIEW (e.g., listing cards)
 export type Listing = {
   id: number;
   title: string;
   thumbnail: string;
   base_price: number;
-  merchant_id: number;
-  module_id: number;
+  merchant_id: string;
+  module_id: string;
   main_category_id: number;
   status: string; // e.g., "Active" | "Inactive"
   highlights: string;
   email: string;
-  media?: Media[]; // Joined from media table (if you want to include all media directly)
+  images?: Media[]; // Joined from media table (if you want to include all media directly)
 
   // Related Data (Omitted from base table but part of the listing object)
-  addresses?: Address[];
+  addresses?: Address;
   contacts?: Contact[];
   listing_info?: ListingInfo[];
   categories?: Category[];
 };
 
+// FOR DETAILED LISTING VIEW (e.g., listing details page)
 export type ListingDetailed = {
-  id: number;
+  id: string;
   title: string;
   thumbnail: string;
   base_price: number;
-  module_id: number;
-  main_category_id: number;
+  module_id: string;
+  main_category_id: string;
   status: string;
   highlights: string;
   email: string;
+  images?: Media[];
+
+  rating?: number; // Average rating from reviews
+  reviews?: number; // Total number of reviews
+  books?: number; // Total number of bookings
+
+  forums?: [];
 
   // From 'categories' table (Primary)
   main_category?: {
-    id: number;
+    id: string;
     name: string;
     type: string;
   };
@@ -103,13 +111,13 @@ export type ListingDetailed = {
   // From 'listing_categories' junction
   // Allows the listing to have multiple secondary categories
   categories?: {
-    id: number;
+    id: string;
     name: string;
     type: string;
   }[];
 
   // From 'addresses' table
-  addresses: Address[];
+  addresses: Address;
 
   // From 'contacts' table
   contacts: Contact[];
@@ -117,9 +125,7 @@ export type ListingDetailed = {
   // From 'listing_info' -> 'content_blocks' -> 'block_media'
   // This represents the CMS/Dynamic content sections
   additional_info: (ListingInfo & {
-    content_blocks: (ContentBlock & {
-      media?: Media[];
-    })[];
+    content_blocks: ContentBlock[];
   })[];
 
   // From 'bookings' table

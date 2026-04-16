@@ -1,4 +1,4 @@
-import { QueryParams } from "@/src/types/filter";
+import { QueryByIdParams, QueryParams } from "@/src/types/filter";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import transportationService from "../api/transportationService";
 
@@ -19,17 +19,22 @@ export const useTransportation = (params: QueryParams) => {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const { currentPage, limit, total } = lastPage.data.pagination;
+      const pagination = lastPage.data.pagination;
+      if (!pagination) {
+        return undefined;
+      }
+
+      const { currentPage, limit, total } = pagination;
       const itemsFetched = currentPage * limit;
       return itemsFetched < total ? currentPage + 1 : undefined;
     },
   });
 };
 
-export const useTransportationDetails = (id: string) => {
+export const useTransportationDetails = (id: QueryByIdParams) => {
   return useQuery({
-    queryKey: transportKeys.detail(id),
-    queryFn: () => transportationService.getTransportationById(id),
+    queryKey: transportKeys.detail(id.id),
+    queryFn: () => transportationService.getTransportationDetails(id.id),
     enabled: !!id,
   });
 };

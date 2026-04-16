@@ -1,4 +1,3 @@
-import type { ForumPost } from "@/src/constants/forum";
 import {
   useBookmarkForum,
   useDislikeForum,
@@ -6,12 +5,25 @@ import {
   useLikeForum,
   useShareForum,
 } from "@/src/services/request/useForum";
+import type { ForumPost } from "@/src/types/forum";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { ForumContent } from "./ForumContent";
 import { ForumFooter } from "./ForumFooter";
 import { ForumHeader } from "./ForumHeader";
+
+type ForumCardProps = Pick<
+  ForumPost,
+  | "id"
+  | "author"
+  | "category"
+  | "content"
+  | "media"
+  | "location"
+  | "stats"
+  | "place"
+>;
 
 export default function ForumCard({
   id,
@@ -20,23 +32,17 @@ export default function ForumCard({
   place,
   content,
   media,
-  viewers,
-  likes = 0,
-  dislikes = 0,
-  commentCount = 0,
-}: Pick<
-  ForumPost,
-  | "id"
-  | "author"
-  | "category"
-  | "place"
-  | "content"
-  | "media"
-  | "viewers"
-  | "likes"
-  | "dislikes"
-  | "commentCount"
->) {
+  location,
+  stats,
+}: ForumCardProps) {
+  const {
+    likes = 0,
+    dislikes = 0,
+    viewers = 0,
+    commentCount = 0,
+  } = stats ?? {};
+  const displayPlace = location?.formatted ?? place ?? "Location not available";
+  const displayCategory = category ?? "";
   const [likesCount, setLikesCount] = useState(likes);
   const [dislikesCount, setDislikesCount] = useState(dislikes);
   const [liked, setLiked] = useState(false);
@@ -154,8 +160,8 @@ export default function ForumCard({
     >
       <ForumHeader
         author={author}
-        category={category}
-        place={place}
+        category={displayCategory}
+        place={displayPlace}
         joined={joined}
         isJoining={joinMutation.isPending}
         onJoinPress={handleJoin}

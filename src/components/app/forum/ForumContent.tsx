@@ -1,6 +1,6 @@
-import { Attachment } from "@/src/constants/forum";
 import { Colors, Typography } from "@/src/constants/styles";
 import VStack from "@/src/layouts/VStack";
+import type { Media } from "@/src/types/forum";
 import cutString from "@/src/utils/cutString";
 import React from "react";
 import { StyleSheet, Text } from "react-native";
@@ -8,7 +8,7 @@ import ForumMedia from "./ForumMedia";
 
 type ForumContentProps = {
   content?: string;
-  media?: Attachment[];
+  media?: Media[];
 };
 
 export const ForumContent = ({ content, media }: ForumContentProps) => (

@@ -1,11 +1,11 @@
-import { Attachment } from "@/src/constants/forum";
+import type { Media } from "@/src/types/forum";
 import React from "react";
 import { View } from "react-native";
 import ForumImageGallery from "./ForumImageGallery";
 import ForumVideos from "./ForumVideos";
 
 type ForumMediaProps = {
-  media: Attachment[];
+  media: Media[];
 };
 
 export default function ForumMedia({ media }: ForumMediaProps) {

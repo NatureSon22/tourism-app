@@ -7,68 +7,83 @@ import DiningReviews from "@/src/components/app/dining/DiningReviews";
 import NavigationRow from "@/src/components/app/NavigationRow";
 import StickyFooter from "@/src/components/app/StickyFooter";
 import Divider from "@/src/components/ui/Divider";
+import Loading from "@/src/components/ui/Loading";
 import { FOOD_DETAIL } from "@/src/constants/fooddetail";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
-import { useRouter } from "expo-router";
+import { useDiningDetails } from "@/src/services/request/useDining";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
 export default function DiningDetailsPage() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ id: string }>();
+  const idParam = Array.isArray(params.id) ? params.id[0] : params.id;
+  const { data: dining, isLoading } = useDiningDetails({
+    id: idParam ?? "",
+  });
 
   return (
-    <SafeArea edges={["top", "bottom"]}>
+  <SafeArea edges={["top", "bottom"]}>
       <Screen style={styles.screenContainer}>
-        <ScrollView
-          style={styles.scrollView}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
-        >
-          <DiningImages images={FOOD_DETAIL.images} />
-
-          <View style={styles.contentContainer}>
-            <DiningHeader
-              name={FOOD_DETAIL.name}
-              rating={FOOD_DETAIL.rating}
-              reviews={FOOD_DETAIL.reviews}
-              books={FOOD_DETAIL.books}
-              tags={FOOD_DETAIL.tags}
-              location={FOOD_DETAIL.location}
-              description={FOOD_DETAIL.description}
-            />
-
-            <DiningHotlines hotlines={FOOD_DETAIL.hotlines} />
-
-            <DiningPackages packages={FOOD_DETAIL.packages} />
-
-            <Divider />
-
-            <NavigationRow
-              label="General Information"
-              onPress={() => {
-                router.push("/dining/about");
-              }}
-            />
-
-            <Divider />
-
-            <NavigationRow
-              label="Terms & Conditions"
-              onPress={() => {
-                router.push("/dining/about");
-              }}
-            />
-
-            <Divider />
-
-            <DiningForums forums={FOOD_DETAIL.forums} />
-
-            <DiningReviews reviews={FOOD_DETAIL.reviewsData} />
+        {isLoading || !dining ? (
+          <View style={styles.loadingContainer}>
+            <Loading />
           </View>
-        </ScrollView>
+        ) : (
+          <>
+            <ScrollView
+              style={styles.scrollView}
+              scrollEventThrottle={16}
+              showsVerticalScrollIndicator={false}
+            >
+              <DiningImages images={FOOD_DETAIL.images} />
 
-        <StickyFooter price={FOOD_DETAIL.price} />
+              <View style={styles.contentContainer}>
+                <DiningHeader
+                  name={FOOD_DETAIL.name}
+                  rating={FOOD_DETAIL.rating}
+                  reviews={FOOD_DETAIL.reviews}
+                  books={FOOD_DETAIL.books}
+                  tags={FOOD_DETAIL.tags}
+                  location={FOOD_DETAIL.location}
+                  description={FOOD_DETAIL.description}
+                />
+
+                <DiningHotlines hotlines={FOOD_DETAIL.hotlines} />
+
+                <DiningPackages packages={FOOD_DETAIL.packages} />
+
+                <Divider />
+
+                <NavigationRow
+                  label="General Information"
+                  onPress={() => {
+                    router.push("/dining/about");
+                  }}
+                />
+
+                <Divider />
+
+                <NavigationRow
+                  label="Terms & Conditions"
+                  onPress={() => {
+                    router.push("/dining/about");
+                  }}
+                />
+
+                <Divider />
+
+                <DiningForums forums={FOOD_DETAIL.forums} />
+
+                <DiningReviews reviews={FOOD_DETAIL.reviewsData} />
+              </View>
+            </ScrollView>
+
+            <StickyFooter price={FOOD_DETAIL.price} />
+          </>
+        )}
       </Screen>
     </SafeArea>
   );
@@ -92,5 +107,10 @@ const styles = StyleSheet.create({
     gap: 12,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

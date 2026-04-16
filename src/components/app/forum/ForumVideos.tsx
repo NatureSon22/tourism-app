@@ -1,11 +1,11 @@
-import { Attachment } from "@/src/constants/forum";
+import type { Media } from "@/src/types/forum";
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 import AppVideoPlayer from "./AppVideoPlayer";
 
 type ForumVideoProps = {
-  videos: Attachment[];
+  videos: Media[];
 };
 
 export default function ForumVideos({ videos }: ForumVideoProps) {
@@ -21,7 +21,7 @@ export default function ForumVideos({ videos }: ForumVideoProps) {
         {videos.map((video) => (
           <AppVideoPlayer
             key={video.id}
-            url={video.url}
+            url={video.url ?? video.src ?? ""}
             isActive={current === videos.indexOf(video)}
           />
         ))}

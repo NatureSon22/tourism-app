@@ -1,8 +1,8 @@
 import ListEmptyState from "@/src/components/app/ListEmptyState";
 import ReloadPage from "@/src/components/app/ReloadPage";
-import { ForumPost } from "@/src/constants/forum";
 import { ForumType } from "@/src/constants/forumTypes";
 import { useGetAllForums } from "@/src/services/request/useForum";
+import { ForumPost } from "@/src/types/forum";
 import createSkeletons, { Skeleton } from "@/src/utils/createSkeletons";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React, { useCallback, useMemo } from "react";

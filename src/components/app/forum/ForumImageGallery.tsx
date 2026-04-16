@@ -1,11 +1,11 @@
-import { Attachment } from "@/src/constants/forum";
+import type { Media } from "@/src/types/forum";
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import React, { useState } from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import PagerView from "react-native-pager-view";
 
-type ForumImageGalleryProps = { images: Attachment[] };
+type ForumImageGalleryProps = { images: Media[] };
 
 export default function ForumImageGallery({ images }: ForumImageGalleryProps) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,7 +33,7 @@ export default function ForumImageGallery({ images }: ForumImageGalleryProps) {
               onPress={() => openModal(idx)}
             >
               <Image
-                source={{ uri: image.url }}
+                source={{ uri: image.url ?? image.src ?? "" }}
                 style={styles.carouselImage}
                 contentFit="cover"
               />
@@ -69,7 +69,7 @@ export default function ForumImageGallery({ images }: ForumImageGalleryProps) {
             {images.map((image) => (
               <View key={image.id} style={styles.page}>
                 <Image
-                  source={{ uri: image.url }}
+                  source={{ uri: image.url ?? image.src ?? "" }}
                   style={styles.modalImage}
                   contentFit="contain"
                 />

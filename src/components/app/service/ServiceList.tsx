@@ -26,7 +26,7 @@ export default function ServiceList({ params }: ServiceListProps) {
   const {
     data,
     isLoading,
-    isFetched,
+    isSuccess,
     isError,
     refetch,
     hasNextPage,
@@ -54,8 +54,8 @@ export default function ServiceList({ params }: ServiceListProps) {
   );
 
   const isEmpty = useMemo(
-    () => isFetched && !isLoading && listings.length === 0,
-    [isFetched, isLoading, listings],
+    () => isSuccess && !isLoading && listings.length === 0,
+    [isSuccess, isLoading, listings],
   );
 
   const renderItem = useCallback<ListRenderItem<Skeleton | SERVICE>>(

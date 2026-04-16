@@ -25,7 +25,7 @@ function ActivityList({ params }: Props) {
   const {
     data,
     isLoading,
-    isFetched,
+    isSuccess,
     isError,
     refetch,
     hasNextPage,
@@ -47,14 +47,14 @@ function ActivityList({ params }: Props) {
     [data],
   );
 
-  const listData = useMemo(
+  const listData = useMemo<(ACTIVITY | Skeleton)[]>(
     () => (isLoading ? createSkeletons(6) : listings),
     [isLoading, listings],
   );
 
   const isEmpty = useMemo(
-    () => isFetched && !isLoading && listings.length === 0,
-    [isFetched, isLoading, listings],
+    () => isSuccess && !isLoading && listings.length === 0,
+    [isSuccess, isLoading, listings],
   );
 
   const handleEndReached = useCallback(() => {

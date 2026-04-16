@@ -24,7 +24,7 @@ export default function ExperienceHeader({
 
   return (
     <View style={styles.header}>
-      <HeaderWithBack />
+      <HeaderWithBack title="New Post" />
 
       <View style={styles.profileRow}>
         <Image

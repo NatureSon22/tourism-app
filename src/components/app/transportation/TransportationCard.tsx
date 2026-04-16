@@ -21,8 +21,8 @@ export default function TransportationCard({
   reviews,
 }: Props) {
   const router = useRouter();
-  const location = addresses?.length
-    ? formatListingAddress(addresses[0], "short")
+  const location = addresses
+    ? formatListingAddress(addresses, "short")
     : "Location not available";
 
   const handlePress = () => {

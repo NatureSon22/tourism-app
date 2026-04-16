@@ -31,13 +31,13 @@ export default function LocationPage() {
   const [isFindingLocation, setIsFindingLocation] = useState(false);
 
   const debouncedSearch = useDebounce(search);
-  const { data, isLoading, isFetched, isError, refetch } = useLocations({
+  const { data, isLoading, isSuccess, isError, refetch } = useLocations({
     search: debouncedSearch,
   });
   const { isConnected } = useNetInfo();
 
   const locations = useMemo(() => data?.data ?? [], [data]);
-  const isEmpty = isFetched && !isLoading && locations.length === 0;
+  const isEmpty = isSuccess && !isLoading && locations.length === 0;
 
   const handleMyLocationPress = async () => {
     setIsFindingLocation(true);

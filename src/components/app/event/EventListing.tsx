@@ -25,7 +25,7 @@ export default function EventListing({ params }: EventListingProps) {
   const {
     data,
     isLoading,
-    isFetched,
+    isSuccess,
     isError,
     refetch,
     hasNextPage,
@@ -53,8 +53,8 @@ export default function EventListing({ params }: EventListingProps) {
   );
 
   const isEmpty = useMemo(
-    () => isFetched && !isLoading && listings.length === 0,
-    [isFetched, isLoading, listings],
+    () => isSuccess && !isLoading && listings.length === 0,
+    [isSuccess, isLoading, listings],
   );
 
   const handleEndReached = useCallback(() => {

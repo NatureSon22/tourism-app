@@ -50,6 +50,8 @@ export default function Experience() {
 
   return (
     <SafeArea edges={["top", "bottom"]}>
+      {/* <Stack.Screen options={{ contentStyle: { backgroundColor: "white" } }} /> */}
+
       <KeyboardAvoidingView
         style={styles.keyboardAvoiding}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -64,6 +66,7 @@ export default function Experience() {
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
             <ExperienceContent
@@ -106,9 +109,8 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   scrollContent: {
-    flex: 1,
+    // flex: 1,
     paddingHorizontal: 10,
-    paddingBottom: 20,
     gap: 24,
   },
 });

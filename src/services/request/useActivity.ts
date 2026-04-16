@@ -1,4 +1,4 @@
-import { QueryParams } from "@/src/types/filter";
+import { QueryByIdParams, QueryParams } from "@/src/types/filter";
 import {
   useInfiniteQuery,
   useMutation,
@@ -25,31 +25,23 @@ export const useActivities = (params: QueryParams) => {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
-      const { currentPage, limit, total } = lastPage.data.pagination;
+      const pagination = lastPage.data.pagination;
+      if (!pagination) {
+        return undefined;
+      }
+
+      const { currentPage, limit, total } = pagination;
       const itemsFetched = currentPage * limit;
       return itemsFetched < total ? currentPage + 1 : undefined;
     },
     placeholderData: (prev) => prev,
-    select: (data) => ({
-      ...data,
-      pages: data.pages.map((page) => ({
-        ...page,
-        data: {
-          ...page.data,
-          listings: page.data.listings.map((act) => ({
-            ...act,
-            id: String(act.id),
-          })),
-        },
-      })),
-    }),
   });
 };
 
-export const useActivityDetails = (id: string) => {
+export const useActivityDetails = (id: QueryByIdParams) => {
   return useQuery({
-    queryKey: activityKeys.detail(id),
-    queryFn: () => activityService.getActivityById(id),
+    queryKey: activityKeys.detail(id.id),
+    queryFn: () => activityService.getActivityById(id.id),
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
   });

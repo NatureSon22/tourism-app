@@ -26,7 +26,7 @@ export default function AccommodationList({ params }: AccommodationListProps) {
   const {
     data,
     isLoading,
-    isFetched,
+    isSuccess,
     isError,
     refetch,
     hasNextPage,
@@ -41,7 +41,7 @@ export default function AccommodationList({ params }: AccommodationListProps) {
     return data?.pages.flatMap((page) => page.data.listings) ?? [];
   }, [data]);
 
-  const isEmpty = isFetched && !isLoading && listings?.length === 0;
+  const isEmpty = isSuccess && !isLoading && listings?.length === 0;
 
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {

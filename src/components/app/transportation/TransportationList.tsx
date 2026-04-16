@@ -28,7 +28,7 @@ export default function TransportationList({
   const {
     data,
     isLoading,
-    isFetched,
+    isSuccess,
     isError,
     refetch,
     hasNextPage,
@@ -56,8 +56,8 @@ export default function TransportationList({
   );
 
   const isEmpty = useMemo(
-    () => isFetched && !isLoading && listings.length === 0,
-    [isFetched, isLoading, listings],
+    () => isSuccess && !isLoading && listings.length === 0,
+    [isSuccess, isLoading, listings],
   );
 
   const renderItem = useCallback<ListRenderItem<Skeleton | TRANSPORTATION>>(
@@ -101,7 +101,6 @@ export default function TransportationList({
         isError={isError}
         onRetry={refetch}
         resourceName="transportation"
-        customNoResultsMessage="Oh no! There's no transportation option that matches the search or filter criteria."
         isEmpty={isEmpty}
         disableOfflineReload={true}
       />

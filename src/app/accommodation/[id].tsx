@@ -1,10 +1,7 @@
 import AccommodationHeader from "@/src/components/app/accomodation/AccommodationHeader";
 import AccommodationHotlines from "@/src/components/app/accomodation/AccommodationHotlines";
-import AccomodationExpectations from "@/src/components/app/accomodation/AccomodationExpectations";
-import AccomodationForums from "@/src/components/app/accomodation/AccomodationForums";
 import AccomodationImages from "@/src/components/app/accomodation/AccomodationImages";
 import AccomodationNavHeader from "@/src/components/app/accomodation/AccomodationNavHeader";
-import AccomodationReviews from "@/src/components/app/accomodation/AccomodationReviews";
 import NavigationRow from "@/src/components/app/NavigationRow";
 import StickyFooter from "@/src/components/app/StickyFooter";
 import Divider from "@/src/components/ui/Divider";
@@ -12,9 +9,10 @@ import Loading from "@/src/components/ui/Loading";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import { useAccommodationDetails } from "@/src/services/request/useAccomodation";
+import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router/build/hooks";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -32,6 +30,21 @@ export default function AccomodationDetailsPage() {
   const { data: accommodation, isLoading } = useAccommodationDetails({
     id: idParam ?? "",
   });
+
+  const imageUrls = useMemo(
+    () => accommodation?.images?.map((img) => img.src) ?? [],
+    [accommodation?.images],
+  );
+
+  const address = useMemo(
+    () => formatListingAddress(accommodation?.addresses),
+    [accommodation?.addresses],
+  );
+
+  const categories = useMemo(
+    () => accommodation?.categories?.map((category) => category.name) ?? [],
+    [accommodation?.categories],
+  );
 
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -58,22 +71,22 @@ export default function AccomodationDetailsPage() {
               showsVerticalScrollIndicator={false}
               stickyHeaderIndices={[1]}
             >
-              <AccomodationImages images={accommodation.images} />
+              {imageUrls && <AccomodationImages images={imageUrls} />}
 
               <AccomodationNavHeader showHeader={showHeader} />
 
               <View style={styles.contentContainer}>
                 <AccommodationHeader
-                  name={accommodation.name}
-                  rating={accommodation.rating}
-                  reviews={accommodation.reviews}
-                  location={accommodation.location}
-                  description={accommodation.description}
-                  books={accommodation.books}
-                  tags={accommodation.tags}
+                  name={accommodation.title}
+                  rating={accommodation?.rating ?? 0}
+                  reviews={accommodation?.reviews ?? 0}
+                  location={address}
+                  description={accommodation.highlights}
+                  books={accommodation?.books ?? 0}
+                  tags={categories}
                 />
 
-                <AccommodationHotlines hotlines={accommodation.hotlines} />
+                <AccommodationHotlines hotlines={accommodation.contacts} />
 
                 <Divider />
 
@@ -96,22 +109,22 @@ export default function AccomodationDetailsPage() {
                 <Divider />
 
                 {/* From Community Forums */}
-                <AccomodationForums forums={accommodation.forums} />
+                {/* <AccomodationForums forums={accommodation.forums} /> */}
 
                 <Divider />
 
                 {/* Reviews */}
-                <AccomodationReviews reviews={accommodation.reviewsData} />
+                {/* <AccomodationReviews reviews={accommodation.reviewsData} /> */}
 
                 <Divider />
 
-                <AccomodationExpectations
+                {/* <AccomodationExpectations
                   expectations={accommodation.expects}
-                />
+                /> */}
               </View>
             </ScrollView>
 
-            <StickyFooter price={accommodation.packages[0].price} />
+            <StickyFooter price={accommodation.base_price} />
           </>
         )}
       </Screen>

@@ -1,6 +1,18 @@
 import axios from "@/src/config/axios";
-import forumData, { ForumPost } from "@/src/constants/forum";
-import { ForumResponse } from "../request/useForum";
+import forumData from "@/src/constants/forum";
+import type { ForumPost } from "@/src/types/forum";
+
+export type ForumResponse = {
+  data: {
+    listings: ForumPost[];
+    pagination?: {
+      count: number;
+      currentPage: number;
+      limit: number;
+      total: number;
+    };
+  };
+};
 
 export type ForumActionResponse = {
   success: boolean;
@@ -19,7 +31,7 @@ const simulateApiDelay = async (ms = 100) =>
 export const forumService = {
   getAllForums: async (type?: string): Promise<ForumResponse> => {
     await simulateApiDelay(1000);
-    return { data: { listings: forumData } };
+    return { data: { listings: forumData as unknown as ForumPost[] } };
 
     // try {
     //   const response = await axios.get(
@@ -38,7 +50,9 @@ export const forumService = {
     const normalizedId = String(postId);
 
     await simulateApiDelay(1000);
-    return forumData.find((forum) => String(forum.id) === normalizedId);
+    return forumData.find(
+      (forum) => String(forum.id) === normalizedId,
+    ) as unknown as ForumPost | undefined;
 
     // const normalizedId = String(postId);
 
@@ -59,7 +73,7 @@ export const forumService = {
         `/forums/${normalizedId}/like`,
       );
       return data;
-    } catch (error) {
+    } catch {
       await simulateApiDelay(100);
       return { success: true, message: "Post liked", liked: true };
     }
@@ -75,7 +89,7 @@ export const forumService = {
         `/forums/${normalizedId}/dislike`,
       );
       return data;
-    } catch (error) {
+    } catch {
       await simulateApiDelay();
       return { success: true, message: "Post disliked", disliked: true };
     }
@@ -122,7 +136,7 @@ export const forumService = {
         `/forums/${normalizedId}/bookmark`,
       );
       return data;
-    } catch (error) {
+    } catch {
       await simulateApiDelay();
       return { success: true, message: "Post bookmarked", bookmarked: true };
     }
@@ -136,7 +150,7 @@ export const forumService = {
         `/forums/${normalizedId}/share`,
       );
       return data;
-    } catch (error) {
+    } catch {
       await simulateApiDelay();
       return { success: true, message: "Post shared", shared: true };
     }
@@ -150,7 +164,7 @@ export const forumService = {
         `/forums/${normalizedId}/join`,
       );
       return data;
-    } catch (error) {
+    } catch {
       await simulateApiDelay();
       return { success: true, message: "Joined post community", joined: true };
     }

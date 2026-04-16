@@ -31,7 +31,7 @@ function ActivityCard({
       : ["Category not specified"];
 
   const handlePress = () => {
-    router.push({ pathname: "/activity/[id]", params: { id: id } });
+    router.push({ pathname: "/activity/[id]", params: { id: String(id) } });
   };
 
   return (
@@ -76,8 +76,8 @@ function ActivityCard({
 
         {/* Location */}
         <Text style={styles.location} numberOfLines={2}>
-          {addresses && addresses.length > 0
-            ? formatListingAddress(addresses[0], "short")
+          {addresses
+            ? formatListingAddress(addresses, "short")
             : "Location not available"}
         </Text>
 

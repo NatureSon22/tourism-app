@@ -15,7 +15,6 @@ export default function ServiceCard({
   thumbnail,
   title,
   addresses,
-  highlights,
   distanceFromCityCenter,
 }: ServiceCardProps) {
   const router = useRouter();
@@ -24,10 +23,9 @@ export default function ServiceCard({
     router.push({ pathname: "/service/[id]", params: { id } });
   };
 
-  const listingLocation =
-    addresses?.[0]?.formatted ?? highlights ?? "Location not available";
+  const listingLocation = addresses?.formatted ?? "Location not available";
   const listingProvince =
-    addresses?.[0]?.province ?? addresses?.[0]?.city ?? "Province not available";
+    addresses?.province ?? addresses?.city ?? "Province not available";
 
   const distanceText =
     distanceFromCityCenter !== undefined && distanceFromCityCenter !== null
@@ -38,7 +36,11 @@ export default function ServiceCard({
     <Pressable style={styles.card} onPress={handlePress}>
       <HStack gap={17} alignItems="flex-start">
         <View style={styles.imageWrapper}>
-          <Image source={{ uri: thumbnail }} contentFit="cover" style={styles.image} />
+          <Image
+            source={{ uri: thumbnail }}
+            contentFit="cover"
+            style={styles.image}
+          />
           <View style={styles.bookmarkIcon}>
             <Ionicons name="bookmark-outline" size={20} color={Colors.rating} />
           </View>

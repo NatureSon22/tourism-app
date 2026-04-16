@@ -28,7 +28,7 @@ const DiningList = ({ params }: DiningListProps) => {
   const {
     data,
     isLoading,
-    isFetched,
+    isSuccess,
     isError,
     refetch,
     hasNextPage,
@@ -56,8 +56,8 @@ const DiningList = ({ params }: DiningListProps) => {
   );
 
   const isEmpty = useMemo(
-    () => isFetched && !isLoading && listings.length === 0,
-    [isFetched, isLoading, listings],
+    () => isSuccess && !isLoading && listings.length === 0,
+    [isSuccess, isLoading, listings],
   );
 
   const renderItem = useCallback<ListRenderItem<Skeleton | DINING>>(

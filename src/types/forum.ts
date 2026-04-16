@@ -3,14 +3,19 @@ type MediaType = "image" | "video";
 export type Media = {
   id: string;
   type: MediaType;
-  src: string;
   alt?: string;
+  src?: string;
+  url?: string;
+  thumbnailUrl?: string;
 };
 
 export type Author = {
   id: string;
   name: string;
   avatar?: string;
+  avatarUrl?: string;
+  profilePictureUrl?: string;
+  userName?: string;
   isVerified?: boolean;
 };
 
@@ -18,8 +23,19 @@ export type Location = {
   id: string;
   name: string;
   address: string;
+  formatted?: string;
   lat: number;
   lng: number;
+  region?: string;
+  region_code?: string;
+  province?: string;
+  province_code?: string;
+  city?: string;
+  city_code?: string;
+  barangay?: string;
+  street?: string;
+  postal_code?: string;
+  is_primary?: boolean;
 };
 
 export type ForumComment = {
@@ -45,11 +61,15 @@ export type ForumPost = {
   title: string;
   content: string;
 
-  // Link to your taxonomies table (e.g., 'Safety Tips', 'Review')
-  category: string;
+  community: {
+    id: string;
+    title: string;
+  };
 
-  // Link to the specific module (e.g., 'Accommodation')
-  moduleId: string;
+  listing_id?: string;
+  type?: string;
+  category?: string;
+  place?: string;
 
   author: Author;
   location?: Location;

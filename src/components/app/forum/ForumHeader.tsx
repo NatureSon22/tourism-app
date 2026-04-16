@@ -1,7 +1,7 @@
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
-import { User } from "@/src/stores/authStore";
+import type { Author } from "@/src/types/forum";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Image } from "expo-image";
 import React from "react";
@@ -9,7 +9,7 @@ import { StyleSheet, Text, View } from "react-native";
 import CustomButton from "../../ui/CustomButton";
 
 type ForumHeaderProps = {
-  author: Partial<User>;
+  author: Author;
   category: string;
   place: string;
   joined?: boolean;
@@ -28,12 +28,16 @@ export const ForumHeader = ({
   <View style={headerStyles.container}>
     <HStack gap={10}>
       <Image
-        source={{ uri: author?.profilePictureUrl }}
+        source={{
+          uri: author?.avatar ?? author?.avatarUrl ?? author?.profilePictureUrl,
+        }}
         style={headerStyles.avatar}
       />
       <VStack gap={2}>
         <HStack gap={2}>
-          <Text style={headerStyles.authorName}>{author?.userName}</Text>
+          <Text style={headerStyles.authorName}>
+            {author?.name ?? author?.userName}
+          </Text>
           <MaterialIcons name="keyboard-arrow-right" size={13} color="black" />
           <Text numberOfLines={1} style={headerStyles.categoryText}>
             {category}

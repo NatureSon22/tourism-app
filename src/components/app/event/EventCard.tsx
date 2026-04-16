@@ -33,8 +33,8 @@ function EventCard({
     [showAllTypes, types],
   );
 
-  const location = addresses?.length
-    ? formatListingAddress(addresses[0], "short")
+  const location = addresses
+    ? formatListingAddress(addresses, "short")
     : "Location not available";
 
   const handlePress = () => {

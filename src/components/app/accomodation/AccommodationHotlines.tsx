@@ -1,29 +1,57 @@
-import { HotlineEntry } from "@/src/constants/fooddetail";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
+import { Contact } from "@/src/types/baseListing";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import DetailSection from "../../ui/DetailsSection";
 
 type AccommodationHotlinesProps = {
-  hotlines: HotlineEntry[];
+  hotlines: Contact[];
 };
 
-export default function AccommodationHotlines({ hotlines }: AccommodationHotlinesProps) {
+export default function AccommodationHotlines({
+  hotlines,
+}: AccommodationHotlinesProps) {
+  // mapped by type
+  const groupedByLabel = hotlines.reduce<
+    Record<string, { label: string; numbers: string[] }>
+  >((acc, hotline) => {
+    const label =
+      hotline.label ?? (hotline.type === "phone" ? "Phone" : "Landline");
+
+    if (!acc[label]) {
+      acc[label] = {
+        label,
+        numbers: [],
+      };
+    }
+
+    acc[label].numbers.push(hotline.number);
+    return acc;
+  }, {});
+
+  const mappedHotlines = Object.values(groupedByLabel);
+
   return (
     <DetailSection title="Nearby Local Hotlines">
       <View style={styles.hotlinesContainer}>
-        {hotlines.map((hotline, index) => (
-          <HStack
-            key={index}
-            gap={8}
-            justifyContent="flex-start"
-            style={styles.hotlineEntry}
-          >
-            <Text style={styles.hotlineText}>
-              <Text style={styles.hotlineLabel}>{hotline.label}: </Text>
-              <Text style={styles.hotlinePhone}>{hotline.phone}</Text>
+        {mappedHotlines.map((hotline, index) => (
+          <HStack key={index} gap={8} justifyContent="flex-start">
+            <Text style={[styles.hotlineText, styles.hotlineEntry]}>
+              {hotline.label}:{" "}
             </Text>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {hotline.numbers.map((number, numIndex) => (
+                <Text
+                  key={numIndex}
+                  style={[styles.hotlineText, styles.hotlinePhone]}
+                >
+                  {number}
+                  {numIndex < hotline.numbers.length - 1 ? " | " : ""}
+                </Text>
+              ))}
+            </ScrollView>
           </HStack>
         ))}
       </View>
@@ -38,6 +66,8 @@ const styles = StyleSheet.create({
   },
   hotlineEntry: {
     alignItems: "center",
+    fontFamily: Typography.family.medium,
+    width: "18%",
   },
   hotlineText: {
     fontSize: 11.5,
@@ -49,6 +79,5 @@ const styles = StyleSheet.create({
   },
   hotlinePhone: {
     fontFamily: Typography.family.regular,
-    textDecorationLine: "underline",
   },
 });
