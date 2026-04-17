@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 2,
+    marginBottom: 12,
   },
   header: {
     justifyContent: "space-between",

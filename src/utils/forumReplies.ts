@@ -7,57 +7,102 @@ export type ThreadReply = ForumComment & {
 };
 
 export const buildThreadedReplies = (
-  comments: {
-    id: string | number;
-    content: string;
-    author?: {
-      id?: string | number;
-      name?: string;
-      userName?: string;
-      avatarUrl?: string;
-      profilePictureUrl?: string;
-    };
-    createdAt: string | Date;
-    likes: number;
-    dislikes: number;
-    viewers?: number;
-    media?: any[];
-    replies?: any[];
-  }[] = [],
+  comments: (
+    | ForumComment
+    | {
+        id: string | number;
+        content: string;
+        author?: {
+          id?: string | number;
+          name?: string;
+          userName?: string;
+          avatarUrl?: string;
+          profilePictureUrl?: string;
+        };
+        createdAt: string | Date;
+        likes?: number;
+        dislikes?: number;
+        viewers?: number;
+        media?: any[];
+        replies?: any[];
+      }
+  )[] = [],
 ): ThreadReply[] => {
   const result: ThreadReply[] = [];
 
   const normalizeReply = (
-    item: any,
+    item:
+      | ForumComment
+      | {
+          id: string | number;
+          content: string;
+          author?: {
+            id?: string | number;
+            name?: string;
+            userName?: string;
+            avatarUrl?: string;
+            profilePictureUrl?: string;
+          };
+          createdAt: string | Date;
+          likes?: number;
+          dislikes?: number;
+          viewers?: number;
+          media?: any[];
+          replies?: any[];
+        },
     parentId: string | null,
     depth: number,
     replyTo?: string,
-  ): ThreadReply => ({
-    id: String(item.id),
-    content: item.content,
-    author: {
-      id: String(item.author?.id ?? "0"),
-      name: item.author?.name || item.author?.userName || "Anonymous",
-      avatar: item.author?.avatarUrl || item.author?.profilePictureUrl,
-    },
-    createdAt:
-      typeof item.createdAt === "string"
-        ? item.createdAt
-        : (item.createdAt?.toISOString?.() ?? String(item.createdAt)),
-    stats: {
-      likes: item.likes ?? 0,
-      dislikes: item.dislikes ?? 0,
-    },
-    userInteractions: {
-      hasLiked: false,
-      hasDisliked: false,
-    },
-    replies: [],
-    media: item.media,
-    parentId,
-    depth,
-    replyTo,
-  });
+  ): ThreadReply => {
+    const author = item.author
+      ? {
+          id: String(item.author.id ?? "0"),
+          name: item.author.name ?? item.author.userName ?? "Anonymous",
+          avatar: item.author.avatarUrl ?? item.author.profilePictureUrl,
+          avatarUrl: item.author.avatarUrl,
+          profilePictureUrl: item.author.profilePictureUrl,
+          userName: item.author.userName,
+          isVerified: false,
+        }
+      : {
+          id: "0",
+          name: "Anonymous",
+          avatar: undefined,
+          avatarUrl: undefined,
+          profilePictureUrl: undefined,
+          userName: undefined,
+          isVerified: false,
+        };
+
+    return {
+      id: String(item.id),
+      content: item.content,
+      author,
+      media: item.media,
+      stats:
+        "stats" in item
+          ? item.stats
+          : {
+              likes: item.likes ?? 0,
+              dislikes: item.dislikes ?? 0,
+            },
+      userInteractions:
+        "userInteractions" in item
+          ? item.userInteractions
+          : {
+              hasLiked: false,
+              hasDisliked: false,
+            },
+      replies: [],
+      createdAt:
+        typeof item.createdAt === "string"
+          ? item.createdAt
+          : (item.createdAt?.toISOString?.() ?? String(item.createdAt)),
+      parentId,
+      depth,
+      replyTo,
+    };
+  };
 
   const walkReplies = (
     item: any,

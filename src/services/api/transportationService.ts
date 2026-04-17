@@ -1,4 +1,6 @@
 import api from "@/src/config/axios";
+import { SAMPLE_TRANSPORTATION_DETAIL } from "@/src/constants/data";
+import { ListingDetailed } from "@/src/types/baseListing";
 import { QueryParams } from "@/src/types/filter";
 import { TRANSPORTATION } from "@/src/types/listingTypes";
 import { buildQueryString } from "@/src/utils/buildQueryString";
@@ -26,9 +28,9 @@ const transportationService = {
     return response.data;
   },
 
-  getTransportationDetails: async (id: string): Promise<TRANSPORTATION> => {
+  getTransportationDetails: async (id: string): Promise<ListingDetailed> => {
     await new Promise((r) => setTimeout(r, 1000));
-    return [] as unknown as TRANSPORTATION;
+    return SAMPLE_TRANSPORTATION_DETAIL;
   },
 };
 

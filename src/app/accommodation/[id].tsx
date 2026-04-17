@@ -1,7 +1,6 @@
 import AccommodationHeader from "@/src/components/app/accomodation/AccommodationHeader";
 import AccommodationHotlines from "@/src/components/app/accomodation/AccommodationHotlines";
 import AccomodationImages from "@/src/components/app/accomodation/AccomodationImages";
-import AccomodationNavHeader from "@/src/components/app/accomodation/AccomodationNavHeader";
 import NavigationRow from "@/src/components/app/NavigationRow";
 import StickyFooter from "@/src/components/app/StickyFooter";
 import Divider from "@/src/components/ui/Divider";
@@ -66,14 +65,13 @@ export default function AccomodationDetailsPage() {
           <>
             <ScrollView
               style={styles.scrollView}
-              onScroll={handleScroll}
               scrollEventThrottle={16}
               showsVerticalScrollIndicator={false}
               stickyHeaderIndices={[1]}
             >
               {imageUrls && <AccomodationImages images={imageUrls} />}
 
-              <AccomodationNavHeader showHeader={showHeader} />
+              <View></View>
 
               <View style={styles.contentContainer}>
                 <AccommodationHeader
@@ -90,33 +88,31 @@ export default function AccomodationDetailsPage() {
 
                 <Divider />
 
-                <NavigationRow
-                  label="General Information"
-                  onPress={() => {
-                    router.push("/accommodation/about");
-                  }}
-                />
+                {accommodation?.additional_info.map((info) => (
+                  <View key={info.id} style={styles.infoContainer}>
+                    <NavigationRow
+                      label={info.title}
+                      onPress={() => {
+                        router.push({
+                          pathname: "/accommodation/about",
+                          params: { id: accommodation.id, sectionId: info.id },
+                        });
+                      }}
+                    />
 
-                <Divider />
-
-                <NavigationRow
-                  label="Terms & Conditions"
-                  onPress={() => {
-                    router.push("/accommodation/about");
-                  }}
-                />
-
-                <Divider />
+                    <Divider />
+                  </View>
+                ))}
 
                 {/* From Community Forums */}
                 {/* <AccomodationForums forums={accommodation.forums} /> */}
 
-                <Divider />
+                {/* <Divider /> */}
 
                 {/* Reviews */}
                 {/* <AccomodationReviews reviews={accommodation.reviewsData} /> */}
 
-                <Divider />
+                {/* <Divider /> */}
 
                 {/* <AccomodationExpectations
                   expectations={accommodation.expects}
@@ -155,5 +151,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  infoContainer: {
+    gap: 12,
   },
 });

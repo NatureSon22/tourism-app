@@ -126,19 +126,25 @@ export const forumService = {
     // }
   },
 
-  bookmarkPost: async (
-    postId: string | number,
-  ): Promise<ForumActionResponse> => {
-    const normalizedId = String(postId);
+  bookmarkPost: async (payload: {
+    bookmarkableId: string | number;
+    bookmarkableType: "Listing" | "Forum";
+  }): Promise<ForumActionResponse> => {
+    const normalizedId = String(payload.bookmarkableId);
 
     try {
-      const { data } = await axios.post<ForumActionResponse>(
-        `/forums/${normalizedId}/bookmark`,
-      );
+      const { data } = await axios.post<ForumActionResponse>(`/bookmarks`, {
+        bookmarkableId: normalizedId,
+        bookmarkableType: payload.bookmarkableType,
+      });
       return data;
     } catch {
       await simulateApiDelay();
-      return { success: true, message: "Post bookmarked", bookmarked: true };
+      return {
+        success: true,
+        message: "Item bookmarked",
+        bookmarked: true,
+      };
     }
   },
 

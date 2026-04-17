@@ -41,8 +41,8 @@ export type ContentBlock = {
   id: string;
   listing_info_id: string;
   type: "subheading" | "paragraph" | "list" | "table"; // Example types
-  body_text: string | null;
-  body_html: string | null;
+  body_text: string;
+  body_html: string;
   order: number;
   media?: BlockMedia[]; // Joined via block_media
 };
@@ -74,6 +74,7 @@ export type Listing = {
   highlights: string;
   email: string;
   images?: Media[]; // Joined from media table (if you want to include all media directly)
+  is_bookmarked?: boolean;
 
   // Related Data (Omitted from base table but part of the listing object)
   addresses?: Address;

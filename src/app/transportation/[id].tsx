@@ -1,8 +1,8 @@
+import NavigationRow from "@/src/components/app/NavigationRow";
 import TranportationForum from "@/src/components/app/transportation/TransportationForum";
 import TransportationHotlines from "@/src/components/app/transportation/TransportationHotlines";
 import TransportationImages from "@/src/components/app/transportation/TransportationImages";
-import TransportationRoutes from "@/src/components/app/transportation/TransportationRoutes";
-import TransportationSchedule from "@/src/components/app/transportation/TransportationSchedule";
+import Divider from "@/src/components/ui/Divider";
 import Loading from "@/src/components/ui/Loading";
 import { Colors, Typography } from "@/src/constants/styles";
 import { TRANSPORTATION_DETAIL } from "@/src/constants/transportationdetail";
@@ -11,9 +11,10 @@ import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import VStack from "@/src/layouts/VStack";
 import { useTransportationDetails } from "@/src/services/request/useTransportation";
+import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   FlatList,
   Pressable,
@@ -27,14 +28,29 @@ export default function TransportationDetailsPage() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id: string }>();
   const idParam = Array.isArray(params.id) ? params.id[0] : params.id;
-  const { data: accommodation, isLoading } = useTransportationDetails({
+  const { data: transportation, isLoading } = useTransportationDetails({
     id: idParam ?? "",
   });
+
+  const imageUrls = useMemo(
+    () => transportation?.images?.map((img) => img.src) ?? [],
+    [transportation?.images],
+  );
+
+  const address = useMemo(
+    () => formatListingAddress(transportation?.addresses),
+    [transportation?.addresses],
+  );
+
+  const categories = useMemo(
+    () => transportation?.categories?.map((category) => category.name) ?? [],
+    [transportation?.categories],
+  );
 
   return (
     <SafeArea edges={["top", "bottom"]}>
       <Screen style={styles.screenContainer}>
-        {isLoading || !accommodation ? (
+        {isLoading || !transportation ? (
           <View style={styles.loadingContainer}>
             <Loading />
           </View>
@@ -44,20 +60,21 @@ export default function TransportationDetailsPage() {
             scrollEventThrottle={16}
             showsVerticalScrollIndicator={false}
           >
-            {/* Image carousel — no sticky, sits at top */}
-            <TransportationImages images={TRANSPORTATION_DETAIL.images} />
+            {imageUrls && imageUrls.length > 0 && (
+              <TransportationImages images={imageUrls} />
+            )}
 
             {/* Content card overlaps the image by pulling it up */}
             <View style={styles.contentContainer}>
               <VStack gap={8} style={{ alignItems: "flex-start" }}>
                 <Text style={styles.title} numberOfLines={2}>
-                  {TRANSPORTATION_DETAIL.title}
+                  {transportation?.title}
                 </Text>
 
                 {/* Tags */}
                 <View style={styles.tagsWrapper}>
                   <FlatList
-                    data={TRANSPORTATION_DETAIL.tags}
+                    data={categories}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={(item) => item}
@@ -86,7 +103,7 @@ export default function TransportationDetailsPage() {
                   />
                   <Pressable onPress={() => {}}>
                     <Text style={styles.locationText} numberOfLines={1}>
-                      {TRANSPORTATION_DETAIL.location}
+                      {address}
                     </Text>
                   </Pressable>
                 </HStack>
@@ -101,17 +118,21 @@ export default function TransportationDetailsPage() {
               {/* Hotlines */}
               <TransportationHotlines />
 
-              <View style={styles.divider} />
+              {transportation?.additional_info.map((info) => (
+                <View key={info.id} style={styles.infoContainer}>
+                  <NavigationRow
+                    label={info.title}
+                    onPress={() => {
+                      router.push({
+                        pathname: "/transportation/about",
+                        params: { id: transportation.id, sectionId: info.id },
+                      });
+                    }}
+                  />
 
-              {/* routes */}
-              <TransportationRoutes />
-
-              <View style={styles.divider} />
-
-              {/* schedule */}
-              <TransportationSchedule />
-
-              <View style={styles.divider} />
+                  <Divider />
+                </View>
+              ))}
 
               <TranportationForum forums={TRANSPORTATION_DETAIL.forums} />
             </View>
@@ -186,5 +207,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  infoContainer: {
+    gap: 12,
   },
 });

@@ -151,6 +151,7 @@ export default function ForumReplies() {
     let unsubscribe: (() => void) | undefined;
     let typingUnsubscribe: (() => void) | undefined;
     const roomId = String(idParam);
+    console.log("Joining forum room:", roomId);
 
     const setupSocket = async () => {
       try {

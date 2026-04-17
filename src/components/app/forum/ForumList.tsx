@@ -29,13 +29,8 @@ export default function ForumList({ type }: ForumListProps) {
   const forums = data?.data.listings ?? [];
   const isEmpty = !isLoading && forums.length === 0;
 
-  const renderItem = useCallback<ListRenderItem<Skeleton | ForumPost>>(
-    ({ item }) => {
-      if ("isSkeleton" in item) {
-        return <ForumSkeletonCard />;
-      }
-      return <ForumCard {...item} />;
-    },
+  const renderItem = useCallback<ListRenderItem<ForumPost>>(
+    ({ item }) => <ForumCard {...item} />,
     [],
   );
 
@@ -48,9 +43,22 @@ export default function ForumList({ type }: ForumListProps) {
     );
   }
 
+  if (isLoading) {
+    return (
+      <FlatList<Skeleton>
+        data={createSkeletons(3)}
+        keyExtractor={(item) => item.id}
+        renderItem={() => <ForumSkeletonCard />}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
+    );
+  }
+
   return (
-    <FlatList<Skeleton | ForumPost>
-      data={isLoading ? createSkeletons(3) : forums}
+    <FlatList<ForumPost>
+      data={forums}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
       showsVerticalScrollIndicator={false}

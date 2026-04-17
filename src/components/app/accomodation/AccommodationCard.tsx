@@ -5,10 +5,11 @@ import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
 import { ACCOMMODATION } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
+import { Ionicons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
 import React, { memo } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type Props = ACCOMMODATION;
 
@@ -31,11 +32,17 @@ function AccommodationCard({
   return (
     <Pressable style={styles.card} onPress={handlePress}>
       <HStack gap={17} alignItems="flex-start">
-        <Image
-          source={{ uri: thumbnail ?? mockAccommodation[0].imageUrl }}
-          contentFit="cover"
-          style={styles.image}
-        />
+        <View style={styles.imageWrapper}>
+          <Image
+            source={{ uri: thumbnail ?? mockAccommodation[0].imageUrl }}
+            contentFit="cover"
+            style={styles.image}
+          />
+
+          <View style={styles.bookmarkBtn}>
+            <Ionicons name="bookmark-outline" size={18} color={Colors.rating} />
+          </View>
+        </View>
 
         <VStack style={styles.content} gap={5}>
           <Text style={styles.name} numberOfLines={1}>
@@ -84,11 +91,29 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     alignItems: "flex-start",
   },
-  image: {
+  imageWrapper: {
     width: 95,
-    height: "100%",
+    height: 120,
+    // borderWidth: 1,
     borderRadius: 10,
     backgroundColor: Colors.background,
+    overflow: "hidden",
+    position: "relative",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  bookmarkBtn: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    borderRadius: 50,
+    padding: 6,
+    zIndex: 1,
+    // borderWidth: 1,
+    // borderColor: "rgba(0,0,0,0.12)",
   },
   content: {
     flex: 1,

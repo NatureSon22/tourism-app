@@ -2,9 +2,7 @@ import { ThreadReply } from "@/src/utils/forumReplies";
 import { tokenStorage } from "@/src/utils/tokenStorage";
 import { io, Socket } from "socket.io-client";
 
-const BASE_URL =
-  process.env.EXPO_PUBLIC_BACKEND_URL?.replace(/\/$/, "") ||
-  "http://localhost:3000";
+const BASE_URL = "https://5mftvr7z-3000.asse.devtunnels.ms/";
 
 const SOCKET_EVENT_REPLY_CREATED = "forum:replyCreated";
 const SOCKET_EVENT_REPLY_TYPING = "forum:replyTyping";
@@ -13,6 +11,7 @@ const SOCKET_EVENT_LEAVE_ROOM = "forum:leaveRoom";
 const SOCKET_EVENT_SEND_REPLY = "forum:sendReply";
 
 let socket: Socket | null = null;
+const joinedRooms = new Set<string>();
 
 const createSocket = async (): Promise<Socket> => {
   if (socket) {
@@ -22,15 +21,28 @@ const createSocket = async (): Promise<Socket> => {
   const tokens = await tokenStorage.getTokens();
 
   socket = io(BASE_URL, {
-    autoConnect: false,
+    autoConnect: true,
     transports: ["websocket"],
     auth: {
       token: tokens?.accessToken,
     },
   });
 
+  socket.on("connect", () => {
+    joinedRooms.forEach((postId) => {
+      socket?.emit(SOCKET_EVENT_JOIN_ROOM, { postId });
+    });
+  });
+
   socket.on("connect_error", (error) => {
-    console.warn("forumSocket connect_error", error);
+    const message =
+      error && typeof error === "object" && "message" in error
+        ? (error as any).message
+        : String(error);
+    console.warn("forumSocket connect_error message:", message);
+    if (message.includes("invalid namespace")) {
+      console.warn("forumSocket invalid namespace:", message);
+    }
   });
 
   socket.on("error", (error) => {
@@ -59,16 +71,21 @@ export const disconnectForumSocket = () => {
 };
 
 export const joinForumRoom = async (postId: string | number) => {
+  const roomId = String(postId);
+  joinedRooms.add(roomId);
   const socketClient = await connectForumSocket();
-  socketClient.emit(SOCKET_EVENT_JOIN_ROOM, { postId: String(postId) });
+  socketClient.emit(SOCKET_EVENT_JOIN_ROOM, { postId: roomId });
 };
 
 export const leaveForumRoom = async (postId: string | number) => {
+  const roomId = String(postId);
+  joinedRooms.delete(roomId);
+
   if (!socket) {
     return;
   }
 
-  socket.emit(SOCKET_EVENT_LEAVE_ROOM, { postId: String(postId) });
+  socket.emit(SOCKET_EVENT_LEAVE_ROOM, { postId: roomId });
 };
 
 type ForumReplyPayload = ThreadReply & {

@@ -11,7 +11,7 @@ export type Media = {
 
 export type Author = {
   id: string;
-  name: string;
+  name?: string;
   avatar?: string;
   avatarUrl?: string;
   profilePictureUrl?: string;
@@ -53,7 +53,7 @@ export type ForumComment = {
     hasDisliked: boolean;
   };
   replies?: ForumComment[];
-  createdAt: string;
+  createdAt: string | Date;
 };
 
 export type ForumPost = {
@@ -89,6 +89,6 @@ export type ForumPost = {
   };
 
   comments: ForumComment[]; // Initial set of top-level comments
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 };

@@ -16,13 +16,16 @@ export type LoginResponse = ApiResponse<AuthResponse>;
 const authService = {
   requestCrsfToken: async (): Promise<string> => {
     try {
-      const response = await fetch("https://5mftvr7z-3000.asse.devtunnels.ms/api/csrf-token", {
-        method: "GET",
-        credentials: "include",
-        headers: {
-    "Content-Type": "application/json",
-  },
-      });
+      const response = await fetch(
+        "https://5mftvr7z-3000.asse.devtunnels.ms/api/csrf-token",
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
 
       if (!response.ok) {
         const errorBody = await response.text();

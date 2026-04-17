@@ -6,24 +6,15 @@ import {
   useShareForum,
 } from "@/src/services/request/useForum";
 import type { ForumPost } from "@/src/types/forum";
+import { createForumLink } from "@/src/utils/appLinking";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, Share, StyleSheet } from "react-native";
 import { ForumContent } from "./ForumContent";
 import { ForumFooter } from "./ForumFooter";
 import { ForumHeader } from "./ForumHeader";
 
-type ForumCardProps = Pick<
-  ForumPost,
-  | "id"
-  | "author"
-  | "category"
-  | "content"
-  | "media"
-  | "location"
-  | "stats"
-  | "place"
->;
+type ForumCardProps = ForumPost;
 
 export default function ForumCard({
   id,
@@ -34,6 +25,7 @@ export default function ForumCard({
   media,
   location,
   stats,
+  userInteractions,
 }: ForumCardProps) {
   const {
     likes = 0,
@@ -43,11 +35,16 @@ export default function ForumCard({
   } = stats ?? {};
   const displayPlace = location?.formatted ?? place ?? "Location not available";
   const displayCategory = category ?? "";
+  const {
+    hasLiked = false,
+    hasDisliked = false,
+    hasBookmarked = false,
+  } = userInteractions ?? {};
   const [likesCount, setLikesCount] = useState(likes);
   const [dislikesCount, setDislikesCount] = useState(dislikes);
-  const [liked, setLiked] = useState(false);
-  const [disliked, setDisliked] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [liked, setLiked] = useState(hasLiked);
+  const [disliked, setDisliked] = useState(hasDisliked);
+  const [bookmarked, setBookmarked] = useState(hasBookmarked);
   const [joined, setJoined] = useState(false);
   const router = useRouter();
 
@@ -123,7 +120,10 @@ export default function ForumCard({
     setBookmarked(!wasBookmarked);
 
     bookmarkMutation.mutate(
-      { postId: id },
+      {
+        bookmarkableId: id,
+        bookmarkableType: "Forum",
+      },
       {
         onError: () => {
           setBookmarked(wasBookmarked);
@@ -132,8 +132,21 @@ export default function ForumCard({
     );
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!id || shareMutation.isPending) return;
+
+    const url = createForumLink(id);
+
+    try {
+      await Share.share({
+        title: "Check out this forum post",
+        message: url,
+        url,
+      });
+    } catch (error) {
+      console.error("Failed to open share sheet:", error);
+    }
+
     shareMutation.mutate({ postId: id });
   };
 
@@ -182,9 +195,6 @@ export default function ForumCard({
         onComment={handleComment}
         onBookmark={handleBookmark}
         onShare={handleShare}
-        isLiking={likeMutation.isPending}
-        isDisliking={dislikeMutation.isPending}
-        isBookmarking={bookmarkMutation.isPending}
         isSharing={shareMutation.isPending}
       />
     </Pressable>
