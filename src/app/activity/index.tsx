@@ -8,10 +8,11 @@ import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import useAuthStore from "@/src/stores/authStore";
 import { useFilterStore } from "@/src/stores/filterStore";
 import { QueryParams } from "@/src/types/filter";
 import { useLocalSearchParams } from "expo-router/build/hooks";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useShallow } from "zustand/react/shallow";
 
@@ -20,6 +21,7 @@ export default function ActivityPage() {
   const [searchLocal, setSearchLocal] = useState("");
   const debouncedSearch = useDebounce(searchLocal, 350);
   const { moduleId } = useLocalSearchParams<{ moduleId: string }>();
+  const auth = useAuthStore((state) => state.user);
 
   const { activityState, updateOptions, resetCategory, setSearch } =
     useFilterStore(
@@ -47,17 +49,30 @@ export default function ActivityPage() {
     });
   };
 
-  const params: QueryParams = {
-    search: activityState.search,
-    area: activityState.options.area,
-    sort: activityState.options.sort,
-    type: activityState.options.type.type || undefined,
-    subtypes: activityState.options.type.subtypes,
-    amenities: activityState.options.amenities,
-    page: 1,
-    limit: 20,
-    moduleId: moduleId,
-  };
+  const params = useMemo<QueryParams>(
+    () => ({
+      search: debouncedSearch,
+      area: activityState.options.area,
+      sort: activityState.options.sort,
+      type: activityState.options.type.type || undefined,
+      subtypes: activityState.options.type.subtypes,
+      amenities: activityState.options.amenities,
+      page: 1,
+      limit: 20,
+      moduleId: moduleId,
+      userId: auth?.id,
+    }),
+    [
+      debouncedSearch,
+      activityState.options.area,
+      activityState.options.sort,
+      activityState.options.type.type,
+      activityState.options.type.subtypes,
+      activityState.options.amenities,
+      moduleId,
+      auth?.id,
+    ],
+  );
 
   return (
     <SafeArea edges={["bottom", "top"]}>

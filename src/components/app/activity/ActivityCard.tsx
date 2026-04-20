@@ -1,13 +1,20 @@
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
+import { useBookmarkActivity } from "@/src/services/request/useActivity";
 import { ACTIVITY } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
 import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { memo, useState } from "react";
+import {
+  GestureResponderEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 type Props = ACTIVITY;
 
@@ -23,8 +30,11 @@ function ActivityCard({
   prevPrice,
   thumbnail,
   categories,
+  is_bookmarked,
 }: Props) {
   const router = useRouter();
+  const [bookmarked, setBookmarked] = useState(is_bookmarked);
+  const bookmarkMutation = useBookmarkActivity(id);
   const types =
     categories && categories.length > 0
       ? categories.map((c) => c.name)
@@ -32,6 +42,29 @@ function ActivityCard({
 
   const handlePress = () => {
     router.push({ pathname: "/activity/[id]", params: { id: String(id) } });
+  };
+
+  const handleBookmark = (event: GestureResponderEvent) => {
+    event.stopPropagation?.();
+    if (!id || bookmarkMutation.isPending) return;
+
+    const nextBookmarked = !bookmarked;
+    const previousBookmarked = bookmarked;
+    setBookmarked(nextBookmarked);
+
+    bookmarkMutation.mutate(
+      { shouldBookmark: nextBookmarked },
+      {
+        onError: () => {
+          setBookmarked(previousBookmarked);
+        },
+        onSuccess: (data) => {
+          if (typeof data?.bookmarked === "boolean") {
+            setBookmarked(data.bookmarked);
+          }
+        },
+      },
+    );
   };
 
   return (
@@ -44,9 +77,13 @@ function ActivityCard({
           contentFit="cover"
         />
         {/* Bookmark icon overlay */}
-        <View style={styles.bookmarkBtn}>
-          <Ionicons name="bookmark-outline" size={18} color={Colors.text} />
-        </View>
+        <Pressable style={styles.bookmarkBtn} onPress={handleBookmark}>
+          <Ionicons
+            name={bookmarked ? "bookmark" : "bookmark-outline"}
+            size={18}
+            color={Colors.rating}
+          />
+        </Pressable>
       </View>
 
       {/* Content */}
@@ -93,7 +130,10 @@ function ActivityCard({
         {/* Price row */}
         <HStack justifyContent="flex-start" alignItems="center" gap={6}>
           <Text style={styles.fromLabel}>From </Text>
-          <Text style={styles.price}>{formatCurrency(base_price)}</Text>
+          {base_price && (
+            <Text style={styles.price}>{formatCurrency(base_price)}</Text>
+          )}
+
           {prevPrice != null && (
             <Text style={styles.prevPrice}>{formatCurrency(prevPrice)}</Text>
           )}
@@ -114,6 +154,7 @@ const styles = StyleSheet.create({
   imageWrapper: {
     width: "100%",
     height: 175,
+    backgroundColor: Colors.background,
   },
   image: {
     width: "100%",

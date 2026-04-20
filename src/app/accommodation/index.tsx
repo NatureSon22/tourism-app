@@ -9,6 +9,7 @@ import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import useAuthStore from "@/src/stores/authStore";
 import { useFilterStore } from "@/src/stores/filterStore";
 import { QueryParams } from "@/src/types/filter";
 import getLocation from "@/src/utils/getLocation";
@@ -22,6 +23,7 @@ export default function AccommodationPage() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
   const { moduleId } = useLocalSearchParams<{ moduleId: string }>();
+  const auth = useAuthStore((state) => state.user);
 
   const { accommodationState, currentSort, updateOptions, resetCategory } =
     useFilterStore(
@@ -54,8 +56,22 @@ export default function AccommodationPage() {
       page: 1,
       limit: 20,
       moduleId: moduleId,
+      userId: auth?.id,
     };
-  }, [debouncedSearch, accommodationState, moduleId]);
+  }, [
+    debouncedSearch,
+    accommodationState.options.area,
+    accommodationState.options.sort,
+    accommodationState.options.rating,
+    accommodationState.options.type.type,
+    accommodationState.options.type.subtypes,
+    accommodationState.options.amenities,
+    accommodationState.options.lat,
+    accommodationState.options.lng,
+    accommodationState.options.radius,
+    moduleId,
+    auth?.id,
+  ]);
 
   const handleAreaPress = (sheet: string) => {
     const payload =

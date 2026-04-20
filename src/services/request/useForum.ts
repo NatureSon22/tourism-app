@@ -5,6 +5,7 @@ import type { ForumPost } from "@/src/types/forum";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert } from "react-native";
 import { ForumResponse, forumService } from "../api/forumService";
+import { bookmarkKeys } from "./useBookmark";
 
 export const forumKeys = {
   all: () => ["forum"] as const,
@@ -277,7 +278,7 @@ export const useBookmarkForum = () => {
       context?.previousListQueries?.forEach(([queryKey, data]) => {
         queryClient.setQueryData(queryKey, data);
       });
-      handleActionError(error, "Bookmark");
+      // handleActionError(error, "Bookmark");
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
@@ -285,6 +286,10 @@ export const useBookmarkForum = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ["forum", "list"],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: bookmarkKeys.all,
         exact: false,
       });
     },

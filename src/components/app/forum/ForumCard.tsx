@@ -7,6 +7,7 @@ import {
 } from "@/src/services/request/useForum";
 import type { ForumPost } from "@/src/types/forum";
 import { createForumLink } from "@/src/utils/appLinking";
+import { showMutationError } from "@/src/utils/showMutationError";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, Share, StyleSheet } from "react-native";
@@ -69,13 +70,14 @@ export default function ForumCard({
     likeMutation.mutate(
       { postId: id },
       {
-        onError: () => {
+        onError: (error) => {
           setLiked(false);
           setLikesCount((prev) => Math.max(prev - 1, 0));
           if (wasDisliked) {
             setDisliked(true);
             setDislikesCount((prev) => prev + 1);
           }
+          showMutationError(error);
         },
       },
     );
@@ -96,13 +98,14 @@ export default function ForumCard({
     dislikeMutation.mutate(
       { postId: id },
       {
-        onError: () => {
+        onError: (error) => {
           setDisliked(false);
           setDislikesCount((prev) => Math.max(prev - 1, 0));
           if (wasLiked) {
             setLiked(true);
             setLikesCount((prev) => prev + 1);
           }
+          showMutationError(error);
         },
       },
     );
@@ -125,8 +128,9 @@ export default function ForumCard({
         bookmarkableType: "Forum",
       },
       {
-        onError: () => {
+        onError: (error) => {
           setBookmarked(wasBookmarked);
+          showMutationError(error);
         },
       },
     );
@@ -144,6 +148,7 @@ export default function ForumCard({
         url,
       });
     } catch (error) {
+      showMutationError(error, "Failed to open share sheet");
       console.error("Failed to open share sheet:", error);
     }
 

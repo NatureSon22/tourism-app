@@ -1,4 +1,5 @@
 import { QueryByIdParams, QueryParams } from "@/src/types/filter";
+import { showMutationError } from "@/src/utils/showMutationError";
 import {
   useInfiniteQuery,
   useMutation,
@@ -6,7 +7,9 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Alert } from "react-native";
+import { bookmarkService } from "../api/bookmarkService";
 import eventService from "../api/eventService";
+import { bookmarkKeys } from "./useBookmark";
 
 const eventKeys = {
   all: ["events"] as const,
@@ -84,6 +87,41 @@ export const useRegisterEvent = () => {
     onError: (error) => {
       Alert.alert("Registration Failed", "Please try again later.");
       console.error("Mutation Error:", error);
+    },
+  });
+};
+
+type EventBookmarkAction = {
+  shouldBookmark: boolean;
+};
+
+export const useBookmarkEvent = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { success: boolean; bookmarked?: boolean; message: string },
+    unknown,
+    EventBookmarkAction
+  >({
+    mutationFn: ({ shouldBookmark }) =>
+      shouldBookmark
+        ? bookmarkService.addBookmark({
+            bookmarkableId: id ?? "",
+            bookmarkableType: "Listing",
+          })
+        : bookmarkService.removeBookmark(id),
+    onError: (error) => {
+      showMutationError(error, "Failed to update bookmark");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: eventKeys.all,
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: bookmarkKeys.all,
+        exact: false,
+      });
     },
   });
 };

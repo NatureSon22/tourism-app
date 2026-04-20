@@ -8,6 +8,7 @@ import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import useAuthStore from "@/src/stores/authStore";
 import { useFilterStore } from "@/src/stores/filterStore";
 import { QueryParams } from "@/src/types/filter";
 import { useLocalSearchParams } from "expo-router/build/hooks";
@@ -20,6 +21,8 @@ export default function DiningPage() {
   const [searchLocal, setSearchLocal] = useState("");
   const debouncedSearch = useDebounce(searchLocal);
   const { moduleId } = useLocalSearchParams<{ moduleId: string }>();
+
+  const auth = useAuthStore((state) => state.user);
 
   const { diningState, updateOptions, resetCategory, setSearch } =
     useFilterStore(
@@ -60,8 +63,19 @@ export default function DiningPage() {
       amenities: diningState.options.amenities,
       page: 1,
       moduleId: moduleId,
+      userId: auth?.id,
     }),
-    [diningState, moduleId],
+    [
+      auth?.id,
+      diningState.options.amenities,
+      diningState.options.area,
+      diningState.options.rating,
+      diningState.options.sort,
+      diningState.options.type.subtypes,
+      diningState.options.type.type,
+      diningState.search,
+      moduleId,
+    ],
   );
 
   return (

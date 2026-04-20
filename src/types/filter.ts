@@ -13,6 +13,7 @@ export type QueryParams = {
   page?: number;
   limit?: number;
   moduleId?: string;
+  userId?: string;
 };
 
 export type QueryByIdParams = {

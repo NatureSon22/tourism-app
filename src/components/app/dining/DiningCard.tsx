@@ -1,11 +1,18 @@
 import { Colors, Typography } from "@/src/constants/styles";
+import { useBookmarkDining } from "@/src/services/request/useDining";
 import { DINING } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
 import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { memo, useState } from "react";
+import {
+  GestureResponderEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import ImageGrid from "../ImageGrid";
 
 type Props = DINING;
@@ -22,8 +29,11 @@ function DiningCard({
   reviews = 0,
   thumbnail,
   books = 0,
+  is_bookmarked,
 }: Props) {
   const router = useRouter();
+  const [bookmarked, setBookmarked] = useState(is_bookmarked ?? false);
+  const bookmarkMutation = useBookmarkDining(id);
   const types =
     categories && categories.length > 0
       ? categories.map((c) => c.name)
@@ -39,17 +49,43 @@ function DiningCard({
     router.push({ pathname: `/dining/[id]`, params: { id } });
   };
 
+  const handleBookmark = (event: GestureResponderEvent) => {
+    event.stopPropagation?.();
+    if (!id || bookmarkMutation.isPending) return;
+
+    const nextBookmarked = !bookmarked;
+    const previousBookmarked = bookmarked;
+    setBookmarked(nextBookmarked);
+
+    bookmarkMutation.mutate(
+      { shouldBookmark: nextBookmarked },
+      {
+        onError: () => {
+          setBookmarked(previousBookmarked);
+        },
+        onSuccess: (data) => {
+          if (typeof data?.bookmarked === "boolean") {
+            setBookmarked(data.bookmarked);
+          }
+        },
+      },
+    );
+  };
+
   return (
     <Pressable style={styles.card} onPress={handlePress}>
       <View style={styles.nameRow}>
         <Text style={styles.name} numberOfLines={1}>
           {title}
         </Text>
-        <View style={styles.distanceBadge}>
-          <Text style={styles.distanceText}>
-            {distanceFromCityCenter}km away
-          </Text>
-        </View>
+
+        {distanceFromCityCenter && (
+          <View style={styles.distanceBadge}>
+            <Text style={styles.distanceText}>
+              {distanceFromCityCenter}km away
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.badgeRow}>
@@ -74,7 +110,16 @@ function DiningCard({
       </View>
 
       {/* Row 4: Thumbnails */}
-      <ImageGrid images={media} />
+      <View style={styles.imageGridWrapper}>
+        <ImageGrid images={media} />
+        <Pressable style={styles.gridBookmarkBtn} onPress={handleBookmark}>
+          <Ionicons
+            name={bookmarked ? "bookmark" : "bookmark-outline"}
+            size={18}
+            color={Colors.rating}
+          />
+        </Pressable>
+      </View>
 
       {/* Row 5: Location + price */}
       <View style={styles.footer}>
@@ -101,6 +146,18 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     gap: 8,
   },
+  imageGridWrapper: {
+    position: "relative",
+  },
+  gridBookmarkBtn: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    borderRadius: 50,
+    padding: 6,
+    zIndex: 2,
+  },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -122,6 +179,16 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: Typography.family.regular,
     color: Colors.textMuted,
+  },
+  bookmarkBtn: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 20,
+    padding: 6,
+    zIndex: 1,
+    borderWidth: 1,
   },
   badgeRow: {
     flexDirection: "row",

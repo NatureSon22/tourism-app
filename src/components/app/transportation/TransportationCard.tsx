@@ -1,14 +1,20 @@
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import { useBookmarkTransportation } from "@/src/services/request/useTransportation";
 import { TRANSPORTATION } from "@/src/types/listingTypes";
-import formatCurrency from "@/src/utils/currency";
 import { formatListingAddress } from "@/src/utils/formatListingAddress";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  GestureResponderEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 type Props = TRANSPORTATION;
 export default function TransportationCard({
@@ -19,14 +25,41 @@ export default function TransportationCard({
   base_price,
   rating,
   reviews,
+  is_bookmarked,
 }: Props) {
   const router = useRouter();
+  const [bookmarked, setBookmarked] = useState(is_bookmarked ?? false);
+  const bookmarkMutation = useBookmarkTransportation(id);
+
   const location = addresses
     ? formatListingAddress(addresses, "short")
     : "Location not available";
 
   const handlePress = () => {
     router.push({ pathname: "/transportation/[id]", params: { id } });
+  };
+
+  const handleBookmark = (event: GestureResponderEvent) => {
+    event.stopPropagation?.();
+    if (!id || bookmarkMutation.isPending) return;
+
+    const nextBookmarked = !bookmarked;
+    const previousBookmarked = bookmarked;
+    setBookmarked(nextBookmarked);
+
+    bookmarkMutation.mutate(
+      { shouldBookmark: nextBookmarked },
+      {
+        onError: () => {
+          setBookmarked(previousBookmarked);
+        },
+        onSuccess: (data) => {
+          if (typeof data?.bookmarked === "boolean") {
+            setBookmarked(data.bookmarked);
+          }
+        },
+      },
+    );
   };
 
   return (
@@ -38,9 +71,13 @@ export default function TransportationCard({
           style={styles.image}
           contentFit="cover"
         />
-        <View style={styles.bookmarkBadge}>
-          <Ionicons name="bookmark-outline" size={20} color={Colors.rating} />
-        </View>
+        <Pressable style={styles.bookmarkBadge} onPress={handleBookmark}>
+          <Ionicons
+            name={bookmarked ? "bookmark" : "bookmark-outline"}
+            size={20}
+            color={Colors.rating}
+          />
+        </Pressable>
       </View>
 
       <VStack style={styles.content} gap={0}>
@@ -60,7 +97,7 @@ export default function TransportationCard({
         </HStack>
 
         {/* 5. Price */}
-        <Text style={styles.price}>{formatCurrency(base_price)}</Text>
+        {/* <Text style={styles.price}>{formatCurrency(base_price)}</Text> */}
       </VStack>
     </Pressable>
   );

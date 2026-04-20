@@ -50,7 +50,7 @@ export default function AccommodationList({ params }: AccommodationListProps) {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const listData = useMemo(
-    () => (isLoading ? createSkeletons(6) : listings),
+    () => (isLoading && listings.length === 0 ? createSkeletons(6) : listings),
     [isLoading, listings],
   );
 

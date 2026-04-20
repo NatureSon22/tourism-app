@@ -63,10 +63,10 @@ export type Category = {
 
 // FOR LISTING PREVIEW (e.g., listing cards)
 export type Listing = {
-  id: number;
+  id: string;
   title: string;
   thumbnail: string;
-  base_price: number;
+  base_price?: number;
   merchant_id: string;
   module_id: string;
   main_category_id: number;
@@ -88,7 +88,7 @@ export type ListingDetailed = {
   id: string;
   title: string;
   thumbnail: string;
-  base_price: number;
+  base_price?: number;
   module_id: string;
   main_category_id: string;
   status: string;

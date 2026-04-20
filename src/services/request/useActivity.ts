@@ -1,4 +1,5 @@
 import { QueryByIdParams, QueryParams } from "@/src/types/filter";
+import { showMutationError } from "@/src/utils/showMutationError";
 import {
   useInfiniteQuery,
   useMutation,
@@ -6,6 +7,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { activityService } from "../api/activityService";
+import { bookmarkService } from "../api/bookmarkService";
+import { bookmarkKeys } from "./useBookmark";
 
 export const activityKeys = {
   all: ["activities"] as const,
@@ -61,5 +64,40 @@ export const useBookActivity = () => {
       });
     },
     onError: () => {},
+  });
+};
+
+type ActivityBookmarkAction = {
+  shouldBookmark: boolean;
+};
+
+export const useBookmarkActivity = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { success: boolean; bookmarked?: boolean; message: string },
+    unknown,
+    ActivityBookmarkAction
+  >({
+    mutationFn: ({ shouldBookmark }) =>
+      shouldBookmark
+        ? bookmarkService.addBookmark({
+            bookmarkableId: id ?? "",
+            bookmarkableType: "Listing",
+          })
+        : bookmarkService.removeBookmark(id),
+    onError: (error) => {
+      showMutationError(error, "Failed to update bookmark");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: activityKeys.all,
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: bookmarkKeys.all,
+        exact: false,
+      });
+    },
   });
 };

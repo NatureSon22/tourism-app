@@ -15,7 +15,9 @@ export const useErrorToast = (
 
       Toast.show({
         type: "error",
+        position: "bottom",
         text1: "Error",
+        bottomOffset: 80,
         text2: errorMessage,
       });
     }

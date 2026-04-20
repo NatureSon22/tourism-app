@@ -3,13 +3,20 @@ import { Colors, Typography } from "@/src/constants/styles";
 import { useSafeNavigation } from "@/src/hooks/useSafeNavigation";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import { useBookmarkAccommodation } from "@/src/services/request/useAccomodation";
 import { ACCOMMODATION } from "@/src/types/listingTypes";
 import formatCurrency from "@/src/utils/currency";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
-import React, { memo } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { memo, useState } from "react";
+import {
+  GestureResponderEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 type Props = ACCOMMODATION;
 
@@ -22,11 +29,37 @@ function AccommodationCard({
   distanceFromCityCenter,
   rating,
   reviews,
+  is_bookmarked,
 }: Props) {
   const router = useSafeNavigation();
+  const [bookmarked, setBookmarked] = useState(is_bookmarked);
+  const bookmarkMutation = useBookmarkAccommodation(id);
 
   const handlePress = () => {
     router.push({ pathname: `/accommodation/[id]`, params: { id: id } });
+  };
+
+  const handleBookmark = (event: GestureResponderEvent) => {
+    event.stopPropagation?.();
+    if (!id || bookmarkMutation.isPending) return;
+
+    const nextBookmarked = !bookmarked;
+    const previousBookmarked = bookmarked;
+    setBookmarked(nextBookmarked);
+
+    bookmarkMutation.mutate(
+      { shouldBookmark: nextBookmarked },
+      {
+        onError: () => {
+          setBookmarked(previousBookmarked);
+        },
+        onSuccess: (data) => {
+          if (typeof data?.bookmarked === "boolean") {
+            setBookmarked(data.bookmarked);
+          }
+        },
+      },
+    );
   };
 
   return (
@@ -39,9 +72,13 @@ function AccommodationCard({
             style={styles.image}
           />
 
-          <View style={styles.bookmarkBtn}>
-            <Ionicons name="bookmark-outline" size={18} color={Colors.rating} />
-          </View>
+          <Pressable style={styles.bookmarkBtn} onPress={handleBookmark}>
+            <Ionicons
+              name={bookmarked ? "bookmark" : "bookmark-outline"}
+              size={18}
+              color={Colors.rating}
+            />
+          </Pressable>
         </View>
 
         <VStack style={styles.content} gap={5}>

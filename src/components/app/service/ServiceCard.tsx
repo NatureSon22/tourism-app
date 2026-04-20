@@ -1,12 +1,19 @@
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
+import { useBookmarkService } from "@/src/services/request/useService";
 import { SERVICE } from "@/src/types/listingTypes";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  GestureResponderEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 type ServiceCardProps = SERVICE;
 
@@ -16,11 +23,37 @@ export default function ServiceCard({
   title,
   addresses,
   distanceFromCityCenter,
+  is_bookmarked,
 }: ServiceCardProps) {
   const router = useRouter();
+  const [bookmarked, setBookmarked] = useState(is_bookmarked ?? false);
+  const bookmarkMutation = useBookmarkService(id);
 
   const handlePress = () => {
     router.push({ pathname: "/service/[id]", params: { id } });
+  };
+
+  const handleBookmark = (event: GestureResponderEvent) => {
+    event.stopPropagation?.();
+    if (!id || bookmarkMutation.isPending) return;
+
+    const nextBookmarked = !bookmarked;
+    const previousBookmarked = bookmarked;
+    setBookmarked(nextBookmarked);
+
+    bookmarkMutation.mutate(
+      { shouldBookmark: nextBookmarked },
+      {
+        onError: () => {
+          setBookmarked(previousBookmarked);
+        },
+        onSuccess: (data) => {
+          if (typeof data?.bookmarked === "boolean") {
+            setBookmarked(data.bookmarked);
+          }
+        },
+      },
+    );
   };
 
   const listingLocation = addresses?.formatted ?? "Location not available";
@@ -41,9 +74,13 @@ export default function ServiceCard({
             contentFit="cover"
             style={styles.image}
           />
-          <View style={styles.bookmarkIcon}>
-            <Ionicons name="bookmark-outline" size={20} color={Colors.rating} />
-          </View>
+          <Pressable style={styles.bookmarkIcon} onPress={handleBookmark}>
+            <Ionicons
+              name={bookmarked ? "bookmark" : "bookmark-outline"}
+              size={20}
+              color={Colors.rating}
+            />
+          </Pressable>
         </View>
 
         <VStack style={styles.content} gap={5}>

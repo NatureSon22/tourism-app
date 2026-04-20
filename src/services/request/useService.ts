@@ -1,6 +1,14 @@
 import { QueryByIdParams, QueryParams } from "@/src/types/filter";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { showMutationError } from "@/src/utils/showMutationError";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { bookmarkService } from "../api/bookmarkService";
 import { localserviceService } from "../api/localserviceService";
+import { bookmarkKeys } from "./useBookmark";
 
 export const serviceKeys = {
   all: ["services"] as const,
@@ -37,5 +45,40 @@ export const useLocalServiceDetails = (id: QueryByIdParams) => {
     queryFn: () => localserviceService.getLocalServiceDetails(id.id),
     enabled: !!id.id,
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+type ServiceBookmarkAction = {
+  shouldBookmark: boolean;
+};
+
+export const useBookmarkService = (id: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { success: boolean; bookmarked?: boolean; message: string },
+    unknown,
+    ServiceBookmarkAction
+  >({
+    mutationFn: ({ shouldBookmark }) =>
+      shouldBookmark
+        ? bookmarkService.addBookmark({
+            bookmarkableId: id ?? "",
+            bookmarkableType: "Listing",
+          })
+        : bookmarkService.removeBookmark(id),
+    onError: (error) => {
+      showMutationError(error, "Failed to update bookmark");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: serviceKeys.all,
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: bookmarkKeys.all,
+        exact: false,
+      });
+    },
   });
 };

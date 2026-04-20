@@ -1,4 +1,4 @@
-import { Typography } from "@/src/constants/styles";
+import { Colors, Typography } from "@/src/constants/styles";
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -89,6 +89,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     height: 180, // Fixed height for the grid
     gap: 5,
+    backgroundColor: Colors.background,
+    borderRadius: 10,
   },
   thumbWrapper: {
     flex: 1,

@@ -8,6 +8,7 @@ import useDebounce from "@/src/hooks/useDebounce";
 import { useSingleSheet } from "@/src/hooks/useSingleSheet";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
+import useAuthStore from "@/src/stores/authStore";
 import { useFilterStore } from "@/src/stores/filterStore";
 import type { QueryParams } from "@/src/types/filter";
 import { useLocalSearchParams } from "expo-router/build/hooks";
@@ -20,6 +21,8 @@ export default function ServicePage() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search);
   const { moduleId } = useLocalSearchParams<{ moduleId: string }>();
+  const auth = useAuthStore((state) => state.user);
+
   const { currentSort, currentOptions, updateOptions, resetCategory } =
     useFilterStore(
       useShallow((state) => ({
@@ -55,8 +58,17 @@ export default function ServicePage() {
       page: 1,
       limit: 5,
       moduleId: moduleId,
+      userId: auth?.id,
     }),
-    [currentOptions, debouncedSearch, moduleId],
+    [
+      auth?.id,
+      currentOptions.area,
+      currentOptions.sort,
+      currentOptions.type.subtypes,
+      currentOptions.type.type,
+      debouncedSearch,
+      moduleId,
+    ],
   );
 
   return (

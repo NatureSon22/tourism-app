@@ -34,8 +34,12 @@ export function buildQueryString(params: QueryParams): string {
   }
 
   if (params.moduleId) {
-    console.log("Appending moduleId to query string:", params.moduleId);
     query.append("moduleId", params.moduleId);
+  }
+
+  if (params.userId) {
+    console.log("Appending userId to query string:", params.userId);
+    query.append("userId", params.userId);
   }
 
   const appendArray = (key: string, value?: string | string[]) => {
