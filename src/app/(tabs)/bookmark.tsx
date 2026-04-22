@@ -2,35 +2,33 @@ import BookmarkForum from "@/src/components/app/bookmark/BookmarkForum";
 import BookmarkListing from "@/src/components/app/bookmark/BookmarkListing";
 import ProtectedAccessNotice from "@/src/components/app/ProtectedAccessNotice";
 import CustomPopupMenu from "@/src/components/ui/CustomPopupMenu";
-import FORUMS_OPTIONS, {
-  ForumsOptionValue,
-} from "@/src/constants/forumsFilter";
-import LISTING_OPTIONS, {
-  type ListingOptionValue,
-} from "@/src/constants/listingsFilter";
+import FORUMS_OPTIONS from "@/src/constants/forumsFilter";
+import LISTING_OPTIONS from "@/src/constants/listingsFilter";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import SafeArea from "@/src/layouts/SafeArea";
 import Screen from "@/src/layouts/Screen";
 import useAuthStore from "@/src/stores/authStore";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { EvilIcons, FontAwesome5 } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Bookmark() {
   const [section, setSection] = useState<"listing" | "forum">("listing");
-  const [selectedFilter, setSelectedFilter] = useState<
-    ListingOptionValue | ForumsOptionValue
-  >("accommodation");
+  const [selectedFilter, setSelectedFilter] = useState<string>("");
   const user = useAuthStore((state) => state.user);
 
   const handleSetSection = (newSection: "listing" | "forum") => {
     setSection(newSection);
-    setSelectedFilter(
-      newSection === "listing"
-        ? "accommodation"
-        : "tourist_spots_and_attractions",
-    );
+    // setSelectedFilter(
+    //   newSection === "listing"
+    //     ? "accommodation"
+    //     : "tourist_spots_and_attractions",
+    // );
+  };
+
+  const handleResetFilter = () => {
+    setSelectedFilter("");
   };
 
   if (!user) {
@@ -99,31 +97,41 @@ export default function Bookmark() {
           </HStack>
 
           {/* filter */}
-          <CustomPopupMenu
-            options={section === "listing" ? LISTING_OPTIONS : FORUMS_OPTIONS}
-            selectedValue={selectedFilter}
-            onSelect={setSelectedFilter}
-            menuStyle={[
-              styles.menuBase,
-              { width: section === "listing" ? 220 : 255 },
-            ]}
-            triggerButton={
-              <View style={styles.filterButton}>
-                <HStack gap={4}>
-                  <FontAwesome5
-                    name="filter"
-                    size={11}
-                    color={Colors.textOnPrimary}
-                  />
-                  <Text style={styles.filterText}>Filter</Text>
-                </HStack>
-              </View>
-            }
-          />
+          <HStack>
+            <CustomPopupMenu
+              options={section === "listing" ? LISTING_OPTIONS : FORUMS_OPTIONS}
+              selectedValue={selectedFilter}
+              onSelect={setSelectedFilter}
+              menuStyle={[
+                styles.menuBase,
+                { width: section === "listing" ? 220 : 255 },
+              ]}
+              triggerButton={
+                <View style={styles.filterButton}>
+                  <HStack gap={4}>
+                    <FontAwesome5
+                      name="filter"
+                      size={11}
+                      color={Colors.textOnPrimary}
+                    />
+                    <Text style={styles.filterText}>Filter</Text>
+                  </HStack>
+                </View>
+              }
+            />
+
+            <Pressable onPress={handleResetFilter} hitSlop={10}>
+              <EvilIcons name="redo" size={24} color="black" />
+            </Pressable>
+          </HStack>
         </HStack>
 
         {/* body */}
-        {section === "listing" ? <BookmarkListing /> : <BookmarkForum />}
+        {section === "listing" ? (
+          <BookmarkListing moduleId={selectedFilter} />
+        ) : (
+          <BookmarkForum />
+        )}
       </Screen>
     </SafeArea>
   );

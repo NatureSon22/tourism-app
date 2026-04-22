@@ -1,11 +1,21 @@
 import CustomButton from "@/src/components/ui/CustomButton";
 import { CustomRadioGroup } from "@/src/components/ui/CustomRadioGroup";
 import DEACTIVATION_REASONS from "@/src/constants/deactivateReason";
+import useAuthStore from "@/src/stores/authStore";
 import React, { useMemo, useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import ModalConfirmation from "../components/app/account/ModalConfirmation";
 import { Typography } from "../constants/styles";
 import VStack from "../layouts/VStack";
+import { useDeactivateAccount } from "../services/request/useDeactivateAccount";
 
 const reasonOptions = DEACTIVATION_REASONS.map((reason) => ({
   label: reason,
@@ -17,6 +27,8 @@ export default function DeactivateForm() {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [otherReasonText, setOtherReasonText] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const deactivateMutation = useDeactivateAccount();
 
   const isOtherSelected = selectedReason === "Other (please specify)";
 
@@ -26,11 +38,17 @@ export default function DeactivateForm() {
   }, [selectedReason, isOtherSelected, otherReasonText]);
 
   const handleConfirm = () => {
+    if (!user || !selectedReason) return;
+
     const payload = {
-      reason: selectedReason,
-      otherReason: isOtherSelected ? otherReasonText.trim() : undefined,
+      username: user.userName,
+      email: user.email,
+      reason: isOtherSelected
+        ? `${selectedReason}: ${otherReasonText.trim()}`
+        : selectedReason,
     };
-    console.log("Deactivate confirmed", payload);
+
+    deactivateMutation.mutate(payload);
     setIsModalOpen(false);
     setSelectedReason(null);
     setOtherReasonText("");
@@ -94,9 +112,13 @@ export default function DeactivateForm() {
           <CustomButton
             title="Deactivate"
             onPress={() => setIsModalOpen(true)}
-            disabled={!isDeactivateEnabled}
-            style={[styles.button, !isDeactivateEnabled && styles.disabledButton]}
+            disabled={!isDeactivateEnabled || deactivateMutation.isPending}
+            style={[
+              styles.button,
+              !isDeactivateEnabled && styles.disabledButton,
+            ]}
             textStyle={styles.buttonStyle}
+            isLoading={deactivateMutation.isPending}
           />
         </View>
       </ScrollView>
@@ -117,7 +139,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,           // lets the scroll area grow to fill the screen…
+    flexGrow: 1, // lets the scroll area grow to fill the screen…
     justifyContent: "space-between", // …then pushes footer to the bottom
     padding: 20,
     gap: 16,

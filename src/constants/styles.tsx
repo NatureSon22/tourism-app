@@ -25,6 +25,7 @@ export const Colors = {
   background: "#F9FAFB",
   surface: "#FFFFFF",
   overlay: "#F4F4F4",
+  surfaceVariant: "#717377",
 
   // Neutral / Borders / Dividers
   border: "#D8D8D9", // Light gray for bordersf

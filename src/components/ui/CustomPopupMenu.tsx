@@ -18,6 +18,7 @@ export type PopupOption = {
   label: string;
   value: any;
   Icon: React.ReactNode;
+  moduleId?: string;
 };
 
 type CustomPopupMenuProps = {
@@ -62,7 +63,10 @@ export default function CustomPopupMenu({
                   key={option.label}
                   label={option.label}
                   Icon={option.Icon}
-                  isSelected={selectedValue === option.value}
+                  isSelected={
+                    selectedValue === option.value ||
+                    selectedValue === option.moduleId
+                  }
                   onPress={() => handleSelect(option.value)}
                 />
               ))}

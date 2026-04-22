@@ -1,6 +1,7 @@
 import HeaderSheet from "@/src/components/app/HeaderSheet";
 import ControllerTextInput from "@/src/components/ui/ControllerTextInput";
 import CustomButton from "@/src/components/ui/CustomButton";
+import { useAccount } from "@/src/services/request/useAccount";
 import useAuthStore from "@/src/stores/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
@@ -21,6 +22,7 @@ type UsernameFormValues = z.infer<typeof UsernameSchema>;
 
 export default function EditUsernameSheet(props: SheetProps) {
   const user = useAuthStore((state) => state.user);
+  const accountMutation = useAccount();
 
   const {
     control,
@@ -39,8 +41,10 @@ export default function EditUsernameSheet(props: SheetProps) {
   };
 
   const onSubmit = (data: UsernameFormValues) => {
-    console.log("Username updated", data);
-    handleCloseSheet();
+    accountMutation.mutate(
+      { userName: data.userName },
+      { onSuccess: handleCloseSheet },
+    );
   };
 
   return (
@@ -78,7 +82,7 @@ export default function EditUsernameSheet(props: SheetProps) {
           <CustomButton
             title="Save"
             onPress={handleSubmit(onSubmit)}
-            disabled={!isValid}
+            disabled={!isValid || accountMutation.isPending}
           />
         </ScrollView>
       </View>

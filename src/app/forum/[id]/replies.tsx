@@ -2,6 +2,7 @@ import ReplyComposer from "@/src/components/app/forum/ReplyComposer";
 import ReplyItem from "@/src/components/app/forum/ReplyItem";
 import HeaderWithBack from "@/src/components/app/HeaderWithBack";
 import { Colors, Typography } from "@/src/constants/styles";
+import { useRequireAuth } from "@/src/hooks/useRequireAuth";
 import SafeArea from "@/src/layouts/SafeArea";
 import {
   useCommentForum,
@@ -69,6 +70,7 @@ export default function ForumReplies() {
   const typingDebounceTimer = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
+  const { requireAuth } = useRequireAuth();
 
   useEffect(() => {
     if (forum) {
@@ -200,14 +202,21 @@ export default function ForumReplies() {
     return map;
   }, [replyChildrenMap]);
 
-  const handleToggleLike = useCallback((replyId: string) => {
-    setLikedReplies((prev) => ({
-      ...prev,
-      [replyId]: !prev[replyId],
-    }));
-  }, []);
+  const handleToggleLike = useCallback(
+    (replyId: string) => {
+      if (!requireAuth("Sign in to like replies")) return;
+
+      setLikedReplies((prev) => ({
+        ...prev,
+        [replyId]: !prev[replyId],
+      }));
+    },
+    [requireAuth],
+  );
 
   const handleReplyPress = useCallback((reply: ThreadReply) => {
+    if (!requireAuth("Sign in to reply")) return;
+
     setActiveReplyParentId(reply.id);
     setActiveReplyTarget(reply.author?.name ?? "user");
   }, []);

@@ -41,6 +41,8 @@ export const useBookmarks = (
       const pagination = lastPage.pagination;
       if (!pagination) return undefined;
 
+      console.log("Bookmark API pagination:", pagination);
+
       const { currentPage, limit, total } = pagination;
       const itemsFetched = currentPage * limit;
       return itemsFetched < total ? currentPage + 1 : undefined;

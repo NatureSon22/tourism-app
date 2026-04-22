@@ -62,12 +62,15 @@ const authService = {
     password: string,
     rememberMe: boolean,
   ): Promise<LoginResponse> => {
-    const { data } = await api.post<LoginResponse>("/auth/login", {
+    const res = await api.post<LoginResponse>("/auth/login", {
       email,
       password,
       rememberMe,
     });
-    return data;
+
+    console.log("Login API Response:", res.data);
+
+    return res.data;
   },
 
   register: async (userData: SignUpFormData): Promise<SignUpResponse> => {

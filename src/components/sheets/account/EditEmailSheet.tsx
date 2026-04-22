@@ -1,6 +1,7 @@
 import HeaderSheet from "@/src/components/app/HeaderSheet";
 import ControllerTextInput from "@/src/components/ui/ControllerTextInput";
 import CustomButton from "@/src/components/ui/CustomButton";
+import { useAccount } from "@/src/services/request/useAccount";
 import useAuthStore from "@/src/stores/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
@@ -21,6 +22,7 @@ type EmailFormValues = z.infer<typeof EmailSchema>;
 
 export default function EditEmailSheet(props: SheetProps) {
   const user = useAuthStore((state) => state.user);
+  const accountMutation = useAccount();
 
   const {
     control,
@@ -39,8 +41,10 @@ export default function EditEmailSheet(props: SheetProps) {
   };
 
   const onSubmit = (data: EmailFormValues) => {
-    console.log("Email updated", data);
-    handleCloseSheet();
+    accountMutation.mutate(
+      { email: data.email },
+      { onSuccess: handleCloseSheet },
+    );
   };
 
   return (
@@ -75,7 +79,7 @@ export default function EditEmailSheet(props: SheetProps) {
           <CustomButton
             title="Save"
             onPress={handleSubmit(onSubmit)}
-            disabled={!isValid}
+            disabled={!isValid || accountMutation.isPending}
           />
         </ScrollView>
       </View>

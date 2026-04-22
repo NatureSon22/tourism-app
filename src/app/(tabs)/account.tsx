@@ -15,6 +15,14 @@ export default function Account() {
   if (!user) {
     return (
       <SafeArea edges={["top"]}>
+        <Tabs.Screen
+          options={{
+            sceneStyle: {
+              backgroundColor: "white",
+            },
+          }}
+        />
+
         <ProtectedAccessNotice
           headline="Account access requires sign-in"
           description="Sign in to manage your profile and preferences."

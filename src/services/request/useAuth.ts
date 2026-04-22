@@ -32,9 +32,18 @@ export const useLogin = (rememberMe: boolean) => {
       const { user, accessToken, refreshToken } = response.data;
       const token = { accessToken, refreshToken };
 
-      useAuthStore
-        .getState()
-        .login({ id: user.id, email: user.email }, token, rememberMe);
+      useAuthStore.getState().login(
+        {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          userName: user.userName,
+          profilePictureUrl: user.profilePictureUrl,
+        },
+        token,
+        rememberMe,
+      );
 
       // 2. Store tokens (Use Keychain for production, AsyncStorage for dev)
       await AsyncStorage.setItem("@access_token", accessToken);

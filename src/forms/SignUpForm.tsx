@@ -98,13 +98,27 @@ export default function SignUpForm() {
   const onSubmit = (data: SignUpFormData) => {
     mutate(data, {
       onSuccess: async (res) => {
-        const { user, accessToken, refreshToken } = res.data;
-        console.log("Registration successful:", res.data);
+        const authData = res?.data ?? res;
+        if (!authData) {
+          throw new Error("Registration response missing auth data.");
+        }
+
+        const { user, accessToken, refreshToken } = authData;
+        console.log("Registration successful:", authData);
+
         await login(
-          { id: user.id, email: user.email },
+          {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            userName: user.userName,
+            profilePictureUrl: user.profilePictureUrl,
+          },
           { accessToken, refreshToken },
           false,
         );
+        
         router.replace("/onboarding");
       },
       onError: (error: any) => {

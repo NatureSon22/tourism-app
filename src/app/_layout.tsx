@@ -123,6 +123,7 @@ function AppNavigator({
     <Stack screenOptions={{ headerShown: false }}>
       {/* Tabs are available to everyone */}
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="forum-replies/[id]" />
 
       {/* Auth flow is available for unauthenticated users only */}
       <Stack.Protected guard={!user}>

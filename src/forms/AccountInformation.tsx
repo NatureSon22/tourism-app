@@ -39,7 +39,9 @@ export default function AccountInformation() {
               <Image
                 source={
                   user.profilePictureUrl
-                    ? { uri: user.profilePictureUrl }
+                    ? {
+                        uri: `${process.env.EXPO_BASE_URL}${user.profilePictureUrl}`,
+                      }
                     : USER_PROFILE_PLACEHOLDER
                 }
                 style={styles.profileImage}
@@ -96,13 +98,13 @@ export default function AccountInformation() {
         <VStack gap={8}>
           <HStack justifyContent="space-between" style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>Email</Text>
-            <CustomButton
+            {/* <CustomButton
               title="Edit"
               variant="outlined"
               onPress={() => handleOpenSheet("edit-email-sheet")}
               style={styles.editBtn}
               textStyle={styles.editBtnText}
-            />
+            /> */}
           </HStack>
           <Text style={styles.fieldValue}>{user.email}</Text>
         </VStack>
@@ -156,7 +158,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
   },
-
   fieldLabel: {
     fontSize: 12,
     fontFamily: Typography.family.medium,

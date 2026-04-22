@@ -21,6 +21,15 @@ const toastConfig: ToastConfig = {
       </Text>
     </View>
   ),
+
+  info: ({ text1 }) => (
+    <View style={[styles.container, styles.info]}>
+      <Feather name="info" size={15} color="#fff" />
+      <Text style={styles.text} numberOfLines={1}>
+        {text1}
+      </Text>
+    </View>
+  ),
 };
 
 const styles = StyleSheet.create({
@@ -31,7 +40,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: 100,
-    maxWidth: "80%",
+    maxWidth: "90%",
     alignSelf: "center",
   },
   error: {
@@ -41,6 +50,10 @@ const styles = StyleSheet.create({
   success: {
     backgroundColor: "#22C55E",
     shadowColor: "#22C55E",
+  },
+  info: {
+    backgroundColor: "#535552",
+    shadowColor: "white",
   },
   text: {
     fontSize: 13,

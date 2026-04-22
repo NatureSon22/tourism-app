@@ -1,3 +1,4 @@
+import { useRequireAuth } from "@/src/hooks/useRequireAuth";
 import {
   useBookmarkForum,
   useDislikeForum,
@@ -48,6 +49,7 @@ export default function ForumCard({
   const [bookmarked, setBookmarked] = useState(hasBookmarked);
   const [joined, setJoined] = useState(false);
   const router = useRouter();
+  const { requireAuth } = useRequireAuth();
 
   const likeMutation = useLikeForum();
   const dislikeMutation = useDislikeForum();
@@ -56,6 +58,8 @@ export default function ForumCard({
   const joinMutation = useJoinForum();
 
   const handleLike = () => {
+    if (!requireAuth("Sign in to like")) return;
+
     if (!id || likeMutation.isPending || liked) return;
 
     const wasDisliked = disliked;
@@ -84,6 +88,8 @@ export default function ForumCard({
   };
 
   const handleDislike = () => {
+    if (!requireAuth("Sign in dislike")) return;
+
     if (!id || dislikeMutation.isPending || disliked) return;
 
     const wasLiked = liked;
@@ -113,10 +119,11 @@ export default function ForumCard({
 
   const handleComment = () => {
     if (!id) return;
-    router.push({ pathname: `/forum/[id]/replies`, params: { id } });
+    router.push({ pathname: "/forum-replies/[id]", params: { id } });
   };
 
   const handleBookmark = () => {
+    if (!requireAuth("Sign in to bookmark")) return;
     if (!id || bookmarkMutation.isPending) return;
 
     const wasBookmarked = bookmarked;
@@ -156,7 +163,7 @@ export default function ForumCard({
   };
 
   const handleJoin = () => {
-    console.log("Join forum with id:", id);
+    if (!requireAuth("Sign in to join")) return;
     if (!id || joinMutation.isPending || joined) return;
 
     setJoined(true);

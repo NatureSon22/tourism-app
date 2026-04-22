@@ -7,8 +7,10 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import PagerView from "react-native-pager-view";
+import AppVideoPlayer from "./AppVideoPlayer";
 
 type ThreadReply = ForumComment & {
   depth: number;
@@ -32,7 +34,9 @@ function ReplyItem({
   onReplyPress,
   onToggleReplies,
 }: ReplyItemProps) {
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const likedCount = reply.stats.likes + (isLiked ? 1 : 0);
+  const mediaItems = reply.media ?? [];
 
   return (
     <View style={[styles.card, { marginLeft: reply.depth * 14 }]}>
@@ -50,6 +54,51 @@ function ReplyItem({
       </View>
 
       <Text style={styles.content}>{reply.content}</Text>
+
+      {mediaItems.length > 0 ? (
+        <View style={styles.mediaCard}>
+          <PagerView
+            style={styles.mediaPager}
+            onPageSelected={(event) =>
+              setCurrentMediaIndex(event.nativeEvent.position)
+            }
+            initialPage={0}
+          >
+            {mediaItems.map((item, index) => (
+              <View key={item.id} style={styles.mediaPage}>
+                {item.type === "video" ? (
+                  <AppVideoPlayer
+                    url={item.url ?? item.src ?? ""}
+                    isActive={currentMediaIndex === index}
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: item.url ?? item.src ?? "" }}
+                    style={styles.mediaImage}
+                    contentFit="cover"
+                  />
+                )}
+              </View>
+            ))}
+          </PagerView>
+
+          {mediaItems.length > 1 ? (
+            <View style={styles.mediaPagination}>
+              {mediaItems.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    index === currentMediaIndex
+                      ? styles.activeDot
+                      : styles.inactiveDot,
+                  ]}
+                />
+              ))}
+            </View>
+          ) : null}
+        </View>
+      ) : null}
 
       {reply.replyTo ? (
         <Text style={styles.replyTo}>Replying to @{reply.replyTo}</Text>
@@ -149,6 +198,47 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 10,
     fontFamily: Typography.family.regular,
+  },
+  mediaCard: {
+    width: "100%",
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: Colors.border,
+    marginBottom: 10,
+  },
+  mediaPager: {
+    width: "100%",
+    aspectRatio: 16 / 9,
+  },
+  mediaPage: {
+    width: "100%",
+    height: "100%",
+  },
+  mediaImage: {
+    width: "100%",
+    height: "100%",
+  },
+  mediaPagination: {
+    position: "absolute",
+    bottom: 10,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  activeDot: {
+    backgroundColor: Colors.surface,
+    width: 14,
+  },
+  inactiveDot: {
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
   },
   replyTo: {
     color: Colors.primary,

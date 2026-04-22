@@ -1,6 +1,7 @@
 import ControllerTextInput from "@/src/components/ui/ControllerTextInput";
 import CustomButton from "@/src/components/ui/CustomButton";
 import VStack from "@/src/layouts/VStack";
+import { useChangePassword } from "@/src/services/request/useChangePassword";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
@@ -23,23 +24,21 @@ const ChangePasswordSchema = z
 type ChangePasswordFormData = z.infer<typeof ChangePasswordSchema>;
 
 const initialValues: ChangePasswordFormData = {
-  currentPassword: "********",
+  currentPassword: "",
   newPassword: "",
   confirmPassword: "",
 };
 
 export default function ChangePasswordForm() {
-  const [editMode, setEditMode] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const changePasswordMutation = useChangePassword();
 
   const {
     control,
     handleSubmit,
-    setValue,
     reset,
-    watch,
     formState: { errors, isValid },
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(ChangePasswordSchema),
@@ -47,29 +46,21 @@ export default function ChangePasswordForm() {
     defaultValues: initialValues,
   });
 
-  const allValues = watch();
-
-  const handleEdit = () => {
-    setEditMode(true);
-
-    if (allValues.currentPassword === "********") {
-      setValue("currentPassword", "", { shouldValidate: false });
-      setValue("newPassword", "", { shouldValidate: false });
-      setValue("confirmPassword", "", { shouldValidate: false });
-      reset({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    }
-  };
-
   const onSubmit = (data: ChangePasswordFormData) => {
-    console.log("current password", data.currentPassword);
-    console.log("new password", data.newPassword);
-    console.log("confirm password", data.confirmPassword);
-
-    setEditMode(false);
-    setShowCurrent(false);
-    setShowNew(false);
-    setShowConfirm(false);
-    reset(initialValues);
+    changePasswordMutation.mutate(
+      {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      },
+      {
+        onSuccess: () => {
+          setShowCurrent(false);
+          setShowNew(false);
+          setShowConfirm(false);
+          reset(initialValues);
+        },
+      },
+    );
   };
 
   return (
@@ -89,7 +80,7 @@ export default function ChangePasswordForm() {
           placeholder="Current Password"
           isRequired
           secureTextEntry={!showCurrent}
-          editable={editMode}
+          editable={true}
           suffixIcon={
             <Ionicons
               name={showCurrent ? "eye-off" : "eye"}
@@ -112,7 +103,7 @@ export default function ChangePasswordForm() {
           placeholder="New Password"
           isRequired
           secureTextEntry={!showNew}
-          editable={editMode}
+          editable={true}
           suffixIcon={
             <Ionicons
               name={showNew ? "eye-off" : "eye"}
@@ -135,7 +126,7 @@ export default function ChangePasswordForm() {
           placeholder="Confirm Password"
           isRequired
           secureTextEntry={!showConfirm}
-          editable={editMode}
+          editable={true}
           suffixIcon={
             <Ionicons
               name={showConfirm ? "eye-off" : "eye"}
@@ -154,7 +145,7 @@ export default function ChangePasswordForm() {
         <CustomButton
           title="Save"
           onPress={handleSubmit(onSubmit)}
-          disabled={!isValid}
+          disabled={!isValid || changePasswordMutation.isPending}
           style={styles.saveButton}
           textStyle={styles.buttonStyle}
         />

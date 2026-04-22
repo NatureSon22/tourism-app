@@ -1,6 +1,7 @@
 import api from "@/src/config/axios";
 import { Bookmark } from "@/src/types/bookmark";
 import { QueryParams } from "@/src/types/filter";
+import { buildQueryString } from "@/src/utils/buildQueryString";
 
 export type BookmarkResponse = {
   bookmarks: Bookmark[];
@@ -24,15 +25,17 @@ export const bookmarkService = {
   },
 
   fetchBookmarksPage: async (
-    params?: QueryParams,
+    params: QueryParams,
   ): Promise<BookmarkResponse> => {
-    const { data } = await api.get<any>("/consumer/bookmarks", {
-      params,
-    });
+    const qs = buildQueryString(params);
+
+    const { data } = await api.get<any>(`/consumer/bookmarks?${qs.toString()}`);
 
     if (Array.isArray(data)) {
       return { bookmarks: data };
     }
+
+    // console.log("Bookmark API response:", data.data.bookmarks[0]);
 
     return {
       bookmarks: data?.data?.bookmarks ?? data.bookmarks ?? [],

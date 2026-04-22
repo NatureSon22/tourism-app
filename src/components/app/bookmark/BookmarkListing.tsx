@@ -18,7 +18,13 @@ import NoResourceFound from "../NoResourceFound";
 import ReloadPage from "../ReloadPage";
 import BookmarkListingCard from "./BookmarkListingCard";
 
-export default function BookmarkListing() {
+// TODO: Check threshold for onEndReached and test pagination with different page sizes
+
+type Props = {
+  moduleId?: string;
+};
+
+export default function BookmarkListing({ moduleId }: Props) {
   const { isConnected } = useNetInfo();
   const {
     data,
@@ -29,7 +35,7 @@ export default function BookmarkListing() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useBookmarks({ page: 1 });
+  } = useBookmarks({ page: 1, moduleId });
 
   const bookmarks = useMemo(
     () => data?.pages.flatMap((page) => page.bookmarks) ?? [],
@@ -139,7 +145,6 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 12,
-    padding: 16,
   },
   imageWrapper: {
     width: 95,

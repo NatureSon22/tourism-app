@@ -43,7 +43,7 @@ export default function SignInForm() {
     formState: { errors, isValid },
   } = useForm<SignInFormData>({
     resolver: zodResolver(SignInSchema),
-    defaultValues: { email: "consumer1@gmail.com", password: "cons1" },
+    defaultValues: { email: "consumer1@gmail.com", password: "ConsumerPassword123!" },
     mode: "onTouched",
   });
 

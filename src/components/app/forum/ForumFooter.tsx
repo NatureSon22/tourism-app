@@ -53,77 +53,79 @@ export const ForumFooter = ({
   isCommenting,
   isBookmarking,
   isSharing,
-}: ForumFooterProps) => (
-  <View style={footerStyles.container}>
-    <HStack gap={6}>
-      <ActionButton
-        icon={
-          <AntDesign
-            name="like"
-            size={13}
-            color={liked ? Colors.primary : Colors.textMuted}
-          />
-        }
-        title={likes.toString()}
-        onPress={onLike}
-        isLoading={isLiking}
-        active={liked}
-      />
+}: ForumFooterProps) => {
+  return (
+    <View style={footerStyles.container}>
+      <HStack gap={6}>
+        <ActionButton
+          icon={
+            <AntDesign
+              name="like"
+              size={13}
+              color={liked ? Colors.primary : Colors.textMuted}
+            />
+          }
+          title={likes.toString()}
+          onPress={onLike}
+          isLoading={isLiking}
+          active={liked}
+        />
 
-      <ActionButton
-        icon={
-          <AntDesign
-            name="like"
-            size={13}
-            style={{ transform: [{ scaleY: -1 }] }}
-            color={disliked ? Colors.primary : Colors.textMuted}
-          />
-        }
-        onPress={onDislike}
-        isLoading={isDisliking}
-        active={disliked}
-      />
+        <ActionButton
+          icon={
+            <AntDesign
+              name="like"
+              size={13}
+              style={{ transform: [{ scaleY: -1 }] }}
+              color={disliked ? Colors.primary : Colors.textMuted}
+            />
+          }
+          onPress={onDislike}
+          isLoading={isDisliking}
+          active={disliked}
+        />
 
-      <ActionButton
-        icon={<AntDesign name="comment" size={13} color={Colors.textMuted} />}
-        title={commentCount.toString()}
-        onPress={onComment}
-        isLoading={isCommenting}
-      />
-    </HStack>
+        <ActionButton
+          icon={<AntDesign name="comment" size={13} color={Colors.textMuted} />}
+          title={commentCount.toString()}
+          onPress={onComment}
+          isLoading={isCommenting}
+        />
+      </HStack>
 
-    <HStack gap={4}>
-      <Ionicons name="eye-outline" size={15} color={Colors.text} />
-      <Text style={footerStyles.statsText}>{viewers}</Text>
-    </HStack>
+      <HStack gap={4}>
+        <Ionicons name="eye-outline" size={15} color={Colors.text} />
+        <Text style={footerStyles.statsText}>{viewers}</Text>
+      </HStack>
 
-    <HStack gap={2}>
-      <ActionButton
-        icon={
-          <MaterialIcons
-            name={bookmarked ? "bookmark" : "bookmark-border"}
-            size={15}
-            color={bookmarked ? Colors.primary : Colors.textMuted}
-          />
-        }
-        onPress={onBookmark}
-        isLoading={isBookmarking}
-        active={bookmarked}
-      />
-      <ActionButton
-        icon={
-          <Feather
-            name="share-2"
-            size={14}
-            color={isSharing ? Colors.primary : Colors.textMuted}
-          />
-        }
-        onPress={onShare}
-        isLoading={isSharing}
-      />
-    </HStack>
-  </View>
-);
+      <HStack gap={2}>
+        <ActionButton
+          icon={
+            <MaterialIcons
+              name={bookmarked ? "bookmark" : "bookmark-border"}
+              size={15}
+              color={bookmarked ? Colors.primary : Colors.textMuted}
+            />
+          }
+          onPress={onBookmark}
+          isLoading={isBookmarking}
+          active={bookmarked}
+        />
+        <ActionButton
+          icon={
+            <Feather
+              name="share-2"
+              size={14}
+              color={isSharing ? Colors.primary : Colors.textMuted}
+            />
+          }
+          onPress={onShare}
+          isLoading={isSharing}
+        />
+      </HStack>
+    </View>
+  );
+};
 
 type ActionButtonProps = {
   icon: React.ReactNode;

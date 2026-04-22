@@ -1,10 +1,13 @@
+import { BOOKMARK_DETAILS_PATH } from "@/src/constants/bookmarkRoutes";
 import { Colors, Typography } from "@/src/constants/styles";
 import HStack from "@/src/layouts/HStack";
 import VStack from "@/src/layouts/VStack";
 import { useDeleteBookmark } from "@/src/services/request/useBookmark";
 import { Bookmark } from "@/src/types/bookmark";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { formatListingAddress } from "@/src/utils/formatListingAddress";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React, { memo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -18,11 +21,28 @@ function BookmarkListingCard({
   bookmarkable_type,
   module_id,
   title,
+  moduleName,
+  address,
 }: Props) {
   const deleteBookmarkMutation = useDeleteBookmark();
+  const router = useRouter();
+
+  const handlePress = () => {
+    const path =
+      BOOKMARK_DETAILS_PATH[moduleName as keyof typeof BOOKMARK_DETAILS_PATH];
+
+    if (path) {
+      router.push({
+        pathname: path,
+        params: { id: String(bookmarkable_id) },
+      });
+    } else {
+      console.warn(`No path defined for module: ${moduleName}`);
+    }
+  };
 
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={handlePress}>
       <HStack alignItems="center" gap={18}>
         <View style={styles.imageWrapper}>
           <Image
@@ -35,7 +55,7 @@ function BookmarkListingCard({
             onPress={() => deleteBookmarkMutation.mutate(id)}
             disabled={deleteBookmarkMutation.isPending}
           >
-            <Ionicons name="bookmark" size={18} color={Colors.rating} />
+            <FontAwesome6 name="trash" size={16} color={Colors.iconSecondary} />
           </Pressable>
         </View>
 
@@ -43,9 +63,19 @@ function BookmarkListingCard({
           <Text style={styles.name} numberOfLines={1}>
             {title}
           </Text>
+
+          <Text style={styles.location} numberOfLines={1}>
+            {formatListingAddress(address)}
+          </Text>
+
+          <View style={styles.moduleWrapper}>
+            <Text style={styles.module} numberOfLines={1}>
+              {moduleName}
+            </Text>
+          </View>
         </VStack>
       </HStack>
-    </View>
+    </Pressable>
   );
 }
 
@@ -80,8 +110,15 @@ const styles = StyleSheet.create({
     fontFamily: Typography.family.regular,
     color: Colors.textMuted,
   },
-  reviewText: {
-    fontSize: 11,
+  moduleWrapper: {
+    backgroundColor: "#dadee6",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    alignSelf: "flex-start",
+    borderRadius: 20,
+  },
+  module: {
+    fontSize: 8,
     fontFamily: Typography.family.regular,
     color: Colors.textMuted,
   },
