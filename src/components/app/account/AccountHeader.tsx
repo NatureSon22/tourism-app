@@ -18,7 +18,7 @@ export default function AccountHeader() {
             source={
               user?.profilePictureUrl
                 ? {
-                    uri: user.profilePictureUrl,
+                    uri: `${process.env.EXPO_PUBLIC_BACKEND_URL_WITHOUT_API}/${user.profilePictureUrl}`,
                   }
                 : USER_PROFILE_PLACEHOLDER
             }

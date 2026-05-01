@@ -84,6 +84,7 @@ const CustomButton = ({
                 styles.baseText,
                 isSolid ? styles.solidText : styles.outlinedText,
                 textStyle,
+                disabled && styles.disabledText,
               ]}
             >
               {title}

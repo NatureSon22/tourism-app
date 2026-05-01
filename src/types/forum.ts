@@ -69,7 +69,7 @@ export type ForumPost = {
   listing_id?: string;
   type?: string;
   category?: string;
-  place?: string;
+  place: string;
 
   author: Author;
   location?: Location;

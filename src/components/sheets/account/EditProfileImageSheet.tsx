@@ -112,6 +112,7 @@ export default function EditProfileImageSheet(props: SheetProps) {
             onPress={handleTakePhoto}
             variant="outlined"
             style={styles.optionButton}
+            disabled={profilePictureMutation.isPending}
             textStyle={styles.buttonTextStyle}
           />
           <CustomButton
@@ -119,6 +120,7 @@ export default function EditProfileImageSheet(props: SheetProps) {
             onPress={handlePickFromLibrary}
             variant="outlined"
             style={styles.optionButton}
+            disabled={profilePictureMutation.isPending}
             textStyle={styles.buttonTextStyle}
           />
         </View>
@@ -137,6 +139,7 @@ export default function EditProfileImageSheet(props: SheetProps) {
             variant="outlined"
             onPress={handleClose}
             style={styles.actionButton}
+            disabled={profilePictureMutation.isPending}
             textStyle={styles.buttonTextStyle}
           />
         </View>

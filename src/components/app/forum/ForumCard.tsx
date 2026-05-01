@@ -22,6 +22,7 @@ export default function ForumCard({
   id,
   author,
   category,
+  community,
   place,
   content,
   media,
@@ -186,6 +187,7 @@ export default function ForumCard({
       <ForumHeader
         author={author}
         category={displayCategory}
+        community={community}
         place={displayPlace}
         joined={joined}
         isJoining={joinMutation.isPending}

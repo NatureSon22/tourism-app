@@ -9,6 +9,8 @@ import { SheetManager } from "react-native-actions-sheet";
 import { USER_PROFILE_PLACEHOLDER } from "../constants/assetsPath";
 import { Typography } from "../constants/styles";
 
+// TODO: The image is not showing after update, need to check the path and how to refresh the image component
+
 export default function AccountInformation() {
   const user = useAuthStore((state) => state.user);
 
@@ -28,6 +30,9 @@ export default function AccountInformation() {
     });
   };
 
+  console.log("Profile Picture URL:", `${process.env.EXPO_PUBLIC_BACKEND_URL_WITHOUT_API}/${user.profilePictureUrl}`);
+  //
+
   return (
     <View style={styles.container}>
       <View style={styles.photoSection}>
@@ -40,7 +45,7 @@ export default function AccountInformation() {
                 source={
                   user.profilePictureUrl
                     ? {
-                        uri: `${process.env.EXPO_BASE_URL}${user.profilePictureUrl}`,
+                        uri: `${process.env.EXPO_PUBLIC_BACKEND_URL_WITHOUT_API}/${user.profilePictureUrl}`,
                       }
                     : USER_PROFILE_PLACEHOLDER
                 }

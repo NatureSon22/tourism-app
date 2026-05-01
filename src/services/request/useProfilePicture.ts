@@ -11,6 +11,8 @@ export const useProfilePicture = () => {
     onSuccess: (response) => {
       const updatedPath = response.data?.path;
 
+      console.log("Profile picture updated successfully:", response.data);
+
       if (updatedPath) {
         useAuthStore.getState().updateUser({
           profilePictureUrl: updatedPath,
@@ -31,9 +33,10 @@ export const useProfilePicture = () => {
       Toast.show({
         type: "error",
         position: "bottom",
-        text1: "Upload Failed",
-        text2: message,
+        text1: "Upload failed",
         bottomOffset: 80,
+        
+
       });
     },
   });

@@ -11,6 +11,10 @@ import CustomButton from "../../ui/CustomButton";
 type ForumHeaderProps = {
   author: Author;
   category: string;
+  community: {
+    id: string;
+    title: string;
+  };
   place: string;
   joined?: boolean;
   isJoining?: boolean;
@@ -20,6 +24,7 @@ type ForumHeaderProps = {
 export const ForumHeader = ({
   author,
   category,
+  community,
   place,
   joined,
   isJoining,
@@ -40,7 +45,7 @@ export const ForumHeader = ({
           </Text>
           <MaterialIcons name="keyboard-arrow-right" size={13} color="black" />
           <Text numberOfLines={1} style={headerStyles.categoryText}>
-            {category}
+            {community.title}
           </Text>
         </HStack>
         <Text style={headerStyles.placeText}>{place}</Text>
